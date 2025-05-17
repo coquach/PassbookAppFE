@@ -56,7 +56,6 @@ class LoginViewModel @Inject constructor(
                 viewModelScope.launch {
                     tokenManager.saveToken(it.accessToken, it.refreshToken)
                     _navigationEvent.send(LoginNavigationEvent.NavigateToHome)
-
                 }
             },
             onFailure = {

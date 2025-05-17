@@ -13,6 +13,7 @@ import com.google.gson.GsonBuilder
 import com.se104.passbookapp.BuildConfig
 import com.se104.passbookapp.data.remote.api.AuthApiService
 import com.se104.passbookapp.data.remote.api.MainApiService
+import com.se104.passbookapp.data.remote.api.SavingApiService
 import com.se104.passbookapp.data.remote.interceptor.AuthAuthenticator
 import com.se104.passbookapp.data.remote.interceptor.AuthInterceptor
 
@@ -90,11 +91,12 @@ object AppModule  {
 
     @Provides
     @Singleton
-    fun provideMainAPIService(okHttpClient: OkHttpClient, retrofit: Retrofit.Builder): MainApiService =
+    fun provideSavingAPIService(okHttpClient: OkHttpClient, retrofit: Retrofit.Builder): SavingApiService =
         retrofit
             .client(okHttpClient)
             .build()
-            .create(MainApiService::class.java)
+            .create(SavingApiService::class.java)
+
 
 
     @Provides

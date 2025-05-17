@@ -21,3 +21,12 @@ object Setting: NavRoute
 
 @Serializable
 object Welcome: NavRoute
+
+@Serializable
+object SavingType: NavRoute
+
+@Serializable
+data class AddSavingType(val savingType: SavingType): NavRoute
+
+@Serializable
+data class UpdateSavingType(val savingType: SavingType): NavRoute

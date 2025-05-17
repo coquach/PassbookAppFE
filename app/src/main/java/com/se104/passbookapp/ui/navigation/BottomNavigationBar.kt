@@ -1,6 +1,5 @@
 package com.se104.passbookapp.ui.navigation
 
-import android.util.Log
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -12,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Savings
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 
@@ -20,9 +20,12 @@ import androidx.compose.material3.MaterialTheme
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+
 
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,7 +51,7 @@ import com.exyte.animatednavbar.utils.noRippleClickable
 sealed class BottomNavItem(val route: NavRoute, val icon: ImageVector) {
     data object Home: BottomNavItem(com.se104.passbookapp.ui.navigation.Home, Icons.Default.Home)
     data object Setting: BottomNavItem(com.se104.passbookapp.ui.navigation.Setting, Icons.Default.Settings)
-
+    data object SavingType: BottomNavItem(com.se104.passbookapp.ui.navigation.SavingType, Icons.Default.Savings)
 }
 
 @Composable
@@ -57,8 +60,13 @@ fun BottomNavigationBar(navController: NavHostController, navItems: List<BottomN
     val currentDestination = navBackStackEntry?.destination
     val currentRoute = currentDestination?.route
 
-    val selectedIndex = navItems.indexOfFirst { it.route::class.qualifiedName == currentRoute }
-        .takeIf { it >= 0 } ?: 0
+    var selectedIndex by rememberSaveable { mutableStateOf(0) }
+
+   
+    val matchedIndex = navItems.indexOfFirst { it.route::class.qualifiedName == currentRoute }
+    if (matchedIndex >= 0 && matchedIndex != selectedIndex) {
+        selectedIndex = matchedIndex
+    }
 
 
     AnimatedNavigationBar(

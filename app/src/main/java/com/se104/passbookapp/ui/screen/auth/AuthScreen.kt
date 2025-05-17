@@ -24,10 +24,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -60,6 +62,7 @@ import com.se104.passbookapp.R
 import com.se104.passbookapp.ui.navigation.Login
 import com.se104.passbookapp.ui.navigation.SignUp
 import com.se104.passbookapp.ui.screen.components.AppButton
+import com.se104.passbookapp.ui.screen.components.ComboBoxSample
 import com.se104.passbookapp.ui.theme.PassBookAppTheme
 import com.se104.passbookapp.ui.theme.button
 
@@ -111,8 +114,25 @@ fun AuthScreen(
                 text = stringResource(id = R.string.app_name),
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold,
-style = MaterialTheme.typography.headlineMedium,
+                style = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier
+            )
+            ComboBoxSample(
+                modifier = Modifier.fillMaxWidth(),
+                textPlaceholder = "Test",
+                title = "",
+                selected = null,
+                onPositionSelected = {},
+                options = listOf("Test1", "Test2"),
+                enabled = true
+            )
+            OutlinedTextField(
+                value = "",
+                onValueChange = {},
+                label = { Text(text = "Email") },
+                modifier = Modifier.fillMaxWidth().height(30.dp)
+
+
             )
 
             AppButton(
@@ -132,7 +152,7 @@ style = MaterialTheme.typography.headlineMedium,
                 backgroundColor = MaterialTheme.colorScheme.onPrimary,
                 textColor = MaterialTheme.colorScheme.button,
 
-            )
+                )
 
 
         }
