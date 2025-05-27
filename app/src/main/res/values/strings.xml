@@ -28,4 +28,6 @@
     <string name="confirm_password">Xác nhận mật khẩu</string>
     <string name="log_in_desc">Chào mừng bạn quay trở lại! Rất vui được gặp lại bạn!</string>
     <string name="sign_up_desc">Xin chào! Đăng ký để bắt đầu nào!</string>
+    <string name="citizen_id">CCCD</string>
+    <string name="address">Địa chỉ</string>
 </resources>

@@ -9,13 +9,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.se104.passbookapp.data.datastore.WelcomeRepository
 import com.se104.passbookapp.di.TokenManager
-import com.se104.passbookapp.ui.navigation.Auth
-import com.se104.passbookapp.ui.navigation.Home
-import com.se104.passbookapp.ui.navigation.NavRoute
+import com.se104.passbookapp.navigation.Auth
+import com.se104.passbookapp.navigation.Home
+import com.se104.passbookapp.navigation.NavRoute
+import com.se104.passbookapp.navigation.SavingType
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -60,7 +59,7 @@ class SplashViewModel @Inject constructor(
             tokenManager.getAccessToken().collect { accessToken ->
                 if (accessToken.isNullOrEmpty()) {
 
-                    _startDestination.value = Auth
+                    _startDestination.value = SavingType
                 } else {
 
                     _startDestination.value = Home

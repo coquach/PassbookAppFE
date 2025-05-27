@@ -4,12 +4,10 @@ import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.view.View
 import android.view.animation.OvershootInterpolator
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -23,10 +21,10 @@ import androidx.compose.ui.Modifier
 import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
-import com.se104.passbookapp.ui.app_nav.AppNavGraph
-import com.se104.passbookapp.ui.navigation.Auth
-import com.se104.passbookapp.ui.navigation.BottomNavItem
-import com.se104.passbookapp.ui.navigation.BottomNavigationBar
+import com.se104.passbookapp.navigation.AppNavGraph
+import com.se104.passbookapp.navigation.Auth
+import com.se104.passbookapp.navigation.BottomNavItem
+import com.se104.passbookapp.navigation.BottomNavigationBar
 import com.se104.passbookapp.ui.theme.PassBookAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -77,8 +75,11 @@ class MainActivity : BasePassbookAppActivity() {
             PassBookAppTheme(darkTheme = isDarkMode) {
                 val navItems = listOf(
                     BottomNavItem.Home,
+                    BottomNavItem.SavingType,
+                    BottomNavItem.SavingTicket,
+                    BottomNavItem.Transaction,
                     BottomNavItem.Setting,
-                    BottomNavItem.SavingType
+
                 )
                 val navController = rememberNavController()
                 val shouldShowBottomNav = remember {

@@ -1,7 +1,5 @@
-package com.example.foodapp.utils.json_format
+package com.se104.passbookapp.utils.json_format
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor

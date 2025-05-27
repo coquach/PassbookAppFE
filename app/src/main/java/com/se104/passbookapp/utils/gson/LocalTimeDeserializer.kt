@@ -1,7 +1,8 @@
-package com.example.foodapp.utils.gson
+package com.se104.passbookapp.utils.gson
 
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
+import com.google.gson.JsonElement
 import java.lang.reflect.Type
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -9,7 +10,7 @@ import java.time.format.DateTimeFormatter
 class LocalTimeDeserializer : JsonDeserializer<LocalTime> {
 
     override fun deserialize(
-        json: com.google.gson.JsonElement?,
+        json: JsonElement?,
         typeOfT: Type?,
         context: JsonDeserializationContext?
     ): LocalTime? {

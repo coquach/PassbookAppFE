@@ -1,7 +1,6 @@
-package com.example.foodapp.utils.json_format
+package com.se104.passbookapp.utils.json_format
 
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Serializer
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
