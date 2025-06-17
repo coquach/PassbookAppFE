@@ -28,6 +28,7 @@ import androidx.navigation.compose.rememberNavController
 import com.se104.passbookapp.navigation.AppNavGraph
 import com.se104.passbookapp.navigation.Auth
 import com.se104.passbookapp.navigation.BottomBarWithCutoutFAB
+import com.se104.passbookapp.navigation.BottomNavItem
 import com.se104.passbookapp.navigation.SelectSavingType
 import com.se104.passbookapp.navigation.bottomBarAnimatedScroll
 import com.se104.passbookapp.navigation.bottomBarVisibility
@@ -86,6 +87,12 @@ class MainActivity : BasePassbookAppActivity() {
                             LoadingAnimation()
                         }
                     } else {
+                        val navItems = listOf(
+                            BottomNavItem.Home,
+                            BottomNavItem.SavingTicket,
+                            BottomNavItem.Transaction,
+                            BottomNavItem.Setting,
+                        )
                         val bottomBarOffsetHeightPx = remember { mutableFloatStateOf(0f) }
                         Scaffold(
                             modifier = Modifier.bottomBarAnimatedScroll(
@@ -105,8 +112,8 @@ class MainActivity : BasePassbookAppActivity() {
                                                 x = 0,
                                                 y = -bottomBarOffsetHeightPx.floatValue.roundToInt()
                                             )
-                                        }
-
+                                        },
+                                    navItems = navItems,
                                 )
                             }
                         ) { paddingValues ->

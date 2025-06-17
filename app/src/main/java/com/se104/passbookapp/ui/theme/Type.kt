@@ -26,6 +26,7 @@ val displayFontFamily = FontFamily(
     Font(
         googleFont = GoogleFont("Montserrat"),
         fontProvider = provider,
+        weight = FontWeight.Bold
     )
 )
 val baseline = Typography()

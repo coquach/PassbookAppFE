@@ -41,9 +41,9 @@ fun <T> CardSample(
             .clickable {
                 onClick(item)
             },
-        shape = RoundedCornerShape(12.dp),
+        shape = MaterialTheme.shapes.medium,
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
@@ -64,7 +64,8 @@ fun DetailsRow(
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Icon(
             imageVector = icon,
@@ -85,6 +86,7 @@ fun DetailsRow(
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.SemiBold,
             color = color,
+            textAlign = androidx.compose.ui.text.style.TextAlign.End
         )
     }
 }

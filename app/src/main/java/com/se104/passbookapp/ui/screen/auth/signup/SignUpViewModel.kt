@@ -195,11 +195,7 @@ class SignUpViewModel @Inject constructor(
                 }
             }
 
-            SignUp.Action.OnBack -> {
-                viewModelScope.launch {
-                    _event.send(SignUp.Event.OnBack)
-                }
-            }
+
         }
     }
 }
@@ -231,7 +227,7 @@ object SignUp {
         data object NavigateToAuth : Event
         data object ShowError : Event
         data object ShowSuccessDialog : Event
-        data object OnBack : Event
+
     }
 
     sealed interface Action {
@@ -246,7 +242,7 @@ object SignUp {
         data object LoginClicked : Action
         data object SignUpClicked : Action
         data object AuthClicked : Action
-        data object OnBack : Action
+
 
     }
 }

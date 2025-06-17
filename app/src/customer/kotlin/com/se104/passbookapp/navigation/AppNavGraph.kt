@@ -17,6 +17,7 @@ import com.se104.passbookapp.ui.screen.saving_ticket.create.SelectSavingTypeScre
 import com.se104.passbookapp.ui.screen.setting.SettingScreen
 import com.se104.passbookapp.ui.screen.success.ActionSuccessScreen
 import com.se104.passbookapp.ui.screen.transaction.TransactionScreen
+import com.se104.passbookapp.ui.screen.welcome.WelcomeScreen
 import kotlin.reflect.typeOf
 
 
@@ -33,6 +34,10 @@ fun AppNavGraph(
             startDestination = startDestination,
             modifier = Modifier.padding(paddingValues),
         ) {
+
+            composable<Welcome> {
+                WelcomeScreen(navController)
+            }
             composable<Auth> {
                 AuthScreen(navController)
             }

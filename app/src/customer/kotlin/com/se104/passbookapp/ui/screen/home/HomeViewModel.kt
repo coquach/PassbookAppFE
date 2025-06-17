@@ -1,5 +1,6 @@
 package com.se104.passbookapp.ui.screen.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.se104.passbookapp.data.dto.ApiResponse
@@ -14,6 +15,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
+import java.time.LocalTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -27,6 +29,20 @@ class HomeViewModel @Inject constructor(
 
     private val _event = Channel<HomeState.Event>()
     val event = _event.receiveAsFlow()
+
+    fun getGreetingTitle(): String {
+        val hour = LocalTime.now().hour
+
+        val greeting = when (hour) {
+            in 6..11 -> "buổi sáng"
+            in 12..17 -> "buổi chiều"
+            in 18..23 -> "buổi tối"
+            else -> "buổi khuya"
+        }
+
+        return "Chào $greeting"
+    }
+
 
     private fun deposit(userId: Long, amount: BigDecimal) {
         viewModelScope.launch {

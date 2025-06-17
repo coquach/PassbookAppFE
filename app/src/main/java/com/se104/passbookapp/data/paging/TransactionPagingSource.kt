@@ -28,6 +28,8 @@ class TransactionPagingSource @Inject constructor(
                     transactionType = filter.transactionType,
                     startDate = StringUtils.formatLocalDate(filter.startDate),
                     endDate = StringUtils.formatLocalDate(filter.endDate),
+                    order = filter.order,
+                    sortBy = filter.sortBy,
                 )
             } else {
                 transactionApiService.getTransactions(
@@ -37,6 +39,8 @@ class TransactionPagingSource @Inject constructor(
                     transactionType = filter.transactionType,
                     startDate = StringUtils.formatLocalDate(filter.startDate),
                     endDate = StringUtils.formatLocalDate(filter.endDate),
+                    order = filter.order,
+                    sortBy = filter.sortBy,
                 )
             }
         }

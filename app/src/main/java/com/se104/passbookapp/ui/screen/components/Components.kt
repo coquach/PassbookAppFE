@@ -1,8 +1,6 @@
 package com.se104.passbookapp.ui.screen.components
 
 
-
-
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -136,7 +134,7 @@ fun FoodAppTextField(
         cursorColor = MaterialTheme.colorScheme.primary,
 
 
-    ),
+        ),
 ) {
 
     Column(
@@ -162,7 +160,7 @@ fun FoodAppTextField(
             modifier = Modifier.fillMaxWidth(),
             enabled,
             readOnly,
-            textStyle ,
+            textStyle,
             null,
             placeholder,
             leadingIcon,
@@ -184,6 +182,7 @@ fun FoodAppTextField(
         )
     }
 }
+
 //if (errorText != null) {
 //    Text(
 //        text = errorText,
@@ -300,7 +299,6 @@ fun FoodItemCounter(
 }
 
 
-
 @Composable
 fun BoxScope.ItemCount(count: Int) {
     Box(
@@ -343,12 +341,11 @@ fun Loading() {
 }
 
 
-
 @Composable
 fun Retry(
     message: String,
     onClicked: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier,
@@ -394,7 +391,8 @@ fun PassbookAppDialog(
             if (showConfirmButton) {
                 AppButton(
                     onClick = { onConfirm?.invoke(); onDismiss() },
-                    text = confirmText
+                    text = confirmText,
+                    shape = MaterialTheme.shapes.extraLarge,
                 )
             }
         },
@@ -402,9 +400,10 @@ fun PassbookAppDialog(
             AppButton(
                 onClick = onDismiss,
                 text = dismissText,
-                backgroundColor = MaterialTheme.colorScheme.outline
+                backgroundColor = MaterialTheme.colorScheme.outline,
+                shape = MaterialTheme.shapes.extraLarge,
 
-            )
+                )
         }
     )
 }
@@ -425,12 +424,13 @@ fun ThemeSwitcher(
         animationSpec = animationSpec
     )
 
-    Box(modifier = Modifier
-        .width(size * 1.625f)
-        .height(size)
-        .clip(shape = parentShape)
-        .clickable { onClick() }
-        .background(MaterialTheme.colorScheme.secondaryContainer)
+    Box(
+        modifier = Modifier
+            .width(size * 1.625f)
+            .height(size)
+            .clip(shape = parentShape)
+            .clickable { onClick() }
+            .background(MaterialTheme.colorScheme.secondaryContainer)
     ) {
         Box(
             modifier = Modifier
@@ -553,7 +553,6 @@ fun <T : Any> LazyListScope.gridItems(
 }
 
 
-
 @Composable
 fun DetailsTextRow(
     modifier: Modifier = Modifier,
@@ -612,7 +611,9 @@ fun <T : Any> LazyPagingSample(
             // 2. Đang loading lần đầu
             loadState.refresh is LoadState.Loading -> {
                 LoadingAnimation(
-                    modifier = modifier.fillMaxSize().align(Alignment.Center),
+                    modifier = modifier
+                        .fillMaxSize()
+                        .align(Alignment.Center),
                 )
             }
 
@@ -621,7 +622,9 @@ fun <T : Any> LazyPagingSample(
                 Nothing(
                     text = textNothing,
                     icon = iconNothing,
-                    modifier = Modifier.fillMaxSize().align(Alignment.Center)
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .align(Alignment.Center)
                 )
             }
 
@@ -670,14 +673,15 @@ fun <T : Any> LazyPagingSample(
         }
     }
 }
+
 @Composable
 fun NoteInput(
     modifier: Modifier = Modifier.height(200.dp),
     note: String,
     onNoteChange: (String) -> Unit,
-    maxLines: Int = 5 ,
+    maxLines: Int = 5,
     textHolder: String,
-    readOnly: Boolean = false
+    readOnly: Boolean = false,
 ) {
     OutlinedTextField(
         value = note,
@@ -703,12 +707,13 @@ fun NoteInput(
         maxLines = maxLines
     )
 }
+
 @Composable
 fun ExpandableText(
     modifier: Modifier = Modifier,
     text: String,
     minimizedMaxLines: Int,
-    style: TextStyle
+    style: TextStyle,
 ) {
     var expanded by remember { mutableStateOf(false) }
     var hasVisualOverflow by remember { mutableStateOf(false) }
@@ -731,7 +736,10 @@ fun ExpandableText(
                         .height(lineHeightDp)
                         .background(
                             brush = Brush.horizontalGradient(
-                                colors = listOf(Color.Transparent, MaterialTheme.colorScheme.background)
+                                colors = listOf(
+                                    Color.Transparent,
+                                    MaterialTheme.colorScheme.background
+                                )
                             )
                         )
                 )
@@ -819,7 +827,7 @@ fun CustomBottomSheet(
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
     content: @Composable ColumnScope.() -> Unit,
 
-) {
+    ) {
     val scope = rememberCoroutineScope()
 
     ModalBottomSheet(
@@ -863,7 +871,7 @@ fun CustomBottomSheet(
                 backgroundColor = MaterialTheme.colorScheme.outline,
 
 
-            )
+                )
         }
     }
 }

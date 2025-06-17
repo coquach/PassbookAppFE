@@ -105,11 +105,7 @@ private val _uiState = MutableStateFlow(Login.UiState())
                     _event.send(Login.Event.NavigateForgot)
                 }
             }
-            is Login.Action.OnBack -> {
-                viewModelScope.launch {
-                    _event.send(Login.Event.OnBack)
-                }
-            }
+
 
         }
     }
@@ -134,7 +130,7 @@ object Login{
         data object NavigateSignUp : Event
         data object NavigateHome : Event
         data object NavigateForgot : Event
-        data object OnBack: Event
+
 
     }
     sealed interface Action {
@@ -143,7 +139,7 @@ object Login{
         data object OnForgotClick : Action
         data class OnEmailChanged(val email: String) : Action
         data class OnPasswordChanged(val password: String) : Action
-        data object OnBack: Action
+
 
     }
 }

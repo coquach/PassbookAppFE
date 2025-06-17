@@ -9,8 +9,6 @@ data class SavingTicketFilter (
     val userId: Long?=null,
     val savingTypeId: Long?=null,
     val isActive: Boolean=true,
-    val minAmount: BigDecimal?=null,
-    val maxAmount: BigDecimal?=null,
     val startDate: LocalDate?=null,
     val endDate: LocalDate?=null,
 

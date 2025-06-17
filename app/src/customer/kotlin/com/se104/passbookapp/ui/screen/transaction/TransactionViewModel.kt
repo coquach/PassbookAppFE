@@ -28,7 +28,7 @@ class TransactionViewModel @Inject constructor(
         TransactionState.UiState(
             filter = TransactionFilter(
                 startDate = LocalDate.now().minusDays(1),
-                endDate = LocalDate.now()
+                endDate = LocalDate.now(),
             )
         )
     )

@@ -5,7 +5,7 @@ import android.view.Display
 enum class TransactionType(val display: String) {
     DEPOSIT("Nạp tiền"),
     WITHDRAWAL("Rút tiền"),
-    SAVE("Tiết kiệm"),
+    SAVE("Nạp tiết kiệm"),
     WITHDRAW_SAVING("Rút tiết kiệm");
 
     fun getDisplayName(): String = display

@@ -351,7 +351,7 @@ fun SavingTypeListSection(
                 ) {
                     SavingTypeCard(
                         savingType = savingType,
-                        onClick = { onClick(savingType) }
+                        onClick = {  }
                     )
                 }
 
@@ -383,7 +383,7 @@ fun SavingDetails(savingType: SavingType) {
             imageVector = Icons.Default.Savings,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(100.dp)
+            modifier = Modifier.size(80.dp)
         )
         Column(
             modifier = Modifier.fillMaxWidth(),

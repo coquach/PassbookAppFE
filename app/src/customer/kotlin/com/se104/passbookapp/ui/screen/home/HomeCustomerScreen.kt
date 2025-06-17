@@ -96,7 +96,7 @@ fun HomeCustomerScreen(
 
             ) {
                 Text(
-                    text = "Chào buổi sáng",
+                    text = viewModel.getGreetingTitle(),
                     style = MaterialTheme.typography.bodyLarge,
 
                     )

@@ -70,7 +70,7 @@ fun LoginScreen(
                 }
                 Login.Event.NavigateSignUp -> {
                     navController.navigate(SignUp) {
-                        popUpTo(Auth) {
+                        popUpTo(navController.graph.startDestinationId) {
                             inclusive = true
                         }
                     }
@@ -84,9 +84,7 @@ fun LoginScreen(
                     showErrorSheet = true
                 }
 
-                Login.Event.OnBack -> {
-                    navController.popBackStack()
-                }
+
             }
         }
     }
@@ -102,13 +100,7 @@ fun LoginScreen(
 
 
     ) {
-        IconCustomButton(
-            modifier = Modifier.align(Alignment.Start),
-            onClick = {
-               viewModel.onAction(Login.Action.OnBack)
-            },
-            icon = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-            )
+
 
         Text(
             text = stringResource(id = R.string.log_in_desc),

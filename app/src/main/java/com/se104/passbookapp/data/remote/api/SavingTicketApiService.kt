@@ -28,19 +28,7 @@ interface SavingTicketApiService {
         @Query("endDate") endDate: String?= null,
     ): Response<PageResponse<SavingTicket>>
 
-    @GET("$PR/customer")
-    suspend fun getSavingTicketsForCustomer(
-        @Query("page") page: Int = 0,
-        @Query("size") size: Int = 10,
-        @Query("sortBy") sortBy: String = "id",
-        @Query("order") order: String = "asc",
-        @Query("userId") userId: Long?= null,
-        @Query("savingTypeId") savingTypeId: Long?= null,
-        @Query("isActive") isActive: Boolean?= null,
-        @Query("startDate") startDate: String?= null,
-        @Query("endDate") endDate: String?= null,
 
-    ) : Response<PageResponse<SavingTicket>>
 
     @POST(PR)
     suspend fun createSavingTicket(@Body request: SavingTicketRequest): Response<SavingTicket>

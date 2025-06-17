@@ -8,6 +8,9 @@ interface NavRoute
 
 
 @Serializable
+object Welcome: NavRoute
+
+@Serializable
 object Auth : NavRoute
 
 @Serializable
@@ -22,8 +25,7 @@ object Home : NavRoute
 @Serializable
 object Setting: NavRoute
 
-@Serializable
-object Welcome: NavRoute
+
 
 @Serializable
 object SavingType: NavRoute

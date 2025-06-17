@@ -72,7 +72,7 @@ fun SignUpScreen(
             when (event) {
                 is SignUp.Event.NavigateToLogin -> {
                     navController.navigate(Login) {
-                        popUpTo(Auth) {
+                        popUpTo(navController.graph.startDestinationId) {
                             inclusive = true
                         }
                     }
@@ -95,9 +95,7 @@ fun SignUpScreen(
                         launchSingleTop = true
                     }
                 }
-                SignUp.Event.OnBack -> {
-                    navController.popBackStack()
-                }
+
             }
 
         }
@@ -119,13 +117,7 @@ fun SignUpScreen(
 
 
         ) {
-            IconCustomButton(
-                modifier = Modifier.align(Alignment.Start),
-                onClick = {
-                   viewModel.onAction(SignUp.Action.OnBack)
-                },
-                icon= Icons.AutoMirrored.Filled.KeyboardArrowLeft
-            )
+
             Text(
                 text = stringResource(id = R.string.sign_up_desc),
                 fontSize = 32.sp,

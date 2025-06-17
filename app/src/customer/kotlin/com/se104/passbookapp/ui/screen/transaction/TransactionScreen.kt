@@ -1,5 +1,6 @@
 package com.se104.passbookapp.ui.screen.transaction
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -81,6 +82,7 @@ fun TransactionScreen(
                     else -> viewModel.onAction(TransactionState.Action.OnChangeSortBy("id"))
 
                 }
+                Log.d("Transaction filter", "filterChange: ${uiState.filter}")
             },
             filters = listOf("Id","Giao dịch", "Thời gian"),
             filterSelected =
@@ -137,7 +139,7 @@ fun TransactionDetails(transaction: Transaction, isStaff: Boolean = false) {
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.medium)
             .background(
-                color = MaterialTheme.colorScheme.onBackground,
+                color = MaterialTheme.colorScheme.background,
                 shape = MaterialTheme.shapes.medium
             )
             .padding(16.dp),
@@ -149,7 +151,7 @@ fun TransactionDetails(transaction: Transaction, isStaff: Boolean = false) {
             imageVector = Icons.Default.CurrencyExchange,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(100.dp)
+            modifier = Modifier.size(50.dp)
         )
         Column(
             modifier = Modifier.fillMaxWidth(),
@@ -178,7 +180,7 @@ fun TransactionDetails(transaction: Transaction, isStaff: Boolean = false) {
                 )
             }
 
-            if (transaction.transactionType == TransactionType.WITHDRAWAL.name || transaction.transactionType == TransactionType.WITHDRAW_SAVING.name) {
+            if (transaction.transactionType == TransactionType.WITHDRAWAL.name || transaction.transactionType == TransactionType.SAVE.name) {
                 DetailsRow(
                     title = "Giao dịch",
                     icon = Icons.Default.MonetizationOn,

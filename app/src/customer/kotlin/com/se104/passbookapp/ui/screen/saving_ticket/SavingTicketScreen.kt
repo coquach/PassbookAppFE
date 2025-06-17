@@ -193,7 +193,7 @@ fun SavingTicketScreen(
                     .fillMaxWidth()
                     .height(700.dp)
                     .background(
-                        MaterialTheme.colorScheme.inversePrimary,
+                        MaterialTheme.colorScheme.secondaryContainer,
                         shape = RoundedCornerShape(16.dp)
                     )
                     .padding(30.dp)
@@ -201,8 +201,8 @@ fun SavingTicketScreen(
             ) {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.Start,
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
 
 
@@ -210,14 +210,15 @@ fun SavingTicketScreen(
                         text = "Chi tiết phiếu",
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.ExtraBold,
-                        style = MaterialTheme.typography.titleLarge
+                        style = MaterialTheme.typography.titleLarge,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                     )
                     Column(
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .fillMaxWidth().weight(1f)
                             .verticalScroll(rememberScrollState()),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         DetailsRow(
                             icon = Icons.Default.Tag,
@@ -266,14 +267,16 @@ fun SavingTicketScreen(
                         DetailsRow(
                             title = "Ngày đáo hạn",
                             icon = Icons.Default.Timer,
-                            text = StringUtils.formatDateTime(uiState.savingTicketSelected!!.maturityDate)!!
+                            text = StringUtils.formatLocalDate(uiState.savingTicketSelected!!.maturityDate)!!
                         )
                         Text(
                             text = "Danh sách lần rút",
                             style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.primary
+                            color = MaterialTheme.colorScheme.primary,
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Start,
+                            modifier = Modifier.fillMaxWidth()
                         )
-                        WithDrawTicketList(withDrawTickets = uiState.savingTicketSelected!!.withdrawalTickets)
+                        WithDrawTicketList(withDrawTickets = uiState.savingTicketSelected!!.withdrawalTickets, modifier = Modifier.fillMaxWidth().weight(1f))
 
 
                     }
@@ -288,7 +291,8 @@ fun SavingTicketScreen(
                             onClick = {
                                 showDialogDetails = false
                             },
-                            enable = !uiState.isLoading
+                            enable = !uiState.isLoading,
+                            backgroundColor = MaterialTheme.colorScheme.outline,
 
                         )
                         AppButton(
@@ -296,7 +300,7 @@ fun SavingTicketScreen(
                             onClick = {
                                 viewModel.onAction(SavingTicketState.Action.Withdraw)
                             },
-                            enable = uiState.savingTicketSelected!!.balance == BigDecimal.ZERO && !uiState.isLoading
+                            enable = uiState.savingTicketSelected!!.balance != BigDecimal.ZERO && !uiState.isLoading
                         )
                     }
                 }
@@ -318,7 +322,7 @@ fun SavingTicketScreen(
 
                 ) {
                     PassbookTextField(
-                        value = StringUtils.formatCurrency(uiState.request.withdrawalAmount),
+                        value = uiState.request.withdrawalAmount.toPlainString(),
                         onValueChange = {
                             viewModel.onAction(SavingTicketState.Action.OnChangeAmountWithdrawal(it.toBigDecimalOrNull()))
                         },
@@ -345,7 +349,7 @@ fun SavingTicketScreen(
                         )
                     AppButton(
                         onClick = {
-                            viewModel.onAction(SavingTicketState.Action.Withdraw)
+                            viewModel.onAction(SavingTicketState.Action.OnCreateWithdrawalTicket)
                         },
                         modifier = Modifier
                             .fillMaxWidth(),
@@ -370,6 +374,7 @@ fun SavingTicketScreen(
 
 @Composable
 fun WithDrawTicketList(
+    modifier: Modifier = Modifier,
     withDrawTickets: List<WithdrawalTicket>,
 ) {
     if (withDrawTickets.isEmpty()) {
@@ -377,12 +382,11 @@ fun WithDrawTicketList(
         Nothing(
             text = "Không có lần rút nào",
             icon = Icons.Default.MoneyOff,
-            modifier = Modifier.fillMaxSize()
+            modifier = modifier
         )
     } else {
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize(),
+            modifier = modifier,
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
 
@@ -406,7 +410,7 @@ fun WithDrawTicketCard(withDrawTicket: WithdrawalTicket) {
         modifier = Modifier
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.medium)
-            .background(MaterialTheme.colorScheme.outline)
+            .background(MaterialTheme.colorScheme.background)
             .padding(12.dp),
     ) {
         Column(
@@ -453,7 +457,7 @@ fun SavingTicketDetails(savingTicket: SavingTicket, isStaff: Boolean = false) {
             imageVector = Icons.Default.CreditCard,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(100.dp)
+            modifier = Modifier.size(80.dp)
         )
         Column(
             modifier = Modifier.fillMaxWidth(),

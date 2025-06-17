@@ -128,13 +128,13 @@ fun SavingTypeSection(
             )
             .padding(16.dp)
             .clickable {
-                onItemClick()
+                onItemClick
             }
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
 
         ) {
             Icon(
@@ -145,7 +145,7 @@ fun SavingTypeSection(
             )
             Column(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
                 horizontalAlignment = Alignment.Start
             ) {
                 Text(
@@ -157,7 +157,7 @@ fun SavingTypeSection(
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     DetailsRow(
                         text = "${savingType.duration} tháng",

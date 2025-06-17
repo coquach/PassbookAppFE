@@ -31,7 +31,11 @@ class SavingTicketViewModel @Inject constructor(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(
         SavingTicketState.UiState(
-            filter = SavingTicketFilter(startDate = LocalDate.now().minusDays(1), endDate = LocalDate.now())
+            filter = SavingTicketFilter(
+                startDate = LocalDate.now().minusDays(1),
+                endDate = LocalDate.now(),
+                userId = 3
+            )
         )
     )
     val uiState: StateFlow<SavingTicketState.UiState> get() = _uiState.asStateFlow()
@@ -40,7 +44,8 @@ class SavingTicketViewModel @Inject constructor(
     val event = _event.receiveAsFlow()
 
 
-    fun getSavingTickets(filter: SavingTicketFilter): Flow<PagingData<SavingTicket>> = getSavingTicketsUseCase(filter)
+    fun getSavingTickets(filter: SavingTicketFilter): Flow<PagingData<SavingTicket>> =
+        getSavingTicketsUseCase(filter)
 
     private fun createWithdrawalTicket() {
         viewModelScope.launch {
@@ -134,11 +139,15 @@ class SavingTicketViewModel @Inject constructor(
                     )
                 }
             }
+
             is SavingTicketState.Action.OnChangeDateFilter -> {
                 if (action.startDate == null || action.endDate == null) return
                 _uiState.update {
                     it.copy(
-                        filter = it.filter.copy(startDate = action.startDate, endDate = action.endDate)
+                        filter = it.filter.copy(
+                            startDate = action.startDate,
+                            endDate = action.endDate
+                        )
                     )
                 }
             }

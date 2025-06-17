@@ -3,6 +3,7 @@ package com.se104.passbookapp.data.datastore
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.se104.passbookapp.utils.Role
 import kotlinx.coroutines.flow.first
@@ -13,6 +14,7 @@ class UserSessionRepository @Inject constructor(
 ) {
     object UserPreferencesKeys {
         val ROLE = stringPreferencesKey("user_role")
+        val USER_ID = longPreferencesKey("user_id")
     }
     suspend fun saveRole(role: Role) {
         dataStore.edit { prefs ->
@@ -25,8 +27,22 @@ class UserSessionRepository @Inject constructor(
         val roleName = prefs[UserPreferencesKeys.ROLE] ?: return null
         return Role.entries.find { it.name == roleName }
     }
+    suspend fun saveUserId(userId: Long) {
+        dataStore.edit { prefs ->
+            prefs[UserPreferencesKeys.USER_ID] = userId
+        }
+    }
+    suspend fun getUserId(): Long? {
+        val prefs = dataStore.data.first()
+        return prefs[UserPreferencesKeys.USER_ID]
+    }
+
+
 
     suspend fun clear() {
-        dataStore.edit { it.clear() }
+        dataStore.edit { prefs ->
+            prefs.remove(UserPreferencesKeys.ROLE)
+            prefs.remove(UserPreferencesKeys.USER_ID)
+        }
     }
 }
