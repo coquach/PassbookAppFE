@@ -12,7 +12,7 @@ val onPrimaryContainerLight = Color(0xFF3A0817)
 
 val secondaryLight = Color(0xFF75565C)
 val onSecondaryLight = Color(0xFFFFFFFF)
-val secondaryContainerLight = Color(0xFFFFD9DF)
+val secondaryContainerLight = Color(0xFFFFECEE)//FFECEE FFD9DF
 val onSecondaryContainerLight = Color(0xFF3F0E19)
 
 val backgroundLight = Color(0xFFFFFBFA)

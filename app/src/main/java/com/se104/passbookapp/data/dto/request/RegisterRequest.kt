@@ -11,5 +11,4 @@ data class RegisterRequest(
     val dateOfBirth: String,
     val citizenID: String,
     val address: String,
-    val balance: BigDecimal
 )
