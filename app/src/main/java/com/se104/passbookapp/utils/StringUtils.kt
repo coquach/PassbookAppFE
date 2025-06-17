@@ -18,7 +18,12 @@ import kotlin.let
 
 object StringUtils {
 
-    fun formatCurrency(value: BigDecimal): String {
+    fun formatCurrency(value: BigDecimal, isHide: Boolean = false): String {
+        if (isHide) {
+            val digitCount = value.toBigInteger().toString().length
+            val stars = "*".repeat(digitCount)
+            return "$stars ₫"
+        }
         val vietnamLocale = Locale("vi", "VN")
         val currencyFormatter = NumberFormat.getCurrencyInstance(vietnamLocale).apply {
             currency = Currency.getInstance("VND")

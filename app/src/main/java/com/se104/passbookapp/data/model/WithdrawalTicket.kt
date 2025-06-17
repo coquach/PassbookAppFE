@@ -14,5 +14,5 @@ data class WithdrawalTicket(
     @Serializable(with = BigDecimalSerializer::class)
     val actualAmount: BigDecimal,
     @Serializable(with = LocalDateTimeSerializer::class)
-    val withdrawalDate: LocalDateTime,
+    val createdAt: LocalDateTime,
 )

@@ -23,6 +23,8 @@ class SalesReportPagingSource @Inject constructor(
                 size = size,
                 startDate = filter.startDate,
                 endDate = filter.endDate,
+                order = filter.order,
+                sortBy = filter.sortBy
             )
         }
     }

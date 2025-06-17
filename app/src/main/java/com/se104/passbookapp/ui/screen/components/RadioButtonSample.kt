@@ -1,4 +1,4 @@
-package com.example.foodapp.ui.screen.components
+package com.se104.passbookapp.ui.screen.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.Icon
@@ -18,8 +17,6 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -33,13 +30,13 @@ fun RadioGroupWrap(
     text: String,
     modifier: Modifier = Modifier,
     options: List<String>,
-    selectedOption: String,
+    selectedOption: String?=null,
     onOptionSelected: (String) -> Unit,
     optionIcons: List<ImageVector>? = null, // <-- giờ là nullable
     isFlowLayout: Boolean = true
 ) {
     LaunchedEffect(options, selectedOption) {
-        if (options.isNotEmpty() && selectedOption.isBlank()) {
+        if (options.isNotEmpty() && selectedOption == null) {
             onOptionSelected(options.first())
         }
     }
@@ -48,7 +45,7 @@ fun RadioGroupWrap(
         Text(
             text = text,
             color = MaterialTheme.colorScheme.outline,
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.ExtraBold,
             modifier = Modifier.padding(start = 4.dp, bottom = 4.dp)
         )

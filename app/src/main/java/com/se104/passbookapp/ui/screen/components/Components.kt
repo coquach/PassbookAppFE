@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -28,6 +29,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.shape.CircleShape
@@ -100,7 +102,6 @@ fun FoodAppTextField(
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    fieldHeight: Dp = 56.dp,
     enabled: Boolean = true,
     readOnly: Boolean = false,
     textStyle: TextStyle = LocalTextStyle.current,
@@ -129,7 +130,11 @@ fun FoodAppTextField(
         errorPlaceholderColor = MaterialTheme.colorScheme.error,
         errorIndicatorColor = MaterialTheme.colorScheme.error,
         focusedPlaceholderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-        unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+        unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
+        unfocusedContainerColor = MaterialTheme.colorScheme.onPrimary,
+        focusedContainerColor = MaterialTheme.colorScheme.onPrimary,
+        cursorColor = MaterialTheme.colorScheme.primary,
+
 
     ),
 ) {
@@ -140,7 +145,6 @@ fun FoodAppTextField(
     ) {
 
         labelText?.let {
-
             Text(
                 text = it,
                 color = MaterialTheme.colorScheme.outline,
@@ -149,37 +153,24 @@ fun FoodAppTextField(
                 modifier = Modifier.padding(start = 4.dp, bottom = 4.dp)
             )
 
+        }
 
-        }
-        val actualTextStyle = when {
-            fieldHeight < 52.dp -> textStyle.copy(fontSize = 14.sp)
-            fieldHeight in 52.dp..60.dp -> textStyle.copy(fontSize = 16.sp)
-            fieldHeight in 61.dp..70.dp -> textStyle.copy(fontSize = 18.sp)
-            else -> textStyle.copy(fontSize = 20.sp)
-        }
 
         OutlinedTextField(
             value = value,
             onValueChange,
-            modifier = modifier.heightIn(min = 56.dp),
+            modifier = Modifier.fillMaxWidth(),
             enabled,
             readOnly,
-            textStyle = actualTextStyle,
+            textStyle ,
             null,
             placeholder,
             leadingIcon,
             trailingIcon,
             prefix,
             suffix,
-            supportingText = {
-                if (errorText != null) {
-                    Text(
-                        text = errorText,
-                        color = MaterialTheme.colorScheme.error,
-                        fontSize = 12.sp
-                    )
-                }
-            },
+
+            supportingText,
             isError,
             visualTransformation,
             keyboardOptions,
@@ -193,7 +184,13 @@ fun FoodAppTextField(
         )
     }
 }
-
+//if (errorText != null) {
+//    Text(
+//        text = errorText,
+//        color = MaterialTheme.colorScheme.error,
+//        fontSize = 12.sp
+//    )
+//}
 @Composable
 fun BasicDialog(title: String, description: String, onClick: () -> Unit) {
     Surface {
@@ -351,9 +348,10 @@ fun Loading() {
 fun Retry(
     message: String,
     onClicked: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Column(
-        Modifier.fillMaxSize(),
+        modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -367,7 +365,7 @@ fun Retry(
 }
 
 @Composable
-fun FoodAppDialog(
+fun PassbookAppDialog(
     title: String,
     titleColor: Color = MaterialTheme.colorScheme.scrim,
     message: String,
@@ -394,27 +392,19 @@ fun FoodAppDialog(
         containerColor = MaterialTheme.colorScheme.background,
         confirmButton = {
             if (showConfirmButton) {
-                Button(
+                AppButton(
                     onClick = { onConfirm?.invoke(); onDismiss() },
-                    colors = ButtonDefaults.buttonColors().copy(
-                        containerColor = containerConfirmButtonColor,
-                        contentColor = labelConfirmButtonColor
-                    ),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text(confirmText)
-                }
+                    text = confirmText
+                )
             }
         },
         dismissButton = {
-            Button(onClick = onDismiss,
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.outline
-                ),
-                ) {
-                Text(dismissText)
-            }
+            AppButton(
+                onClick = onDismiss,
+                text = dismissText,
+                backgroundColor = MaterialTheme.colorScheme.outline
+
+            )
         }
     )
 }
@@ -602,19 +592,40 @@ fun <T : Any> LazyPagingSample(
     key: ((item: T) -> Any)? = null,
     itemContent: @Composable (T) -> Unit,
 ) {
-    val isEmpty = items.itemSnapshotList.items.isEmpty()
-    val isNotLoading = items.loadState.refresh !is LoadState.Loading
+    val loadState = items.loadState
 
     Box(modifier = modifier) {
         when {
-            isEmpty && isNotLoading -> {
-                Nothing(
-                    text = textNothing,
-                    icon = iconNothing,
-                    modifier = Modifier.align(Alignment.Center)
+            // 1. Lỗi khi load lần đầu
+            loadState.refresh is LoadState.Error -> {
+                val error = (loadState.refresh as LoadState.Error).error
+
+                Retry(
+                    message = error.localizedMessage ?: "Lỗi không xác định",
+                    onClicked = {
+                        items.retry()
+                    },
+                    modifier = Modifier.fillMaxSize()
                 )
             }
 
+            // 2. Đang loading lần đầu
+            loadState.refresh is LoadState.Loading -> {
+                LoadingAnimation(
+                    modifier = modifier.fillMaxSize().align(Alignment.Center),
+                )
+            }
+
+            // 3. Danh sách rỗng
+            items.itemSnapshotList.items.isEmpty() -> {
+                Nothing(
+                    text = textNothing,
+                    icon = iconNothing,
+                    modifier = Modifier.fillMaxSize().align(Alignment.Center)
+                )
+            }
+
+            // 4. Bình thường: hiển thị danh sách
             else -> {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
@@ -625,11 +636,35 @@ fun <T : Any> LazyPagingSample(
                         nColumns = columns,
                         key = key,
                         itemContent = { item ->
-                            item?.let{itemContent(item)}
-
-
+                            item?.let { itemContent(it) }
                         }
                     )
+
+                    // 5. Hiển thị loading cuối trang
+                    if (loadState.append is LoadState.Loading) {
+                        item {
+                            CircularProgressIndicator(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+                                    .wrapContentWidth(Alignment.CenterHorizontally)
+                            )
+                        }
+                    }
+
+                    // 6. Hiển thị lỗi cuối trang
+                    if (loadState.append is LoadState.Error) {
+                        val error = (loadState.append as LoadState.Error).error
+                        item {
+                            Retry(
+                                message = error.localizedMessage ?: "Lỗi khi tải thêm",
+                                onClicked = { items.retry() },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -718,7 +753,120 @@ fun ExpandableText(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ErrorModalBottomSheet(
+    description: String,
+    onDismiss: () -> Unit,
+    sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+) {
+    val scope = rememberCoroutineScope()
 
+    ModalBottomSheet(
+        onDismissRequest = {
+            scope.launch {
+                sheetState.hide()
+                onDismiss()
+            }
+        },
+        sheetState = sheetState,
+        containerColor = MaterialTheme.colorScheme.surface,
+        tonalElevation = 4.dp,
+        shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Đã xảy ra lỗi",
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.error,
+                fontWeight = FontWeight.ExtraBold,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            Text(
+                text = description,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(bottom = 24.dp)
+            )
+
+            Button(
+                onClick = {
+                    scope.launch {
+                        sheetState.hide()
+                        onDismiss()
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Đóng")
+            }
+        }
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CustomBottomSheet(
+    title: String,
+    onDismiss: () -> Unit,
+    sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+    content: @Composable ColumnScope.() -> Unit,
+
+) {
+    val scope = rememberCoroutineScope()
+
+    ModalBottomSheet(
+        onDismissRequest = {
+            scope.launch {
+                sheetState.hide()
+                onDismiss()
+            }
+        },
+        sheetState = sheetState,
+        containerColor = MaterialTheme.colorScheme.surface,
+        tonalElevation = 4.dp,
+        shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.ExtraBold,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            content()
+            AppButton(
+                onClick = {
+                    scope.launch {
+                        sheetState.hide()
+                        onDismiss()
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                text = "Đóng",
+                backgroundColor = MaterialTheme.colorScheme.outline,
+
+
+            )
+        }
+    }
+}
 
 
 

@@ -1,8 +1,11 @@
 package com.se104.passbookapp.navigation
 
+import com.se104.passbookapp.data.model.SavingType
 import kotlinx.serialization.Serializable
 
 interface NavRoute
+
+
 
 @Serializable
 object Auth : NavRoute
@@ -30,3 +33,15 @@ object SavingTicket: NavRoute
 
 @Serializable
 object Transaction: NavRoute
+
+@Serializable
+object Notification: NavRoute
+
+@Serializable
+object SelectSavingType: NavRoute
+
+@Serializable
+data class CreateSavingTicket(val savingType: SavingType) : NavRoute
+
+@Serializable
+object ActionSuccess: NavRoute

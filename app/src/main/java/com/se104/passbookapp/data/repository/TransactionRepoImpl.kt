@@ -6,13 +6,13 @@ import androidx.paging.PagingData
 import com.se104.passbookapp.data.dto.ApiResponse
 import com.se104.passbookapp.data.dto.apiRequestFlow
 import com.se104.passbookapp.data.dto.filter.TransactionFilter
-import com.se104.passbookapp.data.dto.request.TransactionRequest
 import com.se104.passbookapp.data.model.Transaction
 import com.se104.passbookapp.data.paging.TransactionPagingSource
 import com.se104.passbookapp.data.remote.api.TransactionApiService
 import com.se104.passbookapp.domain.repository.TransactionRepository
 import com.se104.passbookapp.utils.Constants.ITEMS_PER_PAGE
 import kotlinx.coroutines.flow.Flow
+import java.math.BigDecimal
 import javax.inject.Inject
 
 class TransactionRepoImpl @Inject constructor(
@@ -46,9 +46,18 @@ class TransactionRepoImpl @Inject constructor(
         ).flow
     }
 
-    override fun createTransaction(request: TransactionRequest): Flow<ApiResponse<Transaction>> {
-        return apiRequestFlow {
-            transactionApiService.createTransaction(request)
-        }
+    override fun deposit(
+        userId: Long,
+        amount: BigDecimal,
+    ): Flow<ApiResponse<Transaction>> {
+       return apiRequestFlow { transactionApiService.deposit(userId, amount) }
     }
+
+    override fun withdraw(
+        userId: Long,
+        amount: BigDecimal,
+    ): Flow<ApiResponse<Transaction>> {
+       return apiRequestFlow { transactionApiService.withdraw(userId, amount) }
+    }
+
 }

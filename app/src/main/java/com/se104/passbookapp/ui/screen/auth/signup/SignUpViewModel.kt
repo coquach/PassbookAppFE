@@ -44,9 +44,9 @@ class SignUpViewModel @Inject constructor(
                 _uiState.value.address,
                 _uiState.value.citizenId,
                 StringUtils.formatLocalDate(_uiState.value.dateOfBirth)!!,
-                BigDecimal.ZERO
 
-            )
+
+                )
             registerUseCase.invoke(request).collect {
                 when (it) {
                     is ApiResponse.Success -> {
@@ -116,19 +116,24 @@ class SignUpViewModel @Inject constructor(
                     "Họ tên không hợp lệ"
                 ) { it.matches(Regex("^[a-zA-Z\\s]+$")) }
             }
+
             "address" -> {
                 address = validateField(
                     current.address.trim(),
                     "Địa chỉ không hợp lệ"
-                ) { it.matches(Regex("^[a-zA-Z\\s]+$")) }}
+                ) { it.matches(Regex("^[a-zA-Z\\s]+$")) }
+            }
+
             "citizenId" -> {
                 citizenId = validateField(
                     current.citizenId.trim(),
                     "CMND không hợp lệ"
-                ) { it.matches(Regex("^[0-9]{9,12}$")) }}
+                ) { it.matches(Regex("^[0-9]{9,12}$")) }
+            }
 
         }
-        val isValid = emailError == null && passwordError == null && confirmPasswordError == null && number == null && fullName == null && address == null && citizenId == null
+        val isValid =
+            emailError == null && passwordError == null && confirmPasswordError == null && number == null && fullName == null && address == null && citizenId == null
         _uiState.update {
             it.copy(
                 emailError = emailError,
@@ -147,15 +152,15 @@ class SignUpViewModel @Inject constructor(
             }
 
             is SignUp.Action.PasswordChanged -> {
-               _uiState.update { it.copy(password = action.password) }
+                _uiState.update { it.copy(password = action.password) }
             }
 
             is SignUp.Action.ConfirmPasswordChanged -> {
-                _uiState.update {it.copy(confirmPassword = action.confirmPassword) }
+                _uiState.update { it.copy(confirmPassword = action.confirmPassword) }
             }
 
             is SignUp.Action.PhoneNumberChanged -> {
-               _uiState.update { it.copy(phoneNumber = action.phoneNumber) }
+                _uiState.update { it.copy(phoneNumber = action.phoneNumber) }
             }
 
             is SignUp.Action.FullNameChanged -> {
@@ -189,6 +194,12 @@ class SignUpViewModel @Inject constructor(
                     _event.send(SignUp.Event.NavigateToAuth)
                 }
             }
+
+            SignUp.Action.OnBack -> {
+                viewModelScope.launch {
+                    _event.send(SignUp.Event.OnBack)
+                }
+            }
         }
     }
 }
@@ -209,7 +220,7 @@ object SignUp {
         val addressError: String? = null,
         val citizenId: String = "",
         val citizenIdError: String? = null,
-        val dateOfBirth: LocalDate?=LocalDate.now(),
+        val dateOfBirth: LocalDate? = LocalDate.now(),
         val loading: Boolean = false,
         val error: String? = null,
         val isValid: Boolean = false,
@@ -220,6 +231,7 @@ object SignUp {
         data object NavigateToAuth : Event
         data object ShowError : Event
         data object ShowSuccessDialog : Event
+        data object OnBack : Event
     }
 
     sealed interface Action {
@@ -234,6 +246,7 @@ object SignUp {
         data object LoginClicked : Action
         data object SignUpClicked : Action
         data object AuthClicked : Action
+        data object OnBack : Action
 
     }
 }

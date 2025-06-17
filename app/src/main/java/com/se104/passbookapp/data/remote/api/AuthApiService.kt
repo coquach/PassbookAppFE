@@ -29,4 +29,7 @@ interface AuthApiService {
     ) : Response<TokenResponse>
 
     //Logout
+
+    @POST("$PR/logout")
+    suspend fun logout() : Response<Unit>
 }

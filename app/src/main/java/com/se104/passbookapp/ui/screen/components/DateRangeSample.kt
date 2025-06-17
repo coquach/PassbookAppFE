@@ -1,4 +1,4 @@
-package com.example.foodapp.ui.screen.components
+package com.se104.passbookapp.ui.screen.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.DatePickerDialog
@@ -26,24 +25,21 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.se104.passbookapp.ui.screen.components.FoodAppTextField
+import com.se104.passbookapp.ui.screen.components.text_field.PassbookTextField
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DateRangePickerSample(
+    modifier: Modifier = Modifier,
     startDateText: String = "Ngày bắt đầu",
     endDateText: String = "Ngày kết thúc",
     startDate: LocalDate?,
     endDate: LocalDate?,
-    modifier: Modifier = Modifier.width(200.dp),
-    fieldHeight: Dp = 56.dp,
     isColumn: Boolean = false, // Thêm tham số này
     onDateRangeSelected: (LocalDate?, LocalDate?) -> Unit,
 ) {
@@ -67,10 +63,9 @@ fun DateRangePickerSample(
 
 
     if (isColumn) {
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(modifier=Modifier.fillMaxWidth(),verticalArrangement = Arrangement.spacedBy(12.dp)) {
             DateFields(
                 modifier,
-                fieldHeight,
                 startDateText,
                 endDateText,
                 startDate,
@@ -81,16 +76,16 @@ fun DateRangePickerSample(
             }
         }
     } else {
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(modifier = Modifier.fillMaxWidth(),horizontalArrangement = Arrangement.SpaceBetween) {
             DateFields(
-                modifier,
-                fieldHeight,
+                modifier = modifier,
                 startDateText,
                 endDateText,
                 startDate,
                 endDate,
-                interactionSource
-            ) {
+                interactionSource,
+
+                ) {
                 showDialog = true
             }
         }
@@ -166,8 +161,7 @@ fun DateRangePickerSample(
 
 @Composable
 private fun DateFields(
-    modifier: Modifier,
-    fieldHeight: Dp,
+    modifier: Modifier = Modifier,
     startDateText: String,
     endDateText: String,
     startDate: LocalDate?,
@@ -179,7 +173,8 @@ private fun DateFields(
     val startText = startDate?.format(formatter) ?: LocalDate.now().format(formatter)
     val endText = endDate?.format(formatter) ?: LocalDate.now().format(formatter)
 
-    FoodAppTextField(
+
+    PassbookTextField(
         value = startText,
         onValueChange = {},
         readOnly = true,
@@ -187,10 +182,9 @@ private fun DateFields(
         trailingIcon = { Icon(Icons.Default.DateRange, contentDescription = null) },
         interactionSource = interactionSource,
         modifier = modifier.clickable { onClick() },
-        fieldHeight = fieldHeight
     )
 
-    FoodAppTextField(
+    PassbookTextField(
         value = endText,
         onValueChange = {},
         readOnly = true,
@@ -198,6 +192,6 @@ private fun DateFields(
         trailingIcon = { Icon(Icons.Default.DateRange, contentDescription = null) },
         interactionSource = interactionSource,
         modifier = modifier.clickable { onClick() },
-        fieldHeight = fieldHeight
-    )
+
+        )
 }

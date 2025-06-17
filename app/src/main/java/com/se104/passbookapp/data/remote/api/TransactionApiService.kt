@@ -1,6 +1,5 @@
 package com.se104.passbookapp.data.remote.api
 
-import com.se104.passbookapp.data.dto.request.TransactionRequest
 import com.se104.passbookapp.data.dto.response.PageResponse
 import com.se104.passbookapp.data.model.Transaction
 import retrofit2.Response
@@ -8,6 +7,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
+import java.math.BigDecimal
 
 interface TransactionApiService {
     companion object{
@@ -39,8 +39,9 @@ interface TransactionApiService {
 
     ) : Response<PageResponse<Transaction>>
 
-    @POST(PR)
-    suspend fun createTransaction(@Body request: TransactionRequest): Response<Transaction>
+    @POST("$PR/deposit")
+    suspend fun deposit(@Body userId: Long, @Body amount: BigDecimal) : Response<Transaction>
 
-
+    @POST("$PR/withdraw")
+    suspend fun withdraw(@Body userId: Long, @Body amount: BigDecimal) : Response<Transaction>
 }

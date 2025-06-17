@@ -6,6 +6,7 @@ import com.se104.passbookapp.data.dto.filter.TransactionFilter
 import com.se104.passbookapp.data.dto.response.PageResponse
 import com.se104.passbookapp.data.model.Transaction
 import com.se104.passbookapp.data.remote.api.TransactionApiService
+import com.se104.passbookapp.utils.StringUtils
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -24,12 +25,18 @@ class TransactionPagingSource @Inject constructor(
                     page = page,
                     size = size,
                     userId = filter.userId,
+                    transactionType = filter.transactionType,
+                    startDate = StringUtils.formatLocalDate(filter.startDate),
+                    endDate = StringUtils.formatLocalDate(filter.endDate),
                 )
             } else {
                 transactionApiService.getTransactions(
                     page = page,
                     size = size,
                     userId = filter.userId,
+                    transactionType = filter.transactionType,
+                    startDate = StringUtils.formatLocalDate(filter.startDate),
+                    endDate = StringUtils.formatLocalDate(filter.endDate),
                 )
             }
         }

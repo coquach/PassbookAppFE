@@ -165,4 +165,4 @@ object AppModule {
     }
 }
 
-val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "data_store")
+val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "user_prefs")

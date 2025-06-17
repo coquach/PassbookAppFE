@@ -5,5 +5,5 @@ import java.math.BigDecimal
 data class SavingTypeRequest(
     val typeName: String,
     val duration: Int,
-    val interestRate: BigDecimal
+    val interestRate: BigDecimal,
 )

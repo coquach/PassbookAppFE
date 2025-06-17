@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.navigation.navigation
 import com.se104.passbookapp.navigation.auth.authGraph
 import com.se104.passbookapp.navigation.home.homeGraph
 import com.se104.passbookapp.navigation.saving_ticket.savingTicketGraph

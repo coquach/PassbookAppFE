@@ -9,8 +9,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreHoriz
@@ -48,96 +50,94 @@ fun ChipsGroupWrap(
     shouldSelectDefaultOption: Boolean = true
 ) {
     LaunchedEffect(options, selectedOption) {
-        if (shouldSelectDefaultOption && options.isNotEmpty() && selectedOption == null) {
+        if (shouldSelectDefaultOption && options.isNotEmpty() && selectedOption == null ) {
             onOptionSelected(options.first())
         }
     }
     var isExpanded by remember { mutableStateOf(false) }
 
 
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp)) {
         text?.let{
             Text(
                 text = text,
                 color = MaterialTheme.colorScheme.outline,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.ExtraBold,
-//            modifier = Modifier.padding(start = 4.dp, bottom = 4.dp)
+
             )
         }
 
 
-        Spacer(modifier = Modifier.height(8.dp))
 
-        val layoutModifier = modifier
+
+        val layoutModifier = Modifier
             .fillMaxWidth()
 
 
-        val optionLayout: @Composable (content: @Composable () -> Unit) -> Unit =
-            if (isFlowLayout) {
-                { content ->
-                    FlowRow(
-                        modifier = layoutModifier,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        content = { content() }
-                    )
-                }
-            } else {
-                { content ->
-                    LazyRow(
-                        modifier = layoutModifier,
-                        verticalAlignment = Alignment.CenterVertically,
-                        content = {
-                            item {
-                                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                                    content()
-                                }
-                            }
-                        },
-                    )
+        if (isFlowLayout) {
+            FlowRow(
+                modifier = layoutModifier,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                options.take(if (isExpanded) options.size else thresholdExpend)
+                    .forEach { optionText ->
+                        val isSelected = optionText == selectedOption
+                        FilterChip(
+                            selected = isSelected,
+                            onClick = { onOptionSelected(optionText) },
+                            label = { Text(text = optionText, modifier = modifier) },
+                            colors = FilterChipDefaults.filterChipColors().copy(
+                                labelColor = MaterialTheme.colorScheme.onPrimary,
+                                selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                                containerColor = containerColor
+                            ),
+                            border = BorderStroke(0.dp, Color.Transparent),
+                            modifier = Modifier.padding(2.dp)
+                        )
+                    }
+
+                if (!isExpanded && options.size > thresholdExpend) {
+                    IconButton(
+                        onClick = { isExpanded = true },
+                        modifier = Modifier.size(48.dp).clip(CircleShape)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.MoreHoriz,
+                            contentDescription = "Xem thêm",
+                            tint = MaterialTheme.colorScheme.outline,
+                            modifier = Modifier.size(28.dp)
+                        )
+                    }
                 }
             }
-
-        optionLayout {
-            options.take(
-                if (isFlowLayout){
-                    if(isExpanded) options.size else thresholdExpend
-                } else
-                    options.size
-            )
-                .forEach { optionText -> // Hiển thị tối đa 6 mục, nếu mở rộng sẽ hiển thị tất cả
+        } else {
+            LazyRow(
+                modifier = layoutModifier,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                items(items = options, key = { it }) { optionText ->
                     val isSelected = optionText == selectedOption
                     FilterChip(
                         selected = isSelected,
                         onClick = { onOptionSelected(optionText) },
-                        label = { Text(optionText) },
+                        label = { Text(text = optionText, modifier = Modifier.padding(8.dp)) },
                         colors = FilterChipDefaults.filterChipColors().copy(
                             labelColor = MaterialTheme.colorScheme.onPrimary,
                             selectedContainerColor = MaterialTheme.colorScheme.primary,
+                            selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
                             containerColor = containerColor
                         ),
-                        border = BorderStroke(0.dp, Color.Transparent)
-                    )
-                }
-            if (isFlowLayout && !isExpanded && options.size > thresholdExpend) {
-                IconButton(
-                    onClick = { isExpanded = true },
-                    modifier = Modifier
-
-                        .size(40.dp)
-                        .clip(CircleShape)
-
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.MoreHoriz,
-                        contentDescription = "Xem thêm",
-                        tint = MaterialTheme.colorScheme.outline,
-                        modifier = Modifier.size(24.dp)
+                        border = BorderStroke(0.dp, Color.Transparent),
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                     )
                 }
             }
         }
+
 
 
     }

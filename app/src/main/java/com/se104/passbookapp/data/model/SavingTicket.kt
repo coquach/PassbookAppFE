@@ -19,7 +19,7 @@ data class SavingTicket(
     @Serializable(with = BigDecimalSerializer::class)
     val amount: BigDecimal,
     @Serializable(with = LocalDateTimeSerializer::class)
-    val startDate: LocalDateTime,
+    val createdAt: LocalDateTime,
     @Serializable(with = LocalDateTimeSerializer::class)
     val maturityDate: LocalDateTime,
     @Serializable(with = BigDecimalSerializer::class)

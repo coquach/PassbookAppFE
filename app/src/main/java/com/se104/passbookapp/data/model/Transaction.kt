@@ -13,7 +13,9 @@ data class Transaction(
     val userFullName: String,
     @Serializable(with = BigDecimalSerializer::class)
     val amount: BigDecimal,
+    @Serializable(with = BigDecimalSerializer::class)
+    val remainingBalance: BigDecimal,
     val transactionType: String,
     @Serializable(with = LocalDateTimeSerializer::class)
-    val transactionDateTime: LocalDateTime,
+    val createdAt: LocalDateTime,
 )

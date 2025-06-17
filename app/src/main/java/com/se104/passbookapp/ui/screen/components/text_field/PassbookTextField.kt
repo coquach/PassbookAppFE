@@ -3,6 +3,7 @@ package com.se104.passbookapp.ui.screen.components.text_field
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
@@ -30,7 +31,6 @@ fun PassbookTextField(
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    fieldHeight: Dp = 56.dp,
     enabled: Boolean = true,
     readOnly: Boolean = false,
     textStyle: TextStyle = LocalTextStyle.current,
@@ -50,7 +50,7 @@ fun PassbookTextField(
     maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
     minLines: Int = 1,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    shape: Shape = MaterialTheme.shapes.small,
+    shape: Shape = MaterialTheme.shapes.large,
     colors: TextFieldColors = OutlinedTextFieldDefaults.colors().copy(
         focusedIndicatorColor = MaterialTheme.colorScheme.primary,
         unfocusedIndicatorColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f),
@@ -83,20 +83,15 @@ fun PassbookTextField(
 
 
         }
-        val actualTextStyle = when {
-            fieldHeight < 52.dp -> textStyle.copy(fontSize = 14.sp)
-            fieldHeight in 52.dp..60.dp -> textStyle.copy(fontSize = 16.sp)
-            fieldHeight in 61.dp..70.dp -> textStyle.copy(fontSize = 18.sp)
-            else -> textStyle.copy(fontSize = 20.sp)
-        }
+
 
         OutlinedTextField(
             value = value,
             onValueChange,
-            modifier = modifier.heightIn(min = 56.dp),
+            modifier = Modifier.fillMaxWidth(),
             enabled,
             readOnly,
-            textStyle = actualTextStyle,
+            textStyle,
             null,
             placeholder,
             leadingIcon,

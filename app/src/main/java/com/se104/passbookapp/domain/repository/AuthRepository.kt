@@ -10,5 +10,5 @@ interface AuthRepository {
     fun login(request: LoginRequest): Flow<ApiResponse<TokenResponse>>
     fun register(request: RegisterRequest): Flow<ApiResponse<TokenResponse>>
     fun refreshToken(token: String): Flow<ApiResponse<TokenResponse>>
-    fun logout()
+    fun logout(): Flow<ApiResponse<Unit>>
 }

@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -33,7 +35,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
-
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
@@ -41,11 +42,9 @@ import com.se104.passbookapp.R
 import com.se104.passbookapp.navigation.Auth
 import com.se104.passbookapp.navigation.Home
 import com.se104.passbookapp.navigation.SignUp
-
-
 import com.se104.passbookapp.ui.screen.components.AppButton
 import com.se104.passbookapp.ui.screen.components.ErrorModalBottomSheet
-import com.se104.passbookapp.ui.screen.components.IconBackButton
+import com.se104.passbookapp.ui.screen.components.IconCustomButton
 import com.se104.passbookapp.ui.screen.components.text_field.PasswordTextField
 import com.se104.passbookapp.ui.screen.components.text_field.ValidateTextField
 
@@ -84,6 +83,10 @@ fun LoginScreen(
                 Login.Event.ShowError -> {
                     showErrorSheet = true
                 }
+
+                Login.Event.OnBack -> {
+                    navController.popBackStack()
+                }
             }
         }
     }
@@ -99,11 +102,13 @@ fun LoginScreen(
 
 
     ) {
-        IconBackButton(
+        IconCustomButton(
             modifier = Modifier.align(Alignment.Start),
             onClick = {
-                navController.navigateUp()
-            })
+               viewModel.onAction(Login.Action.OnBack)
+            },
+            icon = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+            )
 
         Text(
             text = stringResource(id = R.string.log_in_desc),
@@ -216,7 +221,7 @@ fun LoginScreen(
     }
     if (showErrorSheet) {
         ErrorModalBottomSheet(
-            title = "Đã có lỗi xảy ra",
+
             description = uiState.error ?: "",
             onDismiss = { showErrorSheet = false },
 
