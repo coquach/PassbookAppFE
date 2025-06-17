@@ -30,18 +30,21 @@ fun<T> apiRequestFlow(call: suspend () -> Response<T>): Flow<ApiResponse<T>> = f
 
         try {
             if (response.isSuccessful) {
-                response.body()?.let { data ->
-                    emit(ApiResponse.Success(data))
+                val body = response.body()
+                if (body != null) {
+                    emit(ApiResponse.Success(body))
+                } else {
+                    @Suppress("UNCHECKED_CAST")
+                    emit(ApiResponse.Success(Unit as T))
                 }
             } else {
-                response.errorBody()?.let { error ->
-                    error.close()
-                    val parsedError: ErrorResponse = Gson().fromJson(error.charStream(), ErrorResponse::class.java)
+                response.errorBody()?.charStream()?.use { reader ->
+                    val parsedError: ErrorResponse = Gson().fromJson(reader, ErrorResponse::class.java)
                     emit(ApiResponse.Failure(parsedError.message, parsedError.code))
                 }
             }
         } catch (e: Exception) {
-            emit(ApiResponse.Failure(e.message ?: e.toString(), 400))
+            emit(ApiResponse.Failure(e.message ?: "Unexpected error", 400))
         }
     } ?: emit(ApiResponse.Failure("Timeout! Please try again.", 408))
 }.flowOn(Dispatchers.IO)

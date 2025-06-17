@@ -34,6 +34,6 @@ fun AppButton(
         contentPadding = padding,
         enabled = enable
     ) {
-        Text(text = text, color = textColor, style = MaterialTheme.typography.labelLarge)
+        Text(text = text, color = textColor, style = MaterialTheme.typography.bodyMedium)
     }
 }

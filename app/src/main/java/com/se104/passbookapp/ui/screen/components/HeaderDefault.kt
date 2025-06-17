@@ -6,11 +6,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -28,6 +26,7 @@ import com.se104.passbookapp.ui.theme.button
 
 @Composable
 fun HeaderDefaultView(
+    modifier: Modifier = Modifier,
     text: String,
     onBackIcon: ImageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
     onBack: (() -> Unit)? = null,
@@ -37,24 +36,16 @@ fun HeaderDefaultView(
 
     ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (onBack != null) {
-            IconButton(
+            IconCustomButton(
                 onClick = onBack,
-                modifier = Modifier
-                    .padding(end = 16.dp)
-                    .size(40.dp) // size to rộng xíu cho dễ bấm
-                    .clip(CircleShape)
-            ) {
-                Icon(
-                    imageVector = onBackIcon,
-                    contentDescription = "Back",
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(24.dp) // icon nhỏ hơn để căn giữa trong button
-                )
-            }
+                icon = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                containerColor = Color.Transparent,
+                iconColor = MaterialTheme.colorScheme.primary
+            )
         } else {
             Spacer(modifier = Modifier.weight(0.2f))
         }
@@ -69,23 +60,12 @@ fun HeaderDefaultView(
             textAlign = TextAlign.Center
         )
 
-        if (icon != null) {
-            IconButton(
-                onClick = { iconClick?.invoke() },
-                modifier = Modifier
-                    .padding(start = 16.dp)
-                    .size(40.dp) // size to rộng xíu cho dễ bấm
-                    .clip(CircleShape)
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(24.dp),
-                    tint = tintIcon
+        if (icon != null && iconClick != null) {
+          IconCustomButton(
+              onClick = iconClick,
+              icon = icon,
 
-                )
-            }
+          )
 
         } else {
             Spacer(modifier = Modifier.weight(0.2f))
@@ -96,10 +76,11 @@ fun HeaderDefaultView(
 }
 
 @Composable
-fun IconBackButton(
+fun IconCustomButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     containerColor: Color = MaterialTheme.colorScheme.button,
+    icon: ImageVector,
     iconColor: Color = MaterialTheme.colorScheme.onPrimary,
 ) {
     IconButton(
@@ -107,7 +88,7 @@ fun IconBackButton(
             onClick.invoke()
         },
         modifier = modifier
-            .size(40.dp)
+            .size(48.dp)
             .clip(RoundedCornerShape(16.dp))
             .background(color = containerColor)
             .padding(4.dp),
@@ -115,11 +96,11 @@ fun IconBackButton(
 
         ) {
         Icon(
-            imageVector = Icons.Default.ArrowBackIosNew,
+            imageVector = icon,
             contentDescription = null,
             tint = iconColor,
             modifier = Modifier
-                .size(20.dp)
+                .size(28.dp)
         )
     }
 }

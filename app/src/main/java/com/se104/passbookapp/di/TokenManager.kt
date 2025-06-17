@@ -58,6 +58,4 @@ class TokenManager @Inject constructor(
             }
     }
 
-
-
 }
