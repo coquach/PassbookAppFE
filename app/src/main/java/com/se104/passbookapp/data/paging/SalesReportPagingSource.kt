@@ -5,7 +5,6 @@ import com.se104.passbookapp.data.dto.apiRequestFlow
 import com.se104.passbookapp.data.dto.filter.SalesReportFilter
 import com.se104.passbookapp.data.dto.response.PageResponse
 import com.se104.passbookapp.data.model.SalesReport
-import com.se104.passbookapp.data.remote.api.SalesReportApiService
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

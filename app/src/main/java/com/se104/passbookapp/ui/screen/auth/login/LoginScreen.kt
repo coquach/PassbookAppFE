@@ -56,7 +56,6 @@ fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    var showPassword by remember { mutableStateOf(false) }
     var showErrorSheet by remember { mutableStateOf(false) }
     var rememberMe by remember { mutableStateOf(false) }
 
@@ -194,20 +193,23 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth()
             )
         }
-        Spacer(modifier = Modifier.weight(0.5f))
-        Text(
-            text = stringResource(id = R.string.dont_have_account),
-            modifier = Modifier
-                .padding(8.dp)
-                .clickable {
-                    viewModel.onAction(Login.Action.OnSignUpClick)
-                }
-                .fillMaxWidth(),
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.primary,
-            style = MaterialTheme.typography.bodyLarge
+        if (isCustomer) {
+            Spacer(modifier = Modifier.weight(0.5f))
+            Text(
+                text = stringResource(id = R.string.dont_have_account),
+                modifier = Modifier
+                    .padding(8.dp)
+                    .clickable {
+                        viewModel.onAction(Login.Action.OnSignUpClick)
+                    }
+                    .fillMaxWidth(),
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.bodyLarge
 
-        )
+            )
+        }
+
 
 
     }

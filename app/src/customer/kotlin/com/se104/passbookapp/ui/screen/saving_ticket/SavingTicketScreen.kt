@@ -1,5 +1,7 @@
 package com.se104.passbookapp.ui.screen.saving_ticket
 
+import CardSample
+import DetailsRow
 import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
@@ -37,11 +39,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.se104.passbookapp.MainViewModel
 import com.se104.passbookapp.data.model.SavingTicket
 import com.se104.passbookapp.navigation.SavingTicketDetails
-import com.se104.passbookapp.ui.component.CardSample
-import com.se104.passbookapp.ui.component.DetailsRow
 import com.se104.passbookapp.ui.screen.components.ChipsGroupWrap
 import com.se104.passbookapp.ui.screen.components.DateRangePickerSample
 import com.se104.passbookapp.ui.screen.components.HeaderDefaultView
@@ -206,7 +205,7 @@ fun SavingTicketCard(
     savingTicket: SavingTicket,
     onClick: (SavingTicket) -> Unit,
     isStaff: Boolean = false,
-) {
+    ) {
     CardSample(
         item = savingTicket,
         onClick = onClick

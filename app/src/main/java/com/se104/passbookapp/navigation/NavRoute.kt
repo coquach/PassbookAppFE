@@ -53,3 +53,6 @@ object ActionSuccess: NavRoute
 
 @Serializable
 object Report: NavRoute
+
+@Serializable
+object Parameters: NavRoute

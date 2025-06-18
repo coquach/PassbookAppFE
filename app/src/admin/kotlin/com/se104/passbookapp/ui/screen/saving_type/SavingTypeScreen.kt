@@ -67,7 +67,6 @@ import me.saket.swipe.SwipeableActionsBox
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SavingTypeScreen(
-    navController: NavController,
     viewModel: SavingTypeViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -121,11 +120,10 @@ fun SavingTypeScreen(
 
         ) {
             HeaderDefaultView(
-                onBack = {
-                    navController.navigateUp()
-                },
+
                 text = "Loại tiết kiệm"
             )
+
             TabWithPager(
                 tabs = listOf("Đang hiển thị", "Đã ẩn"),
                 pages = listOf(

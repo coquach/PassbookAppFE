@@ -1,5 +1,6 @@
 package com.se104.passbookapp.ui.screen.home
 
+import DetailsRow
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -17,7 +18,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.CurrencyExchange
 import androidx.compose.material.icons.filled.MoneyOff
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Tag
@@ -49,11 +49,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.se104.passbookapp.MainViewModel
 import com.se104.passbookapp.data.model.User
 import com.se104.passbookapp.navigation.ActionSuccess
-import com.se104.passbookapp.ui.component.DetailsRow
-import com.se104.passbookapp.ui.screen.components.TabWithPager
 import com.se104.passbookapp.ui.screen.components.AppButton
 import com.se104.passbookapp.ui.screen.components.BoxAvatar
 import com.se104.passbookapp.ui.screen.components.CustomBottomSheet
@@ -63,9 +60,11 @@ import com.se104.passbookapp.ui.screen.components.LazyPagingSample
 import com.se104.passbookapp.ui.screen.components.LoadingAnimation
 import com.se104.passbookapp.ui.screen.components.Retry
 import com.se104.passbookapp.ui.screen.components.SearchField
+import com.se104.passbookapp.ui.screen.components.TabWithPager
 import com.se104.passbookapp.ui.screen.components.text_field.PassbookTextField
 import com.se104.passbookapp.ui.theme.button
 import com.se104.passbookapp.utils.StringUtils
+import com.se104.passbookapp.utils.hasAllPermissions
 import com.se104.passbookapp.utils.hasPermission
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -75,6 +74,9 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     permissions: List<String>,
 ) {
+    val isStaff = permissions.hasAllPermissions("VIEW_USERS", "VIEW_MY_INFO")
+    val isTransaction = permissions.hasAllPermissions("DEPOSIT", "WITHDRAWAL")
+
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var isOpenTransactionSheet by remember { mutableStateOf(false) }
     var showErrorSheet by remember { mutableStateOf(false) }
@@ -133,7 +135,7 @@ fun HomeScreen(
             }
         }
 
-        if (permissions.hasPermission("VIEW_USERS")) {
+        if (isStaff) {
             val users = remember(uiState.filter) {
                 viewModel.getUsers(uiState.filter)
 
@@ -189,11 +191,12 @@ fun HomeScreen(
                         isOpenTransactionSheet = true
                     },
                     user = it,
-                    isStaff = true
+                    isStaff = true,
+                    enabled = isTransaction
                 )
             }
 
-        } else if(permissions.hasPermission("VIEW_MY_INFO") ) {
+        } else  {
             when (uiState.getInfoState) {
                 is HomeState.GetInfoState.Error -> {
                     val message = (uiState.getInfoState as HomeState.GetInfoState.Error).message
@@ -224,6 +227,7 @@ fun HomeScreen(
                             isOpenTransactionSheet = true
                         },
                         user = user,
+                        enabled = isTransaction
                     )
                 }
             }
@@ -348,6 +352,7 @@ fun UserSection(
     onClick: () -> Unit,
     user: User,
     isStaff: Boolean = false,
+    enabled: Boolean
 ) {
     Box(
         modifier = Modifier
@@ -385,6 +390,7 @@ fun UserSection(
                         containerColor = MaterialTheme.colorScheme.button,
                         contentColor = MaterialTheme.colorScheme.onPrimary
                     ),
+                    enabled =enabled
 
                     ) {
                     Icon(

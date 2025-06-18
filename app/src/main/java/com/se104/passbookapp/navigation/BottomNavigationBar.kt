@@ -86,8 +86,6 @@ sealed class BottomNavItem(val route: NavRoute, val icon: ImageVector) {
     data object Transaction :
         BottomNavItem(com.se104.passbookapp.navigation.Transaction, Icons.Default.CurrencyExchange)
 
-    data object Notification :
-        BottomNavItem(com.se104.passbookapp.navigation.Notification, Icons.Default.Notifications)
 }
 
 @Composable
@@ -429,7 +427,7 @@ fun bottomBarVisibility(
 
 
 fun Modifier.bottomBarAnimatedScroll(
-    height: Dp = 20.dp,
+    height: Dp = 108.dp,
     offsetHeightPx: MutableState<Float>
 ): Modifier = composed {
     val bottomBarHeightPx = with(LocalDensity.current) {

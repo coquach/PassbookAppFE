@@ -1,5 +1,6 @@
 package com.se104.passbookapp.ui.screen.saving_ticket.create
 
+import DetailsRow
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -34,7 +35,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
 import com.se104.passbookapp.data.model.SavingType
-import com.se104.passbookapp.ui.component.DetailsRow
 import com.se104.passbookapp.ui.screen.components.HeaderDefaultView
 import com.se104.passbookapp.ui.screen.components.LoadingAnimation
 import com.se104.passbookapp.ui.screen.components.Retry

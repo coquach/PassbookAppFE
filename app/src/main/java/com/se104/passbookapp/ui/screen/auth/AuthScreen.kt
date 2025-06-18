@@ -98,17 +98,19 @@ fun AuthScreen(
                     navController.navigate(Login)
                 },
             )
+            if (isCustomer) {
+                AppButton(
+                    text = stringResource(R.string.sign_up),
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {
+                        navController.navigate(SignUp)
+                    },
+                    backgroundColor = MaterialTheme.colorScheme.onPrimary,
+                    textColor = MaterialTheme.colorScheme.button,
 
-            AppButton(
-                text = stringResource(R.string.sign_up),
-                modifier = Modifier.fillMaxWidth(),
-                onClick = {
-                    navController.navigate(SignUp)
-                },
-                backgroundColor = MaterialTheme.colorScheme.onPrimary,
-                textColor = MaterialTheme.colorScheme.button,
+                    )
+            }
 
-                )
 
 
         }

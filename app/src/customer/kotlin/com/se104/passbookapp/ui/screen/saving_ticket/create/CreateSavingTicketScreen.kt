@@ -1,5 +1,6 @@
 package com.se104.passbookapp.ui.screen.saving_ticket.create
 
+import DetailsRow
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -40,7 +41,6 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.se104.passbookapp.data.model.User
 import com.se104.passbookapp.navigation.ActionSuccess
-import com.se104.passbookapp.ui.component.DetailsRow
 import com.se104.passbookapp.ui.screen.components.AppButton
 import com.se104.passbookapp.ui.screen.components.CustomPagingDropdown
 import com.se104.passbookapp.ui.screen.components.ErrorModalBottomSheet

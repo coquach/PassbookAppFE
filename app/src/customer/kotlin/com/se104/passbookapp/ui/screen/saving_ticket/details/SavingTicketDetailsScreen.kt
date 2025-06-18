@@ -1,5 +1,6 @@
 package com.se104.passbookapp.ui.screen.saving_ticket.details
 
+import DetailsRow
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -42,10 +43,8 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
-import com.se104.passbookapp.MainViewModel
 import com.se104.passbookapp.data.model.WithdrawalTicket
 import com.se104.passbookapp.navigation.ActionSuccess
-import com.se104.passbookapp.ui.component.DetailsRow
 import com.se104.passbookapp.ui.screen.components.AppButton
 import com.se104.passbookapp.ui.screen.components.CustomBottomSheet
 import com.se104.passbookapp.ui.screen.components.ErrorModalBottomSheet
@@ -64,6 +63,7 @@ fun SavingTicketDetailsScreen(
     permissions: List<String>,
 ){
     val isStaff = permissions.hasPermission("VIEW_USERS")
+    val isWithDraw= permissions.hasPermission("CREATE_WITHDRAWALTICKET")
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showErrorSheet by rememberSaveable { mutableStateOf(false) }
@@ -177,7 +177,7 @@ fun SavingTicketDetailsScreen(
                             onClick = {
                                 viewModel.onAction(SavingTicketDetailsState.Action.Withdraw)
                             },
-                            enable = uiState.savingTicketSelected!!.balance != BigDecimal.ZERO && !uiState.isLoading,
+                            enable = isWithDraw && uiState.savingTicketSelected!!.balance != BigDecimal.ZERO && !uiState.isLoading,
                             modifier = Modifier.fillMaxWidth()
                         )
 

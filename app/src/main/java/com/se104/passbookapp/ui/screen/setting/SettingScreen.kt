@@ -1,59 +1,38 @@
 package com.se104.passbookapp.ui.screen.setting
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.BrightnessMedium
-import androidx.compose.material.icons.filled.CardGiftcard
-import androidx.compose.material.icons.filled.Language
-import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.PrivacyTip
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material.icons.filled.SettingsSuggest
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
-import com.se104.passbookapp.MainViewModel
+import com.se104.passbookapp.navigation.Parameters
 import com.se104.passbookapp.navigation.Report
 import com.se104.passbookapp.ui.screen.components.AppButton
 import com.se104.passbookapp.ui.screen.components.ErrorModalBottomSheet
@@ -88,6 +67,9 @@ fun SettingScreen(
                     showErrorSheet = true}
                 is SettingState.Event.NavigateToReport -> {
                     navController.navigate(Report)
+                }
+                is SettingState.Event.NavigateToParameters -> {
+                    navController.navigate(Parameters)
                 }
             }
         }
@@ -124,8 +106,15 @@ fun SettingScreen(
                             }
                         )
                         SettingItem(Icons.Default.Lock, "Bảo mật", onClick = {})
-                        if (permissions.contains("VIEW_DASHBOARD")) {
-                            SettingItem(Icons.Default.BarChart, "Thống kê", onClick = {})
+                        if (permissions.contains("VIEW_PARAMETERS")) {
+                            SettingItem(Icons.Default.SettingsSuggest, "Quản lí hệ thống", onClick = {
+                                viewModel.onAction(SettingState.Action.OnClickParameters)
+                            })
+                        }
+                        if (permissions.contains("VIEW_REPORTS")) {
+                            SettingItem(Icons.Default.BarChart, "Thống kê", onClick = {
+                                viewModel.onAction(SettingState.Action.OnClickReport)
+                            })
                         }
 
                     },

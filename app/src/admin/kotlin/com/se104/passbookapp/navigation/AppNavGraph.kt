@@ -3,38 +3,60 @@ package com.se104.passbookapp.navigation
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
-import androidx.navigation.navigation
-import com.se104.passbookapp.navigation.auth.authGraph
-import com.se104.passbookapp.navigation.home.homeGraph
-import com.se104.passbookapp.navigation.saving_ticket.savingTicketGraph
-import com.se104.passbookapp.navigation.saving_type.savingTypeGraph
-import com.se104.passbookapp.navigation.transaction.transactionGraph
+import androidx.navigation.compose.composable
+import com.se104.passbookapp.ui.screen.auth.AuthScreen
+import com.se104.passbookapp.ui.screen.auth.login.LoginScreen
+import com.se104.passbookapp.ui.screen.saving_type.SavingTypeScreen
+import com.se104.passbookapp.ui.screen.setting.SettingScreen
 
 
 @Composable
 fun AppNavGraph(
     navController: NavHostController,
-    innerPadding: PaddingValues,
-    shouldShowBottomNav: MutableState<Boolean>,
-    startDestination: NavRoute,
     isDarkMode: Boolean,
+    startDestination: NavRoute,
     onThemeUpdated: () -> Unit,
+    paddingValues: PaddingValues,
+    permissions: List<String>
+
 ) {
-    PassbookAppNavHost(
+    PassbookAppNavHost (
         navController = navController,
         startDestination = startDestination,
-        modifier = Modifier.padding(innerPadding)
+        modifier = Modifier.padding(paddingValues),
     ) {
-        authGraph(navController, shouldShowBottomNav)
-        homeGraph(navController, shouldShowBottomNav)
-        savingTypeGraph(navController, shouldShowBottomNav)
-        savingTicketGraph(navController, shouldShowBottomNav)
-        transactionGraph(navController, shouldShowBottomNav)
+
+
+        composable<Auth> {
+            AuthScreen(navController)
+        }
+
+
+
+        composable<Login> {
+            LoginScreen(navController, isCustomer = true)
+        }
+
+        composable<Home> {
+
+
+        }
+        composable<SavingType> {
+            SavingTypeScreen()
+        }
+
+
+
+        composable<Setting> {
+            SettingScreen(navController, isDarkMode, onThemeUpdated, permissions = permissions)
+        }
+
+
     }
 
 }
+
 
 

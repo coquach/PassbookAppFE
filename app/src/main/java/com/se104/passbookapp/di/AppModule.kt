@@ -13,10 +13,11 @@ import com.google.gson.GsonBuilder
 import com.se104.passbookapp.BuildConfig
 import com.se104.passbookapp.data.remote.api.AuthApiService
 import com.se104.passbookapp.data.remote.api.ParameterApiService
-import com.se104.passbookapp.data.remote.api.SalesReportApiService
+import com.se104.passbookapp.data.remote.api.ReportApiService
 import com.se104.passbookapp.data.remote.api.SavingTicketApiService
 import com.se104.passbookapp.data.remote.api.SavingTypeApiService
 import com.se104.passbookapp.data.remote.api.TransactionApiService
+import com.se104.passbookapp.data.remote.api.UserApiService
 import com.se104.passbookapp.data.remote.api.WithdrawalApiService
 import com.se104.passbookapp.data.remote.interceptor.AuthAuthenticator
 import com.se104.passbookapp.data.remote.interceptor.AuthInterceptor
@@ -122,35 +123,14 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideSavingTicketAPIService(
+    fun provideUserAPIService(
         @Named("MainApi") retrofit: Retrofit,
-    ): SavingTicketApiService =
+    ): UserApiService =
         retrofit
-            .create(SavingTicketApiService::class.java)
+            .create(UserApiService::class.java
+    )
 
-    @Provides
-    @Singleton
-    fun provideTransactionAPIService(
-        @Named("MainApi") retrofit: Retrofit,
-    ): TransactionApiService =
-        retrofit
-            .create(TransactionApiService::class.java)
 
-    @Provides
-    @Singleton
-    fun provideWithdrawalAPIService(
-        @Named("MainApi") retrofit: Retrofit,
-    ): WithdrawalApiService =
-        retrofit
-            .create(WithdrawalApiService::class.java)
-
-    @Provides
-    @Singleton
-    fun provideSalesReportAPIService(
-        @Named("MainApi") retrofit: Retrofit,
-    ): SalesReportApiService =
-        retrofit
-            .create(SalesReportApiService::class.java)
 
     @Provides
     @Singleton
