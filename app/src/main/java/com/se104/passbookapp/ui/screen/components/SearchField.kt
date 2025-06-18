@@ -55,7 +55,8 @@ fun SearchField(
     switchChange: (Boolean) -> Unit,
     filterChange: (String) -> Unit,
     filters: List<String>,
-    filterSelected: String
+    filterSelected: String,
+    placeHolder: String
 ) {
     Row(
         modifier = Modifier
@@ -68,7 +69,7 @@ fun SearchField(
             value = searchInput,
             onValueChange = { searchChange(it) },
             placeholder = {
-                Text(text = "Tìm kiếm ở đây", color = MaterialTheme.colorScheme.outline)
+                Text(text = placeHolder, color = MaterialTheme.colorScheme.outline)
             },
             modifier = Modifier
                 .weight(1f),

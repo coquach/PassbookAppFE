@@ -10,6 +10,7 @@ import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
+import java.math.BigDecimal
 
 interface SavingTicketApiService {
     companion object {
@@ -21,20 +22,32 @@ interface SavingTicketApiService {
         @Query("size") size: Int = 10,
         @Query("sortBy") sortBy: String = "id",
         @Query("order") order: String = "asc",
-        @Query("userId") userId: Long?= null,
+        @Query("citizenId") citizenId: String?= null,
+        @Query("amount") amount: BigDecimal?= null,
         @Query("savingTypeId") savingTypeId: Long?= null,
         @Query("isActive") isActive: Boolean?= null,
         @Query("startDate") startDate: String?= null,
         @Query("endDate") endDate: String?= null,
     ): Response<PageResponse<SavingTicket>>
 
+    @GET("$PR/customer")
+    suspend fun getSavingTicketsForCustomer(
+        @Query("page") page: Int = 0,
+        @Query("size") size: Int = 10,
+        @Query("sortBy") sortBy: String = "id",
+        @Query("order") order: String = "asc",
+        @Query("citizenId") citizenId: String?= null,
+        @Query("amount") amount: BigDecimal?= null,
+        @Query("savingTypeId") savingTypeId: Long?= null,
+        @Query("isActive") isActive: Boolean?= null,
+        @Query("startDate") startDate: String?= null,
+        @Query("endDate") endDate: String?= null,
 
+    ): Response<PageResponse<SavingTicket>>
 
     @POST(PR)
     suspend fun createSavingTicket(@Body request: SavingTicketRequest): Response<SavingTicket>
 
-    @PATCH("$PR/activate/{id}")
-    suspend fun setSavingTicketActive(@Path("id") id: Long, @Body isActive: Boolean): Response<Unit>
 
 
 

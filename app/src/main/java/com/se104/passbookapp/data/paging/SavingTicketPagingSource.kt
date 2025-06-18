@@ -13,6 +13,7 @@ import javax.inject.Inject
 class SavingTicketPagingSource @Inject constructor(
     private val savingTicketApiService: SavingTicketApiService,
     private val filter: SavingTicketFilter,
+    private val isCustomer: Boolean,
 ) : ApiPagingSource<SavingTicket>() {
     override suspend fun fetch(
         page: Int,
@@ -20,18 +21,35 @@ class SavingTicketPagingSource @Inject constructor(
     ): Flow<ApiResponse<PageResponse<SavingTicket>>> {
         return apiRequestFlow {
 
-                savingTicketApiService.getSavingTickets(
+            if (isCustomer) {
+                savingTicketApiService.getSavingTicketsForCustomer(
                     page = page,
                     size = size,
-                    userId = filter.userId,
+                    citizenId = filter.citizenId,
+                    amount = filter.amount,
                     savingTypeId = filter.savingTypeId,
                     isActive = filter.isActive,
                     order = filter.order,
                     sortBy = filter.sortBy,
-                    startDate =StringUtils.formatLocalDate(filter.startDate),
+                    startDate = StringUtils.formatLocalDate(filter.startDate),
+                    endDate = StringUtils.formatLocalDate(filter.endDate),
+                )
+            } else {
+                savingTicketApiService.getSavingTickets(
+                    page = page,
+                    size = size,
+                    citizenId = filter.citizenId,
+                    amount = filter.amount,
+                    savingTypeId = filter.savingTypeId,
+                    isActive = filter.isActive,
+                    order = filter.order,
+                    sortBy = filter.sortBy,
+                    startDate = StringUtils.formatLocalDate(filter.startDate),
                     endDate = StringUtils.formatLocalDate(filter.endDate),
 
-                )
+                    )
+            }
+
 
         }
     }

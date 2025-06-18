@@ -26,6 +26,7 @@ import androidx.navigation.NavController
 import com.se104.passbookapp.R
 import com.se104.passbookapp.navigation.Home
 import com.se104.passbookapp.ui.screen.components.AppButton
+import com.se104.passbookapp.ui.theme.confirm
 
 @Composable
 fun ActionSuccessScreen(
@@ -52,18 +53,20 @@ fun ActionSuccessScreen(
 
             Text(
                 text = "Thao tác thành công",
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onBackground,
+                style = MaterialTheme.typography.headlineLarge,
+                color = MaterialTheme.colorScheme.confirm,
                 fontWeight = FontWeight.Bold,
+                modifier = Modifier.fillMaxWidth(),
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
                 text = "Bạn có thể trở về trang chủ để tiếp tục",
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onBackground,
-                textAlign = TextAlign.Center
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.outline,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(24.dp))

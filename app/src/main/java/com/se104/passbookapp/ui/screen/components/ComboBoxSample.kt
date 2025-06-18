@@ -31,9 +31,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.se104.passbookapp.ui.screen.components.text_field.PassbookTextField
+import kotlinx.coroutines.delay
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -109,28 +112,32 @@ fun  CustomPagingDropdown(
     modifier: Modifier = Modifier,
     title: String,
     textPlaceholder: String,
-    selected: String?,
-
+    search: String,
+    onSearch: (String) -> Unit,
     enabled: Boolean = true,
     dropdownContent: @Composable (onDismissDropdown: () -> Unit) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
-    val listState = rememberLazyListState()
-    val interactionSource = remember { MutableInteractionSource() }
 
-    LaunchedEffect(interactionSource) {
-        interactionSource.interactions.collect { interaction ->
-            if (interaction is PressInteraction.Release) {
-                if(enabled) expanded = !expanded
-            }
+    val searchFocusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(expanded) {
+        if (expanded) {
+            delay(100)
+            searchFocusRequester.requestFocus()
         }
     }
 
+
     Box(modifier) {
         PassbookTextField(
-            value = selected ?: "",
-            onValueChange = {},
-            readOnly = true,
+            value = search,
+            onValueChange = {
+                onSearch(it)
+            },
+            placeholder = {
+                Text(text = textPlaceholder)
+            },
             labelText = title,
             trailingIcon = {
                 Icon(
@@ -138,10 +145,10 @@ fun  CustomPagingDropdown(
                     contentDescription = null
                 )
             },
-            interactionSource = interactionSource,
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { if(enabled) expanded = !expanded }
+                .focusRequester(searchFocusRequester)
         )
         Log.d("CustomPagingDropdown", "expanded: $expanded")
         DropdownMenu(

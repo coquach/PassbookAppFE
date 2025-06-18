@@ -111,6 +111,7 @@ dependencies {
 
 // Accompanist Permissions
     implementation("com.google.accompanist:accompanist-permissions:0.34.0")
+    implementation("com.google.accompanist:accompanist-flowlayout:0.27.0")
 
 // Dagger - Hilt
     implementation("com.google.dagger:hilt-android:2.51.1")

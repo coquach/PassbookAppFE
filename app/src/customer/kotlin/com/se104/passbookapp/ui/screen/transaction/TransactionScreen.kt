@@ -34,6 +34,7 @@ import com.se104.passbookapp.ui.screen.components.LazyPagingSample
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.draw.clip
+import com.se104.passbookapp.MainViewModel
 import com.se104.passbookapp.data.model.Transaction
 import com.se104.passbookapp.data.model.enums.TransactionType
 import com.se104.passbookapp.ui.component.CardSample
@@ -41,16 +42,22 @@ import com.se104.passbookapp.ui.component.DetailsRow
 import com.se104.passbookapp.ui.screen.components.DateRangePickerSample
 import com.se104.passbookapp.ui.theme.confirm
 import com.se104.passbookapp.utils.StringUtils
+import com.se104.passbookapp.utils.hasPermission
 import java.time.LocalDate
 
 @Composable
 fun TransactionScreen(
-    navController: NavController,
     viewModel: TransactionViewModel = hiltViewModel(),
+    permissions: List<String>,
 ) {
+    val isStaff = permissions.hasPermission("VIEW_ALL_TRANSACTIONS")
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val transactions = remember(uiState.filter) {
-        viewModel.getTransactions(uiState.filter)
+        if (isStaff) {
+            viewModel.getTransactions(uiState.filter)
+        } else {
+            viewModel.getTransactionsForCustomer(uiState.filter)
+        }
     }.collectAsLazyPagingItems()
     Column(
         modifier = Modifier
@@ -65,7 +72,8 @@ fun TransactionScreen(
         SearchField(
             searchInput = uiState.search,
             searchChange = {
-                viewModel.onAction(TransactionState.Action.Search(it))
+                if (isStaff) viewModel.onAction(TransactionState.Action.SearchStaff(it)) else
+                    viewModel.onAction(TransactionState.Action.SearchCustomer(it))
             },
             switchState = uiState.filter.order == "desc",
             switchChange = {
@@ -84,15 +92,15 @@ fun TransactionScreen(
                 }
                 Log.d("Transaction filter", "filterChange: ${uiState.filter}")
             },
-            filters = listOf("Id","Giao dịch", "Thời gian"),
+            filters = listOf("Id", "Giao dịch", "Thời gian"),
             filterSelected =
-                when(uiState.filter.sortBy){
+                when (uiState.filter.sortBy) {
                     "id" -> "Id"
                     "amount" -> "Giao dịch"
                     "createdAt" -> "Thời gian"
                     else -> ""
-                }
-
+                },
+            placeHolder = if (isStaff) "Tìm kiếm theo CCCD.." else "Tìm kiếm"
         )
         DateRangePickerSample(
             modifier = Modifier.width(170.dp),

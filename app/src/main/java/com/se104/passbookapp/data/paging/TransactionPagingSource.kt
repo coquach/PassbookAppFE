@@ -24,7 +24,7 @@ class TransactionPagingSource @Inject constructor(
                 transactionApiService.getTransactionsForCustomer(
                     page = page,
                     size = size,
-                    userId = filter.userId,
+                    citizenId = filter.citizenId,
                     transactionType = filter.transactionType,
                     startDate = StringUtils.formatLocalDate(filter.startDate),
                     endDate = StringUtils.formatLocalDate(filter.endDate),
@@ -35,7 +35,7 @@ class TransactionPagingSource @Inject constructor(
                 transactionApiService.getTransactions(
                     page = page,
                     size = size,
-                    userId = filter.userId,
+                    citizenId = filter.citizenId,
                     transactionType = filter.transactionType,
                     startDate = StringUtils.formatLocalDate(filter.startDate),
                     endDate = StringUtils.formatLocalDate(filter.endDate),

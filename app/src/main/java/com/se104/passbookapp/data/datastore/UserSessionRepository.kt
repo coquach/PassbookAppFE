@@ -5,31 +5,35 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.se104.passbookapp.utils.Role
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class UserSessionRepository @Inject constructor(
     private val dataStore: DataStore<Preferences>
 ) {
     object UserPreferencesKeys {
-        val ROLE = stringPreferencesKey("user_role")
+
+        val PERMISSIONS = stringPreferencesKey("permissions")
         val USER_ID = longPreferencesKey("user_id")
     }
-    suspend fun saveRole(role: Role) {
+
+
+
+    suspend fun saveId(userId: Long) {
         dataStore.edit { prefs ->
-            prefs[UserPreferencesKeys.ROLE] = role.name
+            prefs[UserPreferencesKeys.USER_ID] = userId
         }
     }
 
-    suspend fun getRole(): Role? {
-        val prefs = dataStore.data.first()
-        val roleName = prefs[UserPreferencesKeys.ROLE] ?: return null
-        return Role.entries.find { it.name == roleName }
-    }
-    suspend fun saveUserId(userId: Long) {
+
+    suspend fun savePermissions(permissions: List<String>) {
+        val joinedPermissions = permissions.joinToString(",") // lưu dạng CSV
         dataStore.edit { prefs ->
-            prefs[UserPreferencesKeys.USER_ID] = userId
+            prefs[UserPreferencesKeys.PERMISSIONS] = joinedPermissions
         }
     }
     suspend fun getUserId(): Long? {
@@ -39,10 +43,20 @@ class UserSessionRepository @Inject constructor(
 
 
 
+    val permissionsFlow: Flow<List<String>> = dataStore.data.map { prefs ->
+        val permissionsString = prefs[UserPreferencesKeys.PERMISSIONS]
+        permissionsString?.split(",") ?: emptyList()
+    }
+
+
+
+
+
     suspend fun clear() {
         dataStore.edit { prefs ->
-            prefs.remove(UserPreferencesKeys.ROLE)
             prefs.remove(UserPreferencesKeys.USER_ID)
+            prefs.remove(UserPreferencesKeys.PERMISSIONS)
+
         }
     }
 }

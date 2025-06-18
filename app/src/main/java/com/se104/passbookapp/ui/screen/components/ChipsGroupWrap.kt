@@ -124,7 +124,7 @@ fun ChipsGroupWrap(
                     FilterChip(
                         selected = isSelected,
                         onClick = { onOptionSelected(optionText) },
-                        label = { Text(text = optionText, modifier = Modifier.padding(8.dp)) },
+                        label = { Text(text = optionText, modifier = modifier) },
                         colors = FilterChipDefaults.filterChipColors().copy(
                             labelColor = MaterialTheme.colorScheme.onPrimary,
                             selectedContainerColor = MaterialTheme.colorScheme.primary,

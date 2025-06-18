@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.automirrored.filled.Message
+import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.BrightnessMedium
 import androidx.compose.material.icons.filled.CardGiftcard
 import androidx.compose.material.icons.filled.Language
@@ -52,6 +53,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.se104.passbookapp.MainViewModel
+import com.se104.passbookapp.navigation.Report
 import com.se104.passbookapp.ui.screen.components.AppButton
 import com.se104.passbookapp.ui.screen.components.ErrorModalBottomSheet
 import com.se104.passbookapp.ui.screen.components.HeaderDefaultView
@@ -67,8 +70,9 @@ fun SettingScreen(
     darkTheme: Boolean,
     onThemeUpdated: () -> Unit,
     viewModel: SettingViewModel = hiltViewModel(),
+    permissions: List<String>,
 ) {
-    val isNotificationMode = rememberSaveable { mutableStateOf(false) }
+
 
     var showErrorSheet by remember { mutableStateOf(false) }
     var showDialogLogout by remember { mutableStateOf(false) }
@@ -78,7 +82,15 @@ fun SettingScreen(
 
     val lifecycleOwner = LocalLifecycleOwner.current
     LaunchedEffect(Unit) {
-
+        viewModel.event.flowWithLifecycle(lifecycleOwner.lifecycle).collect { event ->
+            when (event) {
+                is SettingState.Event.ShowError -> {
+                    showErrorSheet = true}
+                is SettingState.Event.NavigateToReport -> {
+                    navController.navigate(Report)
+                }
+            }
+        }
     }
 
 
@@ -112,6 +124,9 @@ fun SettingScreen(
                             }
                         )
                         SettingItem(Icons.Default.Lock, "Bảo mật", onClick = {})
+                        if (permissions.contains("VIEW_DASHBOARD")) {
+                            SettingItem(Icons.Default.BarChart, "Thống kê", onClick = {})
+                        }
 
                     },
                 )

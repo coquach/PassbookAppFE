@@ -1,5 +1,6 @@
 package com.se104.passbookapp.ui.screen.home
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,6 +18,9 @@ import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.CurrencyExchange
 import androidx.compose.material.icons.filled.MoneyOff
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Tag
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
@@ -26,6 +30,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,26 +44,59 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
+import androidx.paging.compose.collectAsLazyPagingItems
+import com.se104.passbookapp.MainViewModel
+import com.se104.passbookapp.data.model.User
+import com.se104.passbookapp.navigation.ActionSuccess
+import com.se104.passbookapp.ui.component.DetailsRow
 import com.se104.passbookapp.ui.screen.components.TabWithPager
 import com.se104.passbookapp.ui.screen.components.AppButton
 import com.se104.passbookapp.ui.screen.components.BoxAvatar
 import com.se104.passbookapp.ui.screen.components.CustomBottomSheet
+import com.se104.passbookapp.ui.screen.components.ErrorModalBottomSheet
 import com.se104.passbookapp.ui.screen.components.IconCustomButton
+import com.se104.passbookapp.ui.screen.components.LazyPagingSample
+import com.se104.passbookapp.ui.screen.components.LoadingAnimation
+import com.se104.passbookapp.ui.screen.components.Retry
+import com.se104.passbookapp.ui.screen.components.SearchField
 import com.se104.passbookapp.ui.screen.components.text_field.PassbookTextField
 import com.se104.passbookapp.ui.theme.button
 import com.se104.passbookapp.utils.StringUtils
-import java.math.BigDecimal
+import com.se104.passbookapp.utils.hasPermission
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeCustomerScreen(
+fun HomeScreen(
     navController: NavController,
-    viewModel: HomeViewModel= hiltViewModel(),
+    viewModel: HomeViewModel = hiltViewModel(),
+    permissions: List<String>,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var isOpenTransactionSheet by remember { mutableStateOf(false) }
+    var showErrorSheet by remember { mutableStateOf(false) }
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(Unit) {
+        viewModel.event.flowWithLifecycle(lifecycleOwner.lifecycle).collect { event ->
+            when (event) {
+                is HomeState.Event.ShowError -> {
+                    showErrorSheet = true
+                }
+
+                HomeState.Event.NavigateToActionSuccess -> {
+                    navController.navigate(ActionSuccess)
+                }
+            }
+        }
+    }
+
+
+
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -66,21 +104,7 @@ fun HomeCustomerScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.End
-        ) {
-            IconCustomButton(
 
-                onClick = {},
-                containerColor = Color.Transparent,
-                iconColor = MaterialTheme.colorScheme.primary,
-                icon = Icons.Default.Notifications,
-
-                )
-
-        }
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -109,82 +133,101 @@ fun HomeCustomerScreen(
             }
         }
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(MaterialTheme.shapes.medium)
-                .background(
-                    color = MaterialTheme.colorScheme.background,
-                    shape = MaterialTheme.shapes.medium
+        if (permissions.hasPermission("VIEW_USERS")) {
+            val users = remember(uiState.filter) {
+                viewModel.getUsers(uiState.filter)
+
+            }.collectAsLazyPagingItems()
+            SearchField(
+                searchInput = uiState.search,
+                searchChange = {
+                    viewModel.onAction(HomeState.Action.OnSearch(it))
+
+                },
+                switchChange = {
+                    when (it) {
+                        true -> viewModel.onAction(HomeState.Action.OnChangeOrder("desc"))
+                        false -> viewModel.onAction(HomeState.Action.OnChangeOrder("asc"))
+                    }
+                },
+                filterChange = {
+                    when (it) {
+                        "Tên" -> viewModel.onAction(HomeState.Action.OnChangeSortBy("fullName"))
+                        "Số dư" -> viewModel.onAction(HomeState.Action.OnChangeSortBy("balance"))
+                        "Năm sinh" -> viewModel.onAction(HomeState.Action.OnChangeSortBy("dateOfBirth"))
+                        else -> viewModel.onAction(HomeState.Action.OnChangeSortBy("fullName"))
+
+                    }
+                    Log.d("Home", "filterChange: ${uiState.filter}")
+                },
+                filters = listOf("Tên", "Số dư", "Năm sinh"),
+                filterSelected = when (uiState.filter.sortBy) {
+                    "fullName" -> "Tên"
+                    "balance" -> "Số dư"
+                    "dateOfBirth" -> "Năm sinh"
+                    else -> "Số dư"
+                },
+                switchState = uiState.filter.order == "desc",
+                placeHolder = "Tìm kiếm theo CCCD..."
+            )
+            LazyPagingSample(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                items = users,
+                textNothing = "Không có khách hàng nào",
+                iconNothing = Icons.Default.People,
+                columns = 1,
+                key = {
+                    it.id
+                },
+
+                ) {
+                UserSection(
+                    onClick = {
+                        viewModel.onAction(HomeState.Action.OnSelectUser(it.id))
+                        isOpenTransactionSheet = true
+                    },
+                    user = it,
+                    isStaff = true
                 )
-                .padding(18.dp),
-        ) {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+            }
 
-                ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "Số dư tài khoản",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.ExtraBold
-
-                    )
-                    Button(
-                        onClick = {
-                            isOpenTransactionSheet = true
+        } else if(permissions.hasPermission("VIEW_MY_INFO") ) {
+            when (uiState.getInfoState) {
+                is HomeState.GetInfoState.Error -> {
+                    val message = (uiState.getInfoState as HomeState.GetInfoState.Error).message
+                    Retry(
+                        message = message,
+                        onClicked = {
+                            viewModel.getMyInfo()
                         },
                         modifier = Modifier
-                            .width(150.dp)
-                            .height(48.dp),
-                        shape = MaterialTheme.shapes.extraLarge,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.button,
-                            contentColor = MaterialTheme.colorScheme.onPrimary
-                        ),
-
-                        ) {
-                        Icon(
-                            imageVector = Icons.Default.CurrencyExchange,
-                            contentDescription = "Transaction",
-                        )
-                        Text(
-                            text = "Giao dịch",
-                            style = MaterialTheme.typography.labelLarge,
-                            modifier = Modifier.padding(start = 8.dp)
-                        )
-                    }
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ){
-                    var isVisible by remember { mutableStateOf(false) }
-                    Text(
-                        text = StringUtils.formatCurrency(BigDecimal(50000), !isVisible),
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.ExtraBold
-
+                            .fillMaxWidth()
+                            .weight(1f)
                     )
-                    IconCustomButton(
+                }
+
+                HomeState.GetInfoState.Loading -> {
+                    LoadingAnimation(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                    )
+                }
+
+                is HomeState.GetInfoState.Success -> {
+                    val user = (uiState.getInfoState as HomeState.GetInfoState.Success).data
+                    UserSection(
                         onClick = {
-                            isVisible = !isVisible
+                            viewModel.onAction(HomeState.Action.OnSelectUser(user.id))
+                            isOpenTransactionSheet = true
                         },
-                        containerColor = Color.Transparent,
-                        icon = if (isVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                        iconColor = MaterialTheme.colorScheme.primary
+                        user = user,
                     )
                 }
-
             }
         }
-
     }
     if (isOpenTransactionSheet) {
         CustomBottomSheet(
@@ -277,7 +320,7 @@ fun HomeCustomerScreen(
                                     .fillMaxWidth(),
                                 text = "Rút",
                                 backgroundColor = MaterialTheme.colorScheme.primary,
-                            ) 
+                            )
                         }
                     }
                 ),
@@ -289,5 +332,107 @@ fun HomeCustomerScreen(
             )
         }
     }
+    if (showErrorSheet) {
+        ErrorModalBottomSheet(
+            description = uiState.error.toString(),
+            onDismiss = {
+                showErrorSheet = false
+            }
+        )
+    }
 
+}
+
+@Composable
+fun UserSection(
+    onClick: () -> Unit,
+    user: User,
+    isStaff: Boolean = false,
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(MaterialTheme.shapes.medium)
+            .background(
+                color = MaterialTheme.colorScheme.background,
+                shape = MaterialTheme.shapes.medium
+            )
+            .padding(18.dp),
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+
+            ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Số dư tài khoản",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.ExtraBold
+
+                )
+                Button(
+                    onClick = onClick,
+                    modifier = Modifier
+                        .width(150.dp)
+                        .height(48.dp),
+                    shape = MaterialTheme.shapes.extraLarge,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.button,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ),
+
+                    ) {
+                    Icon(
+                        imageVector = Icons.Default.CurrencyExchange,
+                        contentDescription = "Transaction",
+                    )
+                    Text(
+                        text = "Giao dịch",
+                        style = MaterialTheme.typography.labelLarge,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                }
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                var isVisible by remember { mutableStateOf(false) }
+                Text(
+                    text = StringUtils.formatCurrency(user.balance, !isVisible),
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.ExtraBold
+
+                )
+                IconCustomButton(
+                    onClick = {
+                        isVisible = !isVisible
+                    },
+                    containerColor = Color.Transparent,
+                    icon = if (isVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                    iconColor = MaterialTheme.colorScheme.primary
+                )
+            }
+            if (isStaff) {
+                DetailsRow(
+                    text = user.fullName,
+                    title = "Họ và tên",
+                    icon = Icons.Default.Person,
+                )
+                DetailsRow(
+                    text = user.citizenID,
+                    title = "Mã CCCD",
+                    icon = Icons.Default.Tag,
+                )
+            }
+
+
+        }
+    }
 }

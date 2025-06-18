@@ -24,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntOffset
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import com.se104.passbookapp.navigation.AppNavGraph
 import com.se104.passbookapp.navigation.Auth
@@ -51,6 +52,7 @@ class MainActivity : BasePassbookAppActivity() {
             var isDarkMode by remember { mutableStateOf(darkMode) }
             val navController = rememberNavController()
             val screen = viewModel.startDestination.value
+            val permissions by viewModel.permissions.collectAsStateWithLifecycle()
 
             PassBookAppTheme(darkTheme = isDarkMode) {
 
@@ -124,7 +126,8 @@ class MainActivity : BasePassbookAppActivity() {
                                     isDarkMode = !isDarkMode
                                 },
                                 navController = navController,
-                                paddingValues = paddingValues
+                                paddingValues = paddingValues,
+                                permissions = permissions
                             )
                         }
                     }

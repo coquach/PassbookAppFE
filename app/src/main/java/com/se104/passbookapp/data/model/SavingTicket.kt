@@ -1,5 +1,6 @@
 package com.se104.passbookapp.data.model
 
+import com.se104.passbookapp.ui.screen.auth.signup.SignUp
 import com.se104.passbookapp.utils.json_format.BigDecimalSerializer
 import com.se104.passbookapp.utils.json_format.LocalDateSerializer
 import com.se104.passbookapp.utils.json_format.LocalDateTimeSerializer
@@ -12,6 +13,7 @@ import java.time.LocalDateTime
 data class SavingTicket(
     val id: Long,
     val userId: Long,
+    val citizenId: String,
     val savingTypeId: Long,
     val savingTypeName: String,
     val duration: Int,

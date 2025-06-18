@@ -10,10 +10,12 @@ import com.se104.passbookapp.data.model.SavingType
 import com.se104.passbookapp.ui.screen.auth.AuthScreen
 import com.se104.passbookapp.ui.screen.auth.login.LoginScreen
 import com.se104.passbookapp.ui.screen.auth.signup.SignUpScreen
-import com.se104.passbookapp.ui.screen.home.HomeCustomerScreen
+import com.se104.passbookapp.ui.screen.home.HomeScreen
+import com.se104.passbookapp.ui.screen.report.ReportScreen
 import com.se104.passbookapp.ui.screen.saving_ticket.SavingTicketScreen
 import com.se104.passbookapp.ui.screen.saving_ticket.create.CreateSavingTicketsScreen
 import com.se104.passbookapp.ui.screen.saving_ticket.create.SelectSavingTypeScreen
+import com.se104.passbookapp.ui.screen.saving_ticket.details.SavingTicketDetailsScreen
 import com.se104.passbookapp.ui.screen.setting.SettingScreen
 import com.se104.passbookapp.ui.screen.success.ActionSuccessScreen
 import com.se104.passbookapp.ui.screen.transaction.TransactionScreen
@@ -27,7 +29,9 @@ fun AppNavGraph(
     isDarkMode: Boolean,
     startDestination: NavRoute,
     onThemeUpdated: () -> Unit,
-    paddingValues: PaddingValues
+    paddingValues: PaddingValues,
+    permissions: List<String>
+
 ) {
         PassbookAppNavHost (
             navController = navController,
@@ -53,13 +57,19 @@ fun AppNavGraph(
 
             composable<Home> {
 
-                HomeCustomerScreen(navController)
+                HomeScreen(navController, permissions= permissions)
             }
             composable<SavingTicket> {
-                SavingTicketScreen(navController)
+                SavingTicketScreen(navController, permissions = permissions)
+            }
+
+            composable<SavingTicketDetails>(
+                typeMap =mapOf(typeOf<com.se104.passbookapp.data.model.SavingTicket>() to savingTicketNavType)
+            ) {
+                SavingTicketDetailsScreen(navController, permissions = permissions)
             }
             composable<Transaction> {
-                TransactionScreen(navController)
+                TransactionScreen(permissions = permissions)
             }
             composable<SelectSavingType>{
                 SelectSavingTypeScreen(navController)
@@ -68,7 +78,7 @@ fun AppNavGraph(
             composable<CreateSavingTicket>(
                 typeMap =mapOf(typeOf<SavingType>() to savingTypeNavType)
             ) {
-                CreateSavingTicketsScreen(navController)
+                CreateSavingTicketsScreen(navController, permissions = permissions)
             }
 
             composable<ActionSuccess> {
@@ -76,7 +86,11 @@ fun AppNavGraph(
             }
 
             composable<Setting> {
-                SettingScreen(navController, isDarkMode, onThemeUpdated)
+                SettingScreen(navController, isDarkMode, onThemeUpdated, permissions = permissions)
+            }
+
+            composable<Report> {
+                ReportScreen(navController)
             }
         }
 

@@ -1,5 +1,6 @@
 package com.se104.passbookapp.navigation
 
+import com.se104.passbookapp.data.model.SavingTicket
 import com.se104.passbookapp.data.model.SavingType
 import kotlinx.serialization.Serializable
 
@@ -34,10 +35,12 @@ object SavingType: NavRoute
 object SavingTicket: NavRoute
 
 @Serializable
-object Transaction: NavRoute
+data class SavingTicketDetails(val savingTicket: SavingTicket) : NavRoute
 
 @Serializable
-object Notification: NavRoute
+object Transaction: NavRoute
+
+
 
 @Serializable
 object SelectSavingType: NavRoute
@@ -47,3 +50,6 @@ data class CreateSavingTicket(val savingType: SavingType) : NavRoute
 
 @Serializable
 object ActionSuccess: NavRoute
+
+@Serializable
+object Report: NavRoute
