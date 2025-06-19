@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.CurrencyExchange
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.PostAdd
 import androidx.compose.material.icons.filled.Savings
 import androidx.compose.material.icons.filled.Settings
@@ -85,6 +86,9 @@ sealed class BottomNavItem(val route: NavRoute, val icon: ImageVector) {
 
     data object Transaction :
         BottomNavItem(com.se104.passbookapp.navigation.Transaction, Icons.Default.CurrencyExchange)
+
+    data object UserManage :
+           BottomNavItem(com.se104.passbookapp.navigation.UserManage, Icons.Default.People)
 
 }
 

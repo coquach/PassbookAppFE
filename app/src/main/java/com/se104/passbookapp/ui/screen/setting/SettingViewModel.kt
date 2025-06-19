@@ -38,6 +38,11 @@ class SettingViewModel @Inject constructor(): ViewModel() {
                     _event.send(SettingState.Event.NavigateToParameters)
                 }
             }
+            is SettingState.Action.OnClickProfile -> {
+                viewModelScope.launch {
+                    _event.send(SettingState.Event.NavigateToProfile)
+                }
+            }
         }
     }
 }
@@ -52,12 +57,15 @@ object SettingState{
         data object ShowError : Event
         data object NavigateToReport : Event
         data object NavigateToParameters: Event
+        data object NavigateToProfile: Event
+
     }
     sealed class Action{
 
         object OnLogout : Action()
         data object OnClickReport : Action()
         data object OnClickParameters : Action()
+        data object OnClickProfile : Action()
     }
 
 }

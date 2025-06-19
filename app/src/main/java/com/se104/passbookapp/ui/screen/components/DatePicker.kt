@@ -1,4 +1,4 @@
-package com.example.foodapp.ui.screen.components
+package com.se104.passbookapp.ui.screen.components
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
@@ -11,6 +11,7 @@ import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
@@ -22,10 +23,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.se104.passbookapp.ui.screen.components.FoodAppTextField
+import com.se104.passbookapp.ui.screen.components.text_field.PassbookTextField
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -33,10 +35,24 @@ import java.time.format.DateTimeFormatter
 fun DatePickerSample(
     text: String,
     selectedDate: LocalDate?,
-    onDateSelected: (LocalDate) -> Unit
+    onDateSelected: (LocalDate) -> Unit,
+    maxDate: LocalDate? = null
 ) {
     var showDialog by remember { mutableStateOf(false) }
-    val datePickerState = rememberDatePickerState()
+
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = selectedDate?.atStartOfDay(ZoneOffset.UTC)?.toInstant()?.toEpochMilli(),
+
+        selectableDates = object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                val date = Instant.ofEpochMilli(utcTimeMillis)
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate()
+                // ✅ Nếu maxDate có giá trị -> kiểm tra giới hạn
+                return maxDate?.let { !date.isAfter(it) } ?: true
+            }
+        }
+    )
 
     val interactionSource = remember { MutableInteractionSource() }
 
@@ -48,8 +64,7 @@ fun DatePickerSample(
         }
     }
 
-
-    FoodAppTextField(
+    PassbookTextField(
         value = selectedDate?.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) ?: "",
         onValueChange = {},
         readOnly = true,
@@ -58,12 +73,8 @@ fun DatePickerSample(
             Icon(Icons.Default.DateRange, contentDescription = null)
         },
         interactionSource = interactionSource,
-        modifier = Modifier
-            .fillMaxWidth()
-
+        modifier = Modifier.fillMaxWidth()
     )
-
-
 
     if (showDialog) {
         DatePickerDialog(
@@ -89,7 +100,8 @@ fun DatePickerSample(
                 }
             }
         ) {
-            DatePicker(state = datePickerState,
+            DatePicker(
+                state = datePickerState,
                 title = {
                     Text(
                         text = "Chọn ngày",
@@ -98,8 +110,10 @@ fun DatePickerSample(
                             .padding(horizontal = 24.dp, vertical = 20.dp),
                         style = MaterialTheme.typography.titleLarge
                     )
-                })
+                }
+            )
         }
     }
 }
+
 

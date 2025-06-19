@@ -99,6 +99,7 @@ class MainActivity : BasePassbookAppActivity() {
                         val navItems = listOf(
                             BottomNavItem.Home,
                             BottomNavItem.SavingType,
+                            BottomNavItem.UserManage,
                             BottomNavItem.Setting,
                         )
                         val bottomBarOffsetHeightPx = remember { mutableFloatStateOf(0f) }

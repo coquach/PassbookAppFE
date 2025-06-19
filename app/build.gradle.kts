@@ -62,19 +62,14 @@ android {
         }
         create("admin") {
             dimension = "environment"
-            applicationIdSuffix = ".restaurant"
+            applicationIdSuffix = ".admin"
 
 
 
             resValue(
                 type = "string",
                 name = "app_name",
-                value = "FA Restaurant"
-            )
-            resValue(
-                "string",
-                "app_description",
-                "Quản lý đơn hàng, theo dõi doanh thu, tối ưu vận hành."
+                value = "Admin App"
             )
         }
     }

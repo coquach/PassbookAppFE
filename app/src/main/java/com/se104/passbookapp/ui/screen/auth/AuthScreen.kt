@@ -33,6 +33,7 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.se104.passbookapp.R
 import com.se104.passbookapp.navigation.Login
+import com.se104.passbookapp.navigation.SendEmail
 import com.se104.passbookapp.navigation.SignUp
 import com.se104.passbookapp.ui.screen.components.AppButton
 
@@ -45,28 +46,12 @@ fun AuthScreen(
     navController: NavController,
     isCustomer: Boolean = true,
 ) {
-
-
-    val notificationPermissionState =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) rememberPermissionState(
-            permission = Manifest.permission.POST_NOTIFICATIONS
-        ) else null
-
-    if (notificationPermissionState != null) {
-        LaunchedEffect(Unit) {
-
-            if (!notificationPermissionState.status.isGranted) {
-                notificationPermissionState.launchPermissionRequest()
-            }
-
-        }
-    }
+    
 
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.inversePrimary)
 
     ) {
 
@@ -103,10 +88,10 @@ fun AuthScreen(
                     text = stringResource(R.string.sign_up),
                     modifier = Modifier.fillMaxWidth(),
                     onClick = {
-                        navController.navigate(SignUp)
+                        navController.navigate(SendEmail)
                     },
-                    backgroundColor = MaterialTheme.colorScheme.onPrimary,
-                    textColor = MaterialTheme.colorScheme.button,
+                    backgroundColor = MaterialTheme.colorScheme.inversePrimary.copy(alpha = 0.6f),
+                    textColor = MaterialTheme.colorScheme.primary,
 
                     )
             }

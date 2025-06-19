@@ -231,7 +231,7 @@ fun UserComboBox(
                 ) {
                     Text(text = it.fullName, color = MaterialTheme.colorScheme.primary)
                     Spacer(modifier = Modifier.weight(1f))
-                    Text(text = it.username, color = MaterialTheme.colorScheme.primary)
+                    Text(text = it.citizenID, color = MaterialTheme.colorScheme.primary)
                 }
             },
             onClick = {

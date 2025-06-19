@@ -2,6 +2,7 @@ package com.se104.passbookapp.navigation
 
 import com.se104.passbookapp.data.model.SavingTicket
 import com.se104.passbookapp.data.model.SavingType
+import com.se104.passbookapp.data.model.User
 import kotlinx.serialization.Serializable
 
 interface NavRoute
@@ -15,10 +16,25 @@ object Welcome: NavRoute
 object Auth : NavRoute
 
 @Serializable
-object SignUp : NavRoute
+data class SignUp(val email: String) : NavRoute
 
 @Serializable
 object Login : NavRoute
+
+
+@Serializable
+object SendEmail : NavRoute
+
+@Serializable
+data class VerifyEmail(val email: String) : NavRoute
+
+@Serializable
+object ForgotPassword : NavRoute
+
+@Serializable
+object ChangePassword : NavRoute
+
+
 
 @Serializable
 object Home : NavRoute
@@ -40,7 +56,8 @@ data class SavingTicketDetails(val savingTicket: SavingTicket) : NavRoute
 @Serializable
 object Transaction: NavRoute
 
-
+@Serializable
+object Profile: NavRoute
 
 @Serializable
 object SelectSavingType: NavRoute
@@ -56,3 +73,9 @@ object Report: NavRoute
 
 @Serializable
 object Parameters: NavRoute
+
+@Serializable
+object UserManage: NavRoute
+
+@Serializable
+data class UserDetail(val user: User): NavRoute

@@ -14,6 +14,7 @@ import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.BrightnessMedium
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PrivacyTip
 import androidx.compose.material.icons.filled.SettingsSuggest
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,6 +34,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
 import com.se104.passbookapp.navigation.Parameters
+import com.se104.passbookapp.navigation.Profile
 import com.se104.passbookapp.navigation.Report
 import com.se104.passbookapp.ui.screen.components.AppButton
 import com.se104.passbookapp.ui.screen.components.ErrorModalBottomSheet
@@ -71,6 +73,9 @@ fun SettingScreen(
                 is SettingState.Event.NavigateToParameters -> {
                     navController.navigate(Parameters)
                 }
+                is SettingState.Event.NavigateToProfile -> {
+                    navController.navigate(Profile)
+                }
             }
         }
     }
@@ -105,7 +110,12 @@ fun SettingScreen(
                                 )
                             }
                         )
-                        SettingItem(Icons.Default.Lock, "Bảo mật", onClick = {})
+                        if (permissions.contains("VIEW_MY_INFO")) {
+                            SettingItem(Icons.Default.Person, "Thông tin cá nhân", onClick = {
+                                viewModel.onAction(SettingState.Action.OnClickProfile)
+                            })
+                        }
+
                         if (permissions.contains("VIEW_PARAMETERS")) {
                             SettingItem(Icons.Default.SettingsSuggest, "Quản lí hệ thống", onClick = {
                                 viewModel.onAction(SettingState.Action.OnClickParameters)
@@ -118,17 +128,6 @@ fun SettingScreen(
                         }
 
                     },
-                )
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
-            SettingGroup(
-                items = listOf(
-                    {
-                        SettingItem(Icons.AutoMirrored.Filled.Help, "Hỏi đáp & trợ giúp")
-                        SettingItem(Icons.AutoMirrored.Filled.Message, "Liên hệ")
-                        SettingItem(Icons.Default.PrivacyTip, "Chính sách bảo mật")
-                    }
                 )
             )
 

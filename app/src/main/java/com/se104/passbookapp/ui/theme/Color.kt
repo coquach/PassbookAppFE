@@ -5,7 +5,7 @@ import androidx.compose.material3.ColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-val primaryLight = Color(0xFF8D4959)
+val primaryLight = Color(0xFFFF85A2) //0xFF8D4959
 val onPrimaryLight = Color(0xFFFFFFFF)
 val primaryContainerLight = Color(0xFFFFD9DF)
 val onPrimaryContainerLight = Color(0xFF3A0817)
@@ -29,7 +29,7 @@ val inversePrimaryLight = Color(0xFFFFB1C1)
 val outlineLight = Color(0xFF9E8C90)
 
 
-val primaryDark = Color(0xFFFFB1C1)
+val primaryDark = Color(0xFFFFA8B9) //FFB1C1
 val onPrimaryDark = Color(0xFF4B0D1E)
 val primaryContainerDark = Color(0xFF6F2C3B)
 val onPrimaryContainerDark = Color(0xFFFFD9DF)

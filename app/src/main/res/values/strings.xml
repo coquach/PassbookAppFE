@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">PassBookApp</string>
+    <string name="app_name">Passbook App</string>
     <string name="welcome">Chào mừng đến với</string>
     <string name="app_description">Dễ dàng gửi tiết kiệm, sinh lời nhanh chóng, quản lý tài chính thông minh.</string>
     <string name="sign_with_email">Bắt đầu với email</string>

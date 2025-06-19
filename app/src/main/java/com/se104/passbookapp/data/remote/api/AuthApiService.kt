@@ -6,6 +6,7 @@ import com.se104.passbookapp.data.dto.response.TokenResponse
 import retrofit2.Response
 
 import retrofit2.http.Body
+import retrofit2.http.Header
 import retrofit2.http.POST
 
 
@@ -25,11 +26,39 @@ interface AuthApiService {
 
     @POST("$PR/refresh")
     suspend fun refreshToken(
-        @Body tokenRefresh: String?= null
+        @Header("refresh-token") tokenRefresh: String?= null
     ) : Response<TokenResponse>
 
     //Logout
 
     @POST("$PR/logout")
-    suspend fun logout() : Response<Unit>
+    suspend fun logout(
+        @Header("access-token") tokenAccess: String?= null,
+    ) : Response<Unit>
+
+    @POST("$PR/forgot-password")
+    suspend fun forgotPassword(
+        @Body request: Map<String, String>
+    ) : Response<Unit>
+
+
+    @POST("$PR/change-password")
+    suspend fun changePassword(
+        @Body request: Map<String, String>
+    ) : Response<Unit>
+
+
+    @POST("$PR/send-otp")
+    suspend fun verifyEmail(
+        @Body request: Map<String, String>
+    ) : Response<Unit>
+
+    @POST("$PR/verify")
+    suspend fun postMethodName(
+        @Body request: Map<String, String>
+    ) : Response<Unit>
+
+
+
+
 }

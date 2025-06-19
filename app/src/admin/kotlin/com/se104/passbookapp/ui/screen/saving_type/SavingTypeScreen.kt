@@ -1,5 +1,8 @@
 package com.se104.passbookapp.ui.screen.saving_type
 
+import CardSample
+import DetailsRow
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,10 +23,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.MonetizationOn
 import androidx.compose.material.icons.filled.Savings
 import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -42,6 +47,7 @@ import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -50,10 +56,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
-import androidx.navigation.NavController
 import com.se104.passbookapp.data.model.SavingType
-import com.se104.passbookapp.ui.component.CardSample
-import com.se104.passbookapp.ui.component.DetailsRow
+import com.se104.passbookapp.ui.screen.components.AppButton
 import com.se104.passbookapp.ui.screen.components.ErrorModalBottomSheet
 import com.se104.passbookapp.ui.screen.components.HeaderDefaultView
 import com.se104.passbookapp.ui.screen.components.MyFloatingActionButton
@@ -61,6 +65,9 @@ import com.se104.passbookapp.ui.screen.components.Nothing
 import com.se104.passbookapp.ui.screen.components.PassbookAppDialog
 import com.se104.passbookapp.ui.screen.components.TabWithPager
 import com.se104.passbookapp.ui.screen.components.text_field.PassbookTextField
+import com.se104.passbookapp.ui.theme.confirm
+import com.se104.passbookapp.utils.hasAllPermissions
+import com.se104.passbookapp.utils.hasPermission
 import me.saket.swipe.SwipeAction
 import me.saket.swipe.SwipeableActionsBox
 
@@ -68,17 +75,42 @@ import me.saket.swipe.SwipeableActionsBox
 @Composable
 fun SavingTypeScreen(
     viewModel: SavingTypeViewModel = hiltViewModel(),
+    permissions: List<String>,
 ) {
+    val isView = permissions.hasAllPermissions("VIEW_ACTIVE_SAVINGTYPES", "VIEW_INACTIVE_SAVINGTYPES")
+    val isModify = permissions.hasAllPermissions("CREATE_SAVINGTYPE", "UPDATE_SAVINGTYPE")
+    val isDelete = permissions.hasPermission("DELETE_SAVINGTYPE")
+    val isSetActive = permissions.hasPermission("SET_ACTIVE_SAVINGTYPE")
+
+
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showErrorSheet by rememberSaveable { mutableStateOf(false) }
     var showDialogUpdate by rememberSaveable { mutableStateOf(false) }
     var showDialogStatus by rememberSaveable { mutableStateOf(false) }
+    var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
+
+
+    val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     LaunchedEffect(Unit) {
         viewModel.event.flowWithLifecycle(lifecycleOwner.lifecycle).collect {
             when (it) {
                 SavingTypeState.Event.ShowError -> {
                     showErrorSheet = true
+                }
+                SavingTypeState.Event.ShowToastUnEnableAction -> {
+                    Toast.makeText(
+                        context,
+                        "Bạn không có quyền thực hiện thao tác này",
+                        Toast.LENGTH_SHORT
+
+                    ).show()
+                }
+                is SavingTypeState.Event.ShowToastSuccess -> {
+                    Toast.makeText(
+                        context,
+                        it.message,
+                        Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -87,9 +119,14 @@ fun SavingTypeScreen(
         floatingActionButton = {
             MyFloatingActionButton(
                 onClick = {
-                    viewModel.onAction(SavingTypeState.Action.OnSelectedSavingType(SavingType()))
-                    viewModel.onAction(SavingTypeState.Action.OnUpdateStatus(false))
-                    showDialogUpdate = true
+                    if(isModify){
+                        viewModel.onAction(SavingTypeState.Action.OnSelectedSavingType(SavingType()))
+                        viewModel.onAction(SavingTypeState.Action.OnUpdateStatus(false))
+                        showDialogUpdate = true
+                    }else{
+                        viewModel.onAction(SavingTypeState.Action.ShowToast)
+                    }
+
                 },
                 bgColor = MaterialTheme.colorScheme.primary,
             ) {
@@ -120,70 +157,122 @@ fun SavingTypeScreen(
 
         ) {
             HeaderDefaultView(
-
                 text = "Loại tiết kiệm"
             )
-
-            TabWithPager(
-                tabs = listOf("Đang hiển thị", "Đã ẩn"),
-                pages = listOf(
-                    {
-                        SavingTypeListSection(
-                            savingTypes = uiState.activeSavingTypes,
-                            onClick = {
-                                viewModel.onAction(SavingTypeState.Action.OnSelectedSavingType(it))
-                                viewModel.onAction(SavingTypeState.Action.OnUpdateStatus(true))
-                                showDialogUpdate = true
-                            },
-                            endAction = { it ->
-                                SwipeAction(
-                                    icon = rememberVectorPainter(Icons.Default.Visibility),
-                                    background = MaterialTheme.colorScheme.outline,
-                                    onSwipe = {
-                                        viewModel.onAction(
-                                            SavingTypeState.Action.OnSelectedSavingType(
-                                                it
-                                            )
-                                        )
-                                        viewModel.onAction(SavingTypeState.Action.OnHideStatus(true))
-                                        showDialogStatus = true
-                                    }
-                                )
-                            }
-                        )
-                    },
-                    {
-                        SavingTypeListSection(
-                            savingTypes = uiState.inactiveSavingTypes,
-                            onClick = {
-                                viewModel.onAction(SavingTypeState.Action.OnSelectedSavingType(it))
-                                viewModel.onAction(SavingTypeState.Action.OnUpdateStatus(true))
-                                showDialogUpdate = true
-                            },
-                            endAction = { it ->
-                                SwipeAction(
-                                    icon = rememberVectorPainter(Icons.Default.Visibility),
-                                    background = MaterialTheme.colorScheme.outline,
-                                    onSwipe = {
-                                        viewModel.onAction(
-                                            SavingTypeState.Action.OnSelectedSavingType(
-                                                it
-                                            )
-                                        )
-                                        viewModel.onAction(SavingTypeState.Action.OnHideStatus(false))
-                                        showDialogStatus = true
-                                    }
-                                )
-                            }
-                        )
-                    }
-                ),
-                modifier = Modifier.fillMaxWidth().weight(1f),
-                scrollable = false,
-                onTabSelected = {
-
+            if (isView){
+                LaunchedEffect(Unit) {
+                    viewModel.getActiveSavingTypes()
+                    viewModel.getInActiveSavingTypes()
                 }
-            )
+                TabWithPager(
+                    tabs = listOf("Đang hiển thị", "Đã ẩn"),
+                    pages = listOf(
+                        {
+                            SavingTypeListSection(
+                                savingTypes = uiState.activeSavingTypes,
+                                onClick = {
+                                    viewModel.onAction(SavingTypeState.Action.OnSelectedSavingType(it))
+                                    viewModel.onAction(SavingTypeState.Action.OnUpdateStatus(true))
+                                    showDialogUpdate = true
+                                },
+                                startAction = { it ->
+                                    SwipeAction(
+                                        icon = rememberVectorPainter(Icons.Default.VisibilityOff),
+                                        background = MaterialTheme.colorScheme.outline,
+                                        onSwipe = {
+                                            if(isSetActive){
+                                                viewModel.onAction(
+                                                    SavingTypeState.Action.OnSelectedSavingType(
+                                                        it
+                                                    )
+                                                )
+                                                viewModel.onAction(SavingTypeState.Action.OnHideStatus(true))
+                                                showDialogStatus = true
+                                            } else viewModel.onAction(SavingTypeState.Action.ShowToast)
+
+                                        }
+                                    )
+                                },
+                                endAction = { it ->
+                                    SwipeAction(
+                                        icon = rememberVectorPainter(Icons.Default.Delete),
+                                        background = MaterialTheme.colorScheme.error,
+                                        onSwipe = {
+                                            if(isDelete){
+                                                viewModel.onAction(
+                                                    SavingTypeState.Action.OnSelectedSavingType(
+                                                        it
+                                                    )
+                                                )
+                                                showDeleteDialog = true
+                                            } else viewModel.onAction(SavingTypeState.Action.ShowToast)
+
+                                        }
+                                    )
+                                }
+                            )
+                        },
+                        {
+                            SavingTypeListSection(
+                                savingTypes = uiState.inactiveSavingTypes,
+                                onClick = {
+                                    viewModel.onAction(SavingTypeState.Action.OnSelectedSavingType(it))
+                                    viewModel.onAction(SavingTypeState.Action.OnUpdateStatus(true))
+                                    showDialogUpdate = true
+                                },
+                                startAction = { it ->
+                                    SwipeAction(
+                                        icon = rememberVectorPainter(Icons.Default.Visibility),
+                                        background = MaterialTheme.colorScheme.confirm,
+                                        onSwipe = {
+                                            if(isSetActive){
+                                                viewModel.onAction(
+                                                    SavingTypeState.Action.OnSelectedSavingType(
+                                                        it
+                                                    )
+                                                )
+                                                viewModel.onAction(SavingTypeState.Action.OnHideStatus(false))
+                                                showDialogStatus = true
+                                            } else viewModel.onAction(SavingTypeState.Action.ShowToast)
+
+                                        }
+                                    )
+                                },
+                                endAction = { it ->
+                                    SwipeAction(
+                                        icon = rememberVectorPainter(Icons.Default.Delete),
+                                        background = MaterialTheme.colorScheme.error,
+                                        onSwipe = {
+                                            if(isDelete){
+                                                viewModel.onAction(
+                                                    SavingTypeState.Action.OnSelectedSavingType(
+                                                        it
+                                                    )
+                                                )
+                                                showDeleteDialog = true
+                                            } else viewModel.onAction(SavingTypeState.Action.ShowToast)
+
+                                        }
+                                    )
+                                }
+                            )
+                        }
+                    ),
+                    modifier = Modifier.fillMaxWidth().weight(1f),
+                    scrollable = false,
+                    onTabSelected = {
+
+                    }
+                )
+            }
+            else {
+                Nothing(
+                    text = "Bạn không có quyền xem danh sách loại tiết kiệm",
+                    icon = Icons.Default.Groups,
+                    modifier = Modifier.fillMaxWidth().weight(1f)
+                )
+            }
+
 
 
         }
@@ -203,7 +292,7 @@ fun SavingTypeScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(
-                            MaterialTheme.colorScheme.inversePrimary,
+                            MaterialTheme.colorScheme.secondaryContainer,
                             shape = RoundedCornerShape(16.dp)
                         )
                         .padding(30.dp)
@@ -251,21 +340,42 @@ fun SavingTypeScreen(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)
                         ) {
-                            Button(
+//                            AButton(
+//                                onClick = {
+//                                    showDialogUpdate = false
+//                                },
+//                                colors = ButtonDefaults.buttonColors(
+//                                    containerColor = MaterialTheme.colorScheme.outline
+//                                ),
+//                                modifier = Modifier.heightIn(48.dp),
+//                                shape = RoundedCornerShape(12.dp)
+//
+//
+//                            ) {
+//                                Text(text = "Đóng", modifier = Modifier.padding(horizontal = 16.dp))
+//                            }
+                            AppButton(
+                                text = "Đóng",
                                 onClick = {
                                     showDialogUpdate = false
                                 },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.outline
-                                ),
-                                modifier = Modifier.heightIn(48.dp),
-                                shape = RoundedCornerShape(12.dp)
+                                backgroundColor = MaterialTheme.colorScheme.outline,
+                                textColor = MaterialTheme.colorScheme.onPrimary,
+                                enable = isModify && !uiState.isLoading
+                            )
+                            AppButton(
+                                text = if (uiState.isUpdate) "Cập nhật" else "Tạo",
+                                onClick = {
+                                    if (uiState.isUpdate) {
+                                        viewModel.onAction(SavingTypeState.Action.OnUpdateSavingType)
 
+                                    } else viewModel.onAction(SavingTypeState.Action.OnCreateSavingType)
 
-                            ) {
-                                Text(text = "Đóng", modifier = Modifier.padding(horizontal = 16.dp))
-                            }
-
+                                    showDialogUpdate = false
+                                }
+                                ,
+                                enable = isModify && !uiState.isLoading
+                            )
 
                             Button(
                                 onClick = {
@@ -279,7 +389,7 @@ fun SavingTypeScreen(
                                 },
                                 modifier = Modifier.heightIn(48.dp),
                                 shape = RoundedCornerShape(12.dp),
-                                enabled = !uiState.isLoading
+                                enabled =  !uiState.isLoading
                             ) {
                                 Text(
                                     text = if (uiState.isUpdate) "Cập nhật" else "Tạo",
@@ -293,8 +403,8 @@ fun SavingTypeScreen(
         }
         if (showDialogStatus) {
             PassbookAppDialog(
-                title = if (uiState.isHide) "Ẩn nhà cung cấp" else "Hiện nhà cung cấp",
-                message = if (uiState.isHide) "Bạn có chắc chắn muốn ẩn nhà cung cấp này không?" else "Bạn có chắc chắn muốn hiện nhà cung cấp này không?",
+                title = if (uiState.isHide) "Ẩn loại tiết kiệm" else "Hiện loại tiết kiệm",
+                message = if (uiState.isHide) "Bạn có chắc chắn muốn ẩn loại tiết kiệm này không?" else "Bạn có chắc chắn muốn hiện loại tiết kiệm này không?",
                 onDismiss = {
                     showDialogStatus = false
                 },
@@ -311,6 +421,25 @@ fun SavingTypeScreen(
                 showConfirmButton = true
             )
         }
+        if (showDeleteDialog) {
+            PassbookAppDialog(
+                title = "Xóa loại tiết kiệm",
+                message = "Bạn có chắc chắn muốn loại tiết kiệm này không?",
+                onDismiss = {
+                    showDeleteDialog = false
+                },
+                onConfirm = {
+
+                    viewModel.onAction(SavingTypeState.Action.OnDeleteSavingType)
+                    showDeleteDialog = false
+
+
+                },
+                confirmText = "Xóa",
+                dismissText = "Đóng",
+                showConfirmButton = true
+            )
+        }
     }
 }
 
@@ -319,6 +448,7 @@ fun SavingTypeScreen(
 fun SavingTypeListSection(
     savingTypes: List<SavingType>,
     onClick: (SavingType) -> Unit,
+    startAction: @Composable (SavingType) -> SwipeAction,
     endAction: @Composable (SavingType) -> SwipeAction,
 ) {
     if (savingTypes.isEmpty()) {
@@ -345,11 +475,12 @@ fun SavingTypeListSection(
                             8.dp,
                         )
                         .clip(RoundedCornerShape(12.dp)),
+                    startActions = listOf(startAction(savingType)),
                     endActions = listOf(endAction(savingType))
                 ) {
                     SavingTypeCard(
                         savingType = savingType,
-                        onClick = {  }
+                        onClick = onClick
                     )
                 }
 

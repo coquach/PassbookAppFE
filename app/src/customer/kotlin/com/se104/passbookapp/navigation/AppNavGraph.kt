@@ -10,6 +10,8 @@ import com.se104.passbookapp.data.model.SavingType
 import com.se104.passbookapp.ui.screen.auth.AuthScreen
 import com.se104.passbookapp.ui.screen.auth.login.LoginScreen
 import com.se104.passbookapp.ui.screen.auth.signup.SignUpScreen
+import com.se104.passbookapp.ui.screen.auth.verify_email.SendEmailScreen
+import com.se104.passbookapp.ui.screen.auth.verify_email.VerifyEmailScreen
 import com.se104.passbookapp.ui.screen.home.HomeScreen
 import com.se104.passbookapp.ui.screen.report.ReportScreen
 import com.se104.passbookapp.ui.screen.saving_ticket.SavingTicketScreen
@@ -45,15 +47,27 @@ fun AppNavGraph(
             composable<Auth> {
                 AuthScreen(navController)
             }
+            composable<SendEmail> {
+                SendEmailScreen(navController)
+            }
+            composable<VerifyEmail> {
+                VerifyEmailScreen(navController)
+            }
             composable<SignUp> {
 
                 SignUpScreen(navController)
             }
 
 
+
             composable<Login> {
-                LoginScreen(navController, isCustomer = true)
+                LoginScreen(navController)
             }
+
+            composable<ForgotPassword> {
+
+            }
+            
 
             composable<Home> {
 

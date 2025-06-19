@@ -1,9 +1,11 @@
 package com.se104.passbookapp.ui.screen.auth.signup
 
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 
 import com.se104.passbookapp.data.dto.ApiResponse
 import com.se104.passbookapp.data.dto.request.RegisterRequest
@@ -25,9 +27,14 @@ import javax.inject.Inject
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
     private val registerUseCase: RegisterUseCase,
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
+    private val email = savedStateHandle.toRoute<com.se104.passbookapp.navigation.SignUp>().email
 
-    private val _uiState = MutableStateFlow(SignUp.UiState())
+
+    private val _uiState = MutableStateFlow(SignUp.UiState(
+        email = email
+    ))
     val uiState: StateFlow<SignUp.UiState> get() = _uiState.asStateFlow()
 
     private val _event = Channel<SignUp.Event>()
@@ -47,20 +54,20 @@ class SignUpViewModel @Inject constructor(
 
 
                 )
-            registerUseCase.invoke(request).collect {
-                when (it) {
+            registerUseCase.invoke(request).collect { response ->
+                when (response) {
                     is ApiResponse.Success -> {
-                        _uiState.value = _uiState.value.copy(loading = false)
+                        _uiState.update { it.copy(loading = false) }
                         _event.send(SignUp.Event.ShowSuccessDialog)
                     }
 
                     is ApiResponse.Failure -> {
-                        _uiState.value = _uiState.value.copy(loading = false)
+                        _uiState.update { it.copy(loading = false, error = response.errorMessage) }
                         _event.send(SignUp.Event.ShowError)
                     }
 
                     is ApiResponse.Loading -> {
-                        _uiState.value = _uiState.value.copy(loading = true)
+                        _uiState.update { it.copy(loading = true) }
                     }
                 }
             }
@@ -69,7 +76,7 @@ class SignUpViewModel @Inject constructor(
 
     fun validate(type: String) {
         val current = _uiState.value
-        var emailError: String? = current.emailError
+
         var passwordError: String? = current.passwordError
         var confirmPasswordError: String? = current.confirmPasswordError
         var number: String? = current.phoneNumberError
@@ -78,14 +85,6 @@ class SignUpViewModel @Inject constructor(
         var citizenId: String? = current.citizenIdError
 
         when (type) {
-            "email" -> {
-                emailError = validateField(
-                    current.email.trim(),
-                    "Email không hợp lệ"
-                ) { it.matches(Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) }
-
-
-            }
 
             "password" -> {
                 passwordError = validateField(
@@ -133,10 +132,9 @@ class SignUpViewModel @Inject constructor(
 
         }
         val isValid =
-            emailError == null && passwordError == null && confirmPasswordError == null && number == null && fullName == null && address == null && citizenId == null
+            passwordError == null && confirmPasswordError == null && number == null && fullName == null && address == null && citizenId == null
         _uiState.update {
             it.copy(
-                emailError = emailError,
                 passwordError = passwordError,
                 confirmPasswordError = confirmPasswordError,
                 isValid = isValid
@@ -194,6 +192,11 @@ class SignUpViewModel @Inject constructor(
                     _event.send(SignUp.Event.NavigateToAuth)
                 }
             }
+            SignUp.Action.OnBack -> {
+                viewModelScope.launch {
+                    _event.send(SignUp.Event.OnBack)
+                }
+            }
 
 
         }
@@ -202,8 +205,7 @@ class SignUpViewModel @Inject constructor(
 
 object SignUp {
     data class UiState(
-        val email: String = "",
-        val emailError: String? = null,
+        val email: String,
         val password: String = "",
         val passwordError: String? = null,
         val confirmPassword: String = "",
@@ -227,6 +229,7 @@ object SignUp {
         data object NavigateToAuth : Event
         data object ShowError : Event
         data object ShowSuccessDialog : Event
+        data object OnBack: Event
 
     }
 
@@ -242,6 +245,7 @@ object SignUp {
         data object LoginClicked : Action
         data object SignUpClicked : Action
         data object AuthClicked : Action
+        data object OnBack: Action
 
 
     }

@@ -15,17 +15,26 @@ class AuthAuthenticator(
     private val authApiService: AuthApiService
 ) : Authenticator {
     override fun authenticate(route: Route?, response: Response): Request? {
+        if (responseCount(response) >= 2) {
+            println("⛔ Retry exceeded, stop attempting to refresh.")
+            return null
+        }
         return runBlocking{ // Prevent multiple refresh calls
 
             val currentAccessToken = tokenManager.getAccessToken().first()
-            val refreshToken = tokenManager.getRefreshToken().first()
+            val requestAccessToken = response.request.header("Authorization")?.removePrefix("Bearer ")
+
             // If the access token changed since the first failed request, retry with new token
-            if (currentAccessToken != response.request.header("Authorization")?.removePrefix("Bearer ")) {
+            if (currentAccessToken != null && currentAccessToken != requestAccessToken) {
                 return@runBlocking response.request.newBuilder()
                     .header("Authorization", "Bearer $currentAccessToken")
                     .build()
             }
-
+            val refreshToken = tokenManager.getRefreshToken().first()
+            if (refreshToken.isNullOrBlank()) {
+                tokenManager.deleteToken()
+                return@runBlocking null
+            }
             val newTokensResponse = getNewToken(refreshToken)
             if (!newTokensResponse.isSuccessful || newTokensResponse.body() == null) {
                 tokenManager.deleteToken()
@@ -45,4 +54,14 @@ class AuthAuthenticator(
     private suspend fun getNewToken(refreshToken: String?): retrofit2.Response<TokenResponse> {
         return authApiService.refreshToken(refreshToken)
     }
+}
+
+private fun responseCount(response: okhttp3.Response): Int {
+    var count = 1
+    var prior = response.priorResponse
+    while (prior != null) {
+        count++
+        prior = prior.priorResponse
+    }
+    return count
 }

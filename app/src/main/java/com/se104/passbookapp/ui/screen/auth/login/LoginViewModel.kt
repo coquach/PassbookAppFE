@@ -7,6 +7,7 @@ import com.se104.passbookapp.data.dto.ApiResponse
 import com.se104.passbookapp.data.dto.request.LoginRequest
 import com.se104.passbookapp.domain.use_case.auth.LoginUseCase
 import com.se104.passbookapp.ui.screen.components.text_field.validateField
+import com.se104.passbookapp.utils.hasPermission
 import dagger.hilt.android.lifecycle.HiltViewModel
 
 import kotlinx.coroutines.channels.Channel
@@ -31,18 +32,18 @@ private val _uiState = MutableStateFlow(Login.UiState())
 
     private fun login(request: LoginRequest) {
         viewModelScope.launch {
-            loginUseCase.invoke(request).collect {
-                when (it) {
+            loginUseCase.invoke(request).collect {response->
+                when (response) {
                     is ApiResponse.Success -> {
-                        _uiState.value = _uiState.value.copy(isLoading = false)
+                        _uiState.update { it.copy(isLoading = false) }
                         _event.send(Login.Event.NavigateHome)
                     }
                     is ApiResponse.Failure -> {
-                        _uiState.value = _uiState.value.copy(isLoading = false)
+                        _uiState.update { it.copy(isLoading = false, error = response.errorMessage) }
                         _event.send(Login.Event.ShowError)
                     }
                     is ApiResponse.Loading -> {
-                        _uiState.value = _uiState.value.copy(isLoading = true)
+                        _uiState.update { it.copy(isLoading = false) }
                     }
 
                 }

@@ -9,6 +9,10 @@ import kotlinx.coroutines.flow.Flow
 interface AuthRepository {
     fun login(request: LoginRequest): Flow<ApiResponse<TokenResponse>>
     fun register(request: RegisterRequest): Flow<ApiResponse<TokenResponse>>
-    fun refreshToken(token: String): Flow<ApiResponse<TokenResponse>>
-    fun logout(): Flow<ApiResponse<Unit>>
+    fun logout(tokenAccess: String?): Flow<ApiResponse<Unit>>
+    fun forgotPassword(request: Map<String, String>): Flow<ApiResponse<Unit>>
+    fun changePassword(request: Map<String, String>): Flow<ApiResponse<Unit>>
+    fun verifyEmail(request: Map<String, String>): Flow<ApiResponse<Unit>>
+    fun postMethodName(request: Map<String, String>): Flow<ApiResponse<Unit>>
+
 }

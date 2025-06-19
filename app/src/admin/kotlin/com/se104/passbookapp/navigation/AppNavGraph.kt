@@ -8,6 +8,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.se104.passbookapp.ui.screen.auth.AuthScreen
 import com.se104.passbookapp.ui.screen.auth.login.LoginScreen
+import com.se104.passbookapp.ui.screen.parameters.ParametersScreen
 import com.se104.passbookapp.ui.screen.saving_type.SavingTypeScreen
 import com.se104.passbookapp.ui.screen.setting.SettingScreen
 
@@ -30,13 +31,13 @@ fun AppNavGraph(
 
 
         composable<Auth> {
-            AuthScreen(navController)
+            AuthScreen(navController, false)
         }
 
 
 
         composable<Login> {
-            LoginScreen(navController, isCustomer = true)
+            LoginScreen(navController, isCustomer = false)
         }
 
         composable<Home> {
@@ -44,10 +45,12 @@ fun AppNavGraph(
 
         }
         composable<SavingType> {
-            SavingTypeScreen()
+            SavingTypeScreen(permissions = permissions)
         }
 
-
+        composable<Parameters>{
+            ParametersScreen(navController, permissions = permissions)
+        }
 
         composable<Setting> {
             SettingScreen(navController, isDarkMode, onThemeUpdated, permissions = permissions)

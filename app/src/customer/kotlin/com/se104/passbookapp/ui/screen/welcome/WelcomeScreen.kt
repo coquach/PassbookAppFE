@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.se104.passbookapp.navigation.Auth
+import com.se104.passbookapp.navigation.Login
 import com.se104.passbookapp.ui.screen.components.AppButton
 import com.se104.passbookapp.ui.screen.components.CustomPagerIndicator
 
@@ -68,8 +69,11 @@ fun WelcomeScreen(
             pagerState = pagerState
         ) {
             welcomeViewModel.saveOnBoardingState(completed = true)
-            navController.popBackStack()
-            navController.navigate(Auth)
+            navController.navigate(Auth) {
+                popUpTo(navController.graph.startDestinationId) {
+                    inclusive = true
+                }
+            }
         }
     }
 }

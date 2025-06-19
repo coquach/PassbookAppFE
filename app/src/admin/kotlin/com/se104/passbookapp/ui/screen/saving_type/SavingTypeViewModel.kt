@@ -5,9 +5,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
 import com.se104.passbookapp.data.dto.ApiResponse
-import com.se104.passbookapp.data.dto.request.SavingTypeRequest
 import com.se104.passbookapp.data.model.SavingType
-import com.se104.passbookapp.domain.repository.SavingTypeRepository
+import com.se104.passbookapp.domain.use_case.saving_type.CreateSavingTypeUseCase
+import com.se104.passbookapp.domain.use_case.saving_type.DeleteSavingTypeUseCase
+import com.se104.passbookapp.domain.use_case.saving_type.GetActiveSavingTypesUseCase
+import com.se104.passbookapp.domain.use_case.saving_type.GetInActiveSavingTypesUseCase
+import com.se104.passbookapp.domain.use_case.saving_type.SetActiveSavingTypeUseCase
+import com.se104.passbookapp.domain.use_case.saving_type.UpdateSavingTypeUseCase
 
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -23,7 +27,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SavingTypeViewModel @Inject constructor(
-    private val savingTypeRepository: SavingTypeRepository,
+    private val getActiveSavingTypesUseCase: GetActiveSavingTypesUseCase,
+    private val getInActiveSavingTypesUseCase: GetInActiveSavingTypesUseCase,
+    private val createSavingTypeUseCase: CreateSavingTypeUseCase,
+    private val updateSavingTypeUseCase: UpdateSavingTypeUseCase,
+    private val deleteSavingTypeUseCase: DeleteSavingTypeUseCase,
+    private val setActiveSavingTypesUseCase: SetActiveSavingTypeUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SavingTypeState.UiState())
@@ -32,19 +41,15 @@ class SavingTypeViewModel @Inject constructor(
     private val _event = Channel<SavingTypeState.Event>()
     val event = _event.receiveAsFlow()
 
-    init {
-        getActiveSavingTypes()
-        getInActiveSavingTypes()
-    }
 
-    private fun getActiveSavingTypes() {
+    fun getActiveSavingTypes() {
         viewModelScope.launch {
-            savingTypeRepository.getActiveSavingTypes().collect { response ->
+            getActiveSavingTypesUseCase().collect { response ->
                 when (response) {
                     is ApiResponse.Success -> {
                         _uiState.update {
                             it.copy(
-                                activeSavingTypeList = SavingTypeState.ActiveSavingTypeList.Success,
+                                activeSavingTypeListState = SavingTypeState.ActiveSavingTypeList.Success,
                                 activeSavingTypes = response.data
                             )
                         }
@@ -53,7 +58,7 @@ class SavingTypeViewModel @Inject constructor(
                     is ApiResponse.Loading -> {
                         _uiState.update {
                             it.copy(
-                                activeSavingTypeList = SavingTypeState.ActiveSavingTypeList.Loading
+                                activeSavingTypeListState = SavingTypeState.ActiveSavingTypeList.Loading
                             )
                         }
                     }
@@ -61,7 +66,7 @@ class SavingTypeViewModel @Inject constructor(
                     is ApiResponse.Failure -> {
                         _uiState.update {
                             it.copy(
-                                activeSavingTypeList = SavingTypeState.ActiveSavingTypeList.Error(
+                                activeSavingTypeListState = SavingTypeState.ActiveSavingTypeList.Error(
                                     response.errorMessage
                                 )
                             )
@@ -74,14 +79,14 @@ class SavingTypeViewModel @Inject constructor(
 
     }
 
-    private fun getInActiveSavingTypes() {
+    fun getInActiveSavingTypes() {
         viewModelScope.launch {
-            savingTypeRepository.getInactiveSavingTypes().collect { response ->
+            getInActiveSavingTypesUseCase().collect { response ->
                 when (response) {
                     is ApiResponse.Success -> {
                         _uiState.update {
                             it.copy(
-                                inactiveSavingTypeList = SavingTypeState.InactiveSavingTypeList.Success,
+                                inactiveSavingTypeListState = SavingTypeState.InactiveSavingTypeList.Success,
                                 inactiveSavingTypes = response.data
                             )
                         }
@@ -90,7 +95,7 @@ class SavingTypeViewModel @Inject constructor(
                     is ApiResponse.Loading -> {
                         _uiState.update {
                             it.copy(
-                                inactiveSavingTypeList = SavingTypeState.InactiveSavingTypeList.Loading
+                                inactiveSavingTypeListState = SavingTypeState.InactiveSavingTypeList.Loading
                             )
                         }
                     }
@@ -98,7 +103,7 @@ class SavingTypeViewModel @Inject constructor(
                     is ApiResponse.Failure -> {
                         _uiState.update {
                             it.copy(
-                                inactiveSavingTypeList = SavingTypeState.InactiveSavingTypeList.Error(
+                                inactiveSavingTypeListState = SavingTypeState.InactiveSavingTypeList.Error(
                                     response.errorMessage
                                 )
                             )
@@ -113,12 +118,8 @@ class SavingTypeViewModel @Inject constructor(
 
     private fun createSavingType() {
         viewModelScope.launch {
-            val request = SavingTypeRequest(
-                typeName = _uiState.value.savingTypeSelected.typeName,
-                duration = _uiState.value.savingTypeSelected.duration,
-                interestRate = _uiState.value.savingTypeSelected.interestRate
-            )
-            savingTypeRepository.createSavingType(request).collect { response ->
+
+            createSavingTypeUseCase(_uiState.value.savingTypeSelected).collect { response ->
                 when (response) {
                     is ApiResponse.Success -> {
                         _uiState.update {
@@ -128,6 +129,8 @@ class SavingTypeViewModel @Inject constructor(
                                 activeSavingTypes = it.activeSavingTypes + response.data
                             )
                         }
+                        _event.send(SavingTypeState.Event.ShowToastSuccess("Tạo loại tiết kiệm thành công"))
+
                     }
 
                     is ApiResponse.Loading -> {
@@ -153,21 +156,15 @@ class SavingTypeViewModel @Inject constructor(
     private fun updateSavingType(savingType: SavingType) {
 
         viewModelScope.launch {
-            val request = SavingTypeRequest(
-                typeName = savingType.typeName,
-                duration = savingType.duration,
-                interestRate = savingType.interestRate
-            )
-            val id = savingType.id!!
 
-            savingTypeRepository.updateSavingType(id, request).collect { response ->
+            updateSavingTypeUseCase(_uiState.value.savingTypeSelected).collect { response ->
                 when (response) {
                     is ApiResponse.Success -> {
                         _uiState.update {
                             it.copy(
                                 isLoading = false,
                                 activeSavingTypes = it.activeSavingTypes.map { savingType ->
-                                    if (savingType.id == id) {
+                                    if (savingType.id == response.data.id) {
                                         response.data
                                     } else {
                                         savingType
@@ -175,6 +172,7 @@ class SavingTypeViewModel @Inject constructor(
                                 }
                             )
                         }
+                        _event.send(SavingTypeState.Event.ShowToastSuccess("Cập nhật loại tiết kiệm thành công"))
                     }
 
                     is ApiResponse.Loading -> {
@@ -197,15 +195,15 @@ class SavingTypeViewModel @Inject constructor(
 
     private fun setActiveSavingType(id: Long, isActive: Boolean) {
         viewModelScope.launch {
-            savingTypeRepository.setActiveSavingType(id, isActive).collect { response ->
+            setActiveSavingTypesUseCase(id, isActive).collect { response ->
                 when (response) {
                     is ApiResponse.Success -> {
                         _uiState.update {
                             it.copy(
                                 isLoading = false,
-
-                                )
+                            )
                         }
+                        _event.send(SavingTypeState.Event.ShowToastSuccess("Cập nhật trạng thái loại tiết kiệm thành công"))
                         onAction(SavingTypeState.Action.Refresh)
                     }
 
@@ -228,6 +226,37 @@ class SavingTypeViewModel @Inject constructor(
         }
     }
 
+    private fun deleteSavingType(id: Long) {
+        viewModelScope.launch {
+            deleteSavingTypeUseCase(id).collect { response ->
+                when (response) {
+                    is ApiResponse.Success -> {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                            )
+                        }
+                        _event.send(SavingTypeState.Event.ShowToastSuccess("Xóa loại tiết kiệm thành công"))
+                        onAction(SavingTypeState.Action.Refresh)
+                    }
+
+                    is ApiResponse.Loading -> {
+                        _uiState.update {
+                            it.copy(isLoading = true)
+                        }
+                    }
+
+                    is ApiResponse.Failure -> {
+                        _uiState.update {
+                            it.copy(isLoading = false, errorMessage = response.errorMessage)
+                        }
+                        _event.send(SavingTypeState.Event.ShowError)
+                    }
+                }
+            }
+        }
+    }
+
     fun onAction(action: SavingTypeState.Action) {
         when (action) {
             is SavingTypeState.Action.OnCreateSavingType -> {
@@ -241,6 +270,9 @@ class SavingTypeViewModel @Inject constructor(
             is SavingTypeState.Action.OnSetActiveSavingType -> {
                 setActiveSavingType(uiState.value.savingTypeSelected.id!!, action.isActive)
             }
+            is SavingTypeState.Action.OnDeleteSavingType -> {
+                deleteSavingType(uiState.value.savingTypeSelected.id!!)
+            }
 
             is SavingTypeState.Action.OnTypeNameChange -> {
                 _uiState.update {
@@ -250,13 +282,21 @@ class SavingTypeViewModel @Inject constructor(
 
             is SavingTypeState.Action.OnDurationChange -> {
                 _uiState.update {
-                    it.copy(savingTypeSelected = it.savingTypeSelected.copy(duration = action.duration?: 0))
+                    it.copy(
+                        savingTypeSelected = it.savingTypeSelected.copy(
+                            duration = action.duration ?: 0
+                        )
+                    )
                 }
             }
 
             is SavingTypeState.Action.OnInterestRateChange -> {
                 _uiState.update {
-                    it.copy(savingTypeSelected = it.savingTypeSelected.copy(interestRate = action.interestRate?: BigDecimal.ZERO))
+                    it.copy(
+                        savingTypeSelected = it.savingTypeSelected.copy(
+                            interestRate = action.interestRate ?: BigDecimal.ZERO
+                        )
+                    )
                 }
             }
 
@@ -282,6 +322,12 @@ class SavingTypeViewModel @Inject constructor(
                     it.copy(isHide = action.isHide)
                 }
             }
+
+            is SavingTypeState.Action.ShowToast -> {
+                viewModelScope.launch {
+                    _event.send(SavingTypeState.Event.ShowToastUnEnableAction)
+                }
+            }
         }
     }
 }
@@ -289,13 +335,13 @@ class SavingTypeViewModel @Inject constructor(
 
 object SavingTypeState {
     data class UiState(
+        val activeSavingTypeListState: ActiveSavingTypeList = ActiveSavingTypeList.Loading,
+        val inactiveSavingTypeListState: InactiveSavingTypeList = InactiveSavingTypeList.Loading,
         val activeSavingTypes: List<SavingType> = emptyList(),
         val inactiveSavingTypes: List<SavingType> = emptyList(),
         val savingTypeSelected: SavingType = SavingType(),
         val isLoading: Boolean = false,
         val errorMessage: String? = null,
-        val activeSavingTypeList: ActiveSavingTypeList = ActiveSavingTypeList.Loading,
-        val inactiveSavingTypeList: InactiveSavingTypeList = InactiveSavingTypeList.Loading,
         val isUpdate: Boolean = false,
         val isHide: Boolean = false,
     )
@@ -315,6 +361,8 @@ object SavingTypeState {
 
     sealed interface Event {
         data object ShowError : Event
+        data object ShowToastUnEnableAction : Event
+        data class ShowToastSuccess(val message: String) : Event
 
     }
 
@@ -329,6 +377,8 @@ object SavingTypeState {
         data object Refresh : Action
         data class OnUpdateStatus(val isUpdate: Boolean) : Action
         data class OnHideStatus(val isHide: Boolean) : Action
+        data object OnDeleteSavingType : Action
+        data object ShowToast : Action
 
     }
 }

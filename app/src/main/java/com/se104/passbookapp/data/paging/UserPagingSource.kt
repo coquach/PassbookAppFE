@@ -21,7 +21,7 @@ class UserPagingSource @Inject constructor(
             userApiService.getUsers(
                 page = page,
                 size = size,
-                fullname = filter.fullname,
+                fullName = filter.fullName,
                 citizenID = filter.citizenID,
                 order = filter.order,
                 sortBy = filter.sortBy,

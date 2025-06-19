@@ -7,6 +7,7 @@ import com.se104.passbookapp.data.model.DailyReport
 import com.se104.passbookapp.data.model.MonthlyReport
 import com.se104.passbookapp.domain.repository.ReportRepository
 import com.se104.passbookapp.ui.screen.report.ReportState.DailyReportState
+import com.se104.passbookapp.ui.screen.report.ReportState.Event.*
 import com.se104.passbookapp.ui.screen.report.ReportState.MonthlyReportState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -124,7 +125,7 @@ class ReportViewModel @Inject constructor(
                     getMonthlyReports()
                 } else {
                     viewModelScope.launch {
-                        _event.send(ReportState.Event.ShowErrorToast("Thời gian không hợp lệ"))
+                        _event.send(ShowErrorToast("Thời gian không hợp lệ"))
                     }
                 }
 
@@ -140,7 +141,7 @@ class ReportViewModel @Inject constructor(
                 }
                 else {
                     viewModelScope.launch {
-                        _event.send(ReportState.Event.ShowErrorToast("Thời gian không hợp lệ"))
+                        _event.send(ShowErrorToast("Thời gian không hợp lệ"))
                     }
                 }
             }
@@ -163,7 +164,7 @@ class ReportViewModel @Inject constructor(
 
                 else {
                     viewModelScope.launch {
-                        _event.send(ReportState.Event.ShowErrorToast("Thời gian vượt hiện tại"))
+                        _event.send(ShowErrorToast("Thời gian vượt hiện tại"))
                     }
                 }
             }
@@ -219,7 +220,6 @@ object ReportState {
     }
 
     sealed interface Action {
-        data object GoToNotification : Action
         data class OnChangeFromMonthYear(val year: Int, val month: Int) : Action
         data class OnChangeToMonthYear(val year: Int, val month: Int) : Action
         data class OnChangeSelectedMonthYear(val year: Int, val month: Int) : Action

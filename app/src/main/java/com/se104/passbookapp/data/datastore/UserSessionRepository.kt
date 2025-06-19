@@ -21,21 +21,13 @@ class UserSessionRepository @Inject constructor(
         val USER_ID = longPreferencesKey("user_id")
     }
 
-
-
-    suspend fun saveId(userId: Long) {
+    suspend fun saveUserSession(userId: Long, permissions: List<String>) {
         dataStore.edit { prefs ->
             prefs[UserPreferencesKeys.USER_ID] = userId
+            prefs[UserPreferencesKeys.PERMISSIONS] = permissions.joinToString(",")
         }
     }
 
-
-    suspend fun savePermissions(permissions: List<String>) {
-        val joinedPermissions = permissions.joinToString(",") // lưu dạng CSV
-        dataStore.edit { prefs ->
-            prefs[UserPreferencesKeys.PERMISSIONS] = joinedPermissions
-        }
-    }
     suspend fun getUserId(): Long? {
         val prefs = dataStore.data.first()
         return prefs[UserPreferencesKeys.USER_ID]

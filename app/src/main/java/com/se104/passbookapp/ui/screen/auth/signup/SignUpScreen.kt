@@ -6,14 +6,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -37,17 +36,18 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
-import com.example.foodapp.ui.screen.components.DatePickerSample
+import com.se104.passbookapp.ui.screen.components.DatePickerSample
 import com.se104.passbookapp.R
 import com.se104.passbookapp.navigation.Auth
 import com.se104.passbookapp.navigation.Login
 import com.se104.passbookapp.ui.screen.components.AppButton
 import com.se104.passbookapp.ui.screen.components.DialogSample
 import com.se104.passbookapp.ui.screen.components.ErrorModalBottomSheet
-import com.se104.passbookapp.ui.screen.components.IconCustomButton
+import com.se104.passbookapp.ui.screen.components.HeaderDefaultView
 import com.se104.passbookapp.ui.screen.components.text_field.PasswordTextField
 import com.se104.passbookapp.ui.screen.components.text_field.ValidateTextField
 import com.se104.passbookapp.ui.theme.confirm
+import java.time.LocalDate
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -95,19 +95,16 @@ fun SignUpScreen(
                         launchSingleTop = true
                     }
                 }
+                SignUp.Event.OnBack -> {
+                    navController.popBackStack()
+                }
 
             }
 
         }
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.secondaryContainer)
-            .padding(top= 40.dp, bottom = 30.dp)
 
-    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -118,15 +115,12 @@ fun SignUpScreen(
 
         ) {
 
-            Text(
-                text = stringResource(id = R.string.sign_up_desc),
-                fontSize = 32.sp,
-                lineHeight = 40.sp,
-                fontWeight = FontWeight.Bold,
-
-                color = MaterialTheme.colorScheme.primary
-
-            )
+           HeaderDefaultView(
+               text = stringResource(R.string.sign_up),
+               onBack = {
+                   viewModel.onAction(SignUp.Action.OnBack)
+               }
+           )
 
 
             Column(
@@ -135,21 +129,7 @@ fun SignUpScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                ValidateTextField(
-                    value = uiState.email,
-                    onValueChange = {
-                        viewModel.onAction(SignUp.Action.EmailChanged(it))
-                    },
-                    labelText = stringResource(R.string.email),
-                    errorMessage = uiState.emailError,
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    validate = { viewModel.validate("email") },
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        keyboardType = KeyboardType.Email,
-                        imeAction = ImeAction.Next
-                    ),
-                )
+
                 PasswordTextField(
                     modifier = Modifier.fillMaxWidth(),
                     value = uiState.password,
@@ -246,7 +226,8 @@ fun SignUpScreen(
                     selectedDate = uiState.dateOfBirth,
                     onDateSelected = {
                         viewModel.onAction(SignUp.Action.DateOfBirthChanged(it))
-                    }
+                    },
+                    maxDate = LocalDate.now()
                 )
 
             }
@@ -257,22 +238,9 @@ fun SignUpScreen(
                 onClick = {
                     viewModel.onAction(SignUp.Action.SignUpClicked)
                 },
+                enable = !uiState.loading
             )
 
-
-            Text(
-                text = stringResource(id = R.string.already_have_account),
-                modifier = Modifier
-                    .padding(8.dp)
-                    .clickable {
-                        viewModel.onAction(SignUp.Action.LoginClicked)
-                    }
-                    .fillMaxWidth(),
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.bodyLarge
-
-            )
             if (showSuccessDialog) {
 
                 DialogSample(
@@ -300,7 +268,7 @@ fun SignUpScreen(
 
 
         }
-    }
+
 
 
     if (showErrorSheet) {
