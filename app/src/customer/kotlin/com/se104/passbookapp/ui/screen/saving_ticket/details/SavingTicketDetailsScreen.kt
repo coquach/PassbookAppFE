@@ -13,6 +13,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccessTime
+import androidx.compose.material.icons.filled.AccessTimeFilled
 import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.DateRange
@@ -174,7 +176,7 @@ fun SavingTicketDetailsScreen(
 
             DetailsRow(
                 title = "Ngày tạo",
-                icon = Icons.Default.Timer,
+                icon = Icons.Default.AccessTime,
                 text = StringUtils.formatDateTime(uiState.savingTicket.createdAt)!!,
                 titleColor = MaterialTheme.colorScheme.outline,
                 textColor = MaterialTheme.colorScheme.onBackground
@@ -182,7 +184,7 @@ fun SavingTicketDetailsScreen(
             if(uiState.savingTicket.maturityDate!=null){
                 DetailsRow(
                     title = "Ngày đáo hạn",
-                    icon = Icons.Default.Timer,
+                    icon = Icons.Default.AccessTimeFilled,
                     text = StringUtils.formatLocalDate(uiState.savingTicket.maturityDate)!!,
                     titleColor = MaterialTheme.colorScheme.outline,
                     textColor = MaterialTheme.colorScheme.onBackground

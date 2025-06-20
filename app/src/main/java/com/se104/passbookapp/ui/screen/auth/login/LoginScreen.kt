@@ -42,6 +42,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
 import com.se104.passbookapp.R
 import com.se104.passbookapp.navigation.Auth
+import com.se104.passbookapp.navigation.ForgotPassword
 import com.se104.passbookapp.navigation.Home
 import com.se104.passbookapp.navigation.SendEmail
 import com.se104.passbookapp.navigation.SignUp
@@ -60,7 +61,7 @@ fun LoginScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showErrorSheet by remember { mutableStateOf(false) }
-    var rememberMe by remember { mutableStateOf(false) }
+
 
 
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -68,7 +69,7 @@ fun LoginScreen(
         viewModel.event.flowWithLifecycle(lifecycleOwner.lifecycle).collect {
             when (it) {
                 Login.Event.NavigateForgot -> {
-
+                    navController.navigate(ForgotPassword)
                 }
 
                 Login.Event.NavigateSignUp -> {
@@ -174,7 +175,7 @@ fun LoginScreen(
                 ) {
                     Text(
                         text = stringResource(R.string.forgot_password),
-                        color = MaterialTheme.colorScheme.secondary,
+                        color = MaterialTheme.colorScheme.outline,
                         style = MaterialTheme.typography.bodyLarge,
                     )
                 }
@@ -182,7 +183,6 @@ fun LoginScreen(
                 Text(
                     text = stringResource(id = R.string.dont_have_account),
                     modifier = Modifier
-                        .padding(8.dp)
                         .clickable {
                             viewModel.onAction(Login.Action.OnSignUpClick)
                         }
@@ -201,7 +201,7 @@ fun LoginScreen(
                 },
                 text = stringResource(R.string.log_in),
                 modifier = Modifier.fillMaxWidth(),
-                enable = !uiState.isLoading
+                enable = uiState.isValid && !uiState.isLoading
             )
         }
 

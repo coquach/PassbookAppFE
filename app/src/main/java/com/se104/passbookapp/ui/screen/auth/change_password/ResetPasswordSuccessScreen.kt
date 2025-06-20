@@ -88,7 +88,8 @@ showErrorSheet = true
             onClick = {
                viewModel.onAction(ResetPasswordSuccessState.Action.NavigateToAuth)
             },
-            text = "Quay về đăng nhập"
+            text = "Quay về đăng nhập",
+            enable = !uiState.isLoading
         ) 
     }
     if (showErrorSheet) {

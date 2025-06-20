@@ -119,18 +119,18 @@ class SignUpViewModel @Inject constructor(
                 address = validateField(
                     current.address.trim(),
                     "Địa chỉ không hợp lệ"
-                ) { it.matches(Regex("^[a-zA-Z\\s]+$")) }
+                ) { it.matches(Regex("^[\\p{L}0-9\\s,.\\-\\/()]+\$")) }
             }
 
             "citizenId" -> {
                 citizenId = validateField(
                     current.citizenId.trim(),
-                    "CMND không hợp lệ"
-                ) { it.matches(Regex("^[0-9]{9,12}$")) }
+                    "CCCD không hợp lệ"
+                ) { it.matches(Regex("^0(?!0{11}\$)[0-9]{11}\$")) }
             }
 
         }
-        val isValid =
+        val isValid =  current.password.isNotBlank() && current.confirmPassword.isNotBlank() && current.phoneNumber.isNotBlank() && current.fullName.isNotBlank() && current.address.isNotBlank() && current.citizenId.isNotBlank()
             passwordError == null && confirmPasswordError == null && number == null && fullName == null && address == null && citizenId == null
         _uiState.update {
             it.copy(

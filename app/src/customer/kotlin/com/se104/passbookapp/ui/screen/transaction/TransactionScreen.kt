@@ -10,10 +10,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccessTime
+import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.CurrencyExchange
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.MonetizationOn
+import androidx.compose.material.icons.filled.MoneyOff
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Tag
 import androidx.compose.material3.MaterialTheme
@@ -150,7 +154,7 @@ fun TransactionDetails(transaction: Transaction, isStaff: Boolean = false) {
             )
             DetailsRow(
                 title = "Thời gian",
-                icon = Icons.Default.DateRange,
+                icon = Icons.Default.AccessTime,
                 text = StringUtils.formatDateTime(transaction.createdAt)!!,
                 titleColor = MaterialTheme.colorScheme.outline,
                 textColor = MaterialTheme.colorScheme.onBackground
@@ -170,7 +174,7 @@ fun TransactionDetails(transaction: Transaction, isStaff: Boolean = false) {
             if (transaction.transactionType == TransactionType.WITHDRAWAL.name || transaction.transactionType == TransactionType.SAVE.name) {
                 DetailsRow(
                     title = "Giao dịch",
-                    icon = Icons.Default.MonetizationOn,
+                    icon = Icons.Default.MoneyOff,
                     text = "-${StringUtils.formatCurrency(transaction.amount)}",
                     titleColor = MaterialTheme.colorScheme.outline,
                     textColor = MaterialTheme.colorScheme.error
@@ -178,7 +182,7 @@ fun TransactionDetails(transaction: Transaction, isStaff: Boolean = false) {
             } else {
                 DetailsRow(
                     title = "Giao dịch",
-                    icon = Icons.Default.MonetizationOn,
+                    icon = Icons.Default.AttachMoney,
                     text = "+${StringUtils.formatCurrency(transaction.amount)}",
                     titleColor = MaterialTheme.colorScheme.outline,
                     textColor = MaterialTheme.colorScheme.confirm
@@ -186,7 +190,7 @@ fun TransactionDetails(transaction: Transaction, isStaff: Boolean = false) {
             }
             DetailsRow(
                 title = "Nội dung",
-                icon = Icons.Default.Category,
+                icon = Icons.Default.Description,
                 text = TransactionType.fromName(transaction.transactionType).display,
                 titleColor = MaterialTheme.colorScheme.outline,
                 textColor = MaterialTheme.colorScheme.onBackground

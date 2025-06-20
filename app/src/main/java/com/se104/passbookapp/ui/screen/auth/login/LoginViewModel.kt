@@ -7,9 +7,7 @@ import com.se104.passbookapp.data.dto.ApiResponse
 import com.se104.passbookapp.data.dto.request.LoginRequest
 import com.se104.passbookapp.domain.use_case.auth.LoginUseCase
 import com.se104.passbookapp.ui.screen.components.text_field.validateField
-import com.se104.passbookapp.utils.hasPermission
 import dagger.hilt.android.lifecycle.HiltViewModel
-
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,7 +15,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-
 import javax.inject.Inject
 
 @HiltViewModel
@@ -57,7 +54,7 @@ private val _uiState = MutableStateFlow(Login.UiState())
         var passwordError: String? = current.passwordError
         when (type) {
             "email" -> {
-                val emailError = validateField(
+                 emailError = validateField(
                     current.email.trim(),
                     "Email không hợp lệ"
                 ) { it.matches(Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) }
@@ -66,7 +63,7 @@ private val _uiState = MutableStateFlow(Login.UiState())
             }
 
             "password" -> {
-                val passwordError = validateField(
+                 passwordError = validateField(
                     current.password.trim(),
                     "Mật khẩu phải có ít nhất 6 ký tự"
                 ) { it.length >= 6 }
@@ -75,7 +72,7 @@ private val _uiState = MutableStateFlow(Login.UiState())
             }
 
         }
-        val isValid = emailError == null && passwordError == null
+        val isValid = current.email.isNotBlank() && current.password.isNotBlank() && emailError == null && passwordError == null
         _uiState.update {
             it.copy(
                 emailError = emailError,

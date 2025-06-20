@@ -17,6 +17,7 @@ import com.se104.passbookapp.ui.screen.auth.signup.SignUpScreen
 import com.se104.passbookapp.ui.screen.auth.verify_email.SendEmailScreen
 import com.se104.passbookapp.ui.screen.auth.verify_email.VerifyEmailScreen
 import com.se104.passbookapp.ui.screen.home.HomeScreen
+import com.se104.passbookapp.ui.screen.profile.ProfileScreen
 import com.se104.passbookapp.ui.screen.report.ReportScreen
 import com.se104.passbookapp.ui.screen.saving_ticket.SavingTicketScreen
 import com.se104.passbookapp.ui.screen.saving_ticket.create.CreateSavingTicketsScreen
@@ -118,7 +119,7 @@ fun AppNavGraph(
             }
 
             composable<Profile> {
-
+                ProfileScreen(navController)
             }
 
             composable<Report> {

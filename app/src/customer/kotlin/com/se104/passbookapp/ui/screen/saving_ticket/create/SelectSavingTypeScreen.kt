@@ -151,7 +151,7 @@ fun SavingTypeSection(
                     )
 
                     DetailsRow(
-                        text = "${savingType.duration} tháng",
+                        text = if(savingType.duration==0) "Không có" else "${savingType.duration} tháng",
                         icon = Icons.Default.DateRange,
                         title = "Kỳ hạn",
                         titleColor = MaterialTheme.colorScheme.outline,
