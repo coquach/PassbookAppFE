@@ -22,7 +22,7 @@
     <string name="enter_email_to_reset_password">Nhập email vào bên dưới để nhận được OTP khôi phục mật khẩu</string>
     <string name="send_otp">Nhập mã xác thực</string>
     <string name="enter_otp">Chúng tôi đã gửi mã xác thực đến email của bạn. Vui lòng nhập mã để tiếp tục.</string>
-    <string name="reset_success">Đặt lại mật khẩu thành công</string>
+    <string name="reset_success">Thay đổi mật khẩu thành công</string>
     <string name="back_with_new_password">Hãy quay lại và đăng nhập với mật khẩu mới để tiếp tục.</string>
     <string name="reset_password">Đặt lại mật khẩu</string>
     <string name="confirm_password">Xác nhận mật khẩu</string>

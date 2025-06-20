@@ -1,30 +1,27 @@
 package com.se104.passbookapp.ui.screen.transaction
 
-import CardSample
 import DetailsRow
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.CurrencyExchange
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.DriveFileRenameOutline
 import androidx.compose.material.icons.filled.MonetizationOn
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Tag
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,7 +44,7 @@ fun TransactionScreen(
     viewModel: TransactionViewModel = hiltViewModel(),
     permissions: List<String>,
 ) {
-    val isStaff = permissions.hasPermission("VIEW_ALL_TRANSACTIONS")
+    val isStaff by rememberSaveable { mutableStateOf(permissions.hasPermission("VIEW_ALL_TRANSACTIONS")) }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val transactions = remember(uiState.filter) {
         if (isStaff) {
@@ -121,67 +118,52 @@ fun TransactionScreen(
                 it.id
             },
         ) {
-            TransactionCard(transaction = it, onClick = {})
+            TransactionDetails(transaction = it, isStaff = isStaff)
         }
     }
 }
 
-@Composable
-fun TransactionCard(transaction: Transaction, onClick: (Transaction) -> Unit) {
-    CardSample(
-        item = transaction,
-        onClick = onClick
-    ) {
-        TransactionDetails(transaction)
 
-    }
-}
 
 @Composable
 fun TransactionDetails(transaction: Transaction, isStaff: Boolean = false) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(MaterialTheme.shapes.medium)
-            .background(
-                color = MaterialTheme.colorScheme.background,
-                shape = MaterialTheme.shapes.medium
-            )
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
 
-        Icon(
-            imageVector = Icons.Default.CurrencyExchange,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(50.dp)
-        )
         Column(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .padding(8.dp)
+                .fillMaxWidth()
+                .clip(MaterialTheme.shapes.extraLarge)
+                .background(
+                    color = MaterialTheme.colorScheme.background,
+                    shape = MaterialTheme.shapes.extraLarge
+                )
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            DetailsRow(
-                title = "Thời gian",
-                icon = Icons.Default.DateRange,
-                text = StringUtils.formatDateTime(transaction.createdAt)!!
-            )
             DetailsRow(
                 title = "Mã giao dịch",
                 icon = Icons.Default.Tag,
                 text = transaction.id.toString(),
+                titleColor = MaterialTheme.colorScheme.primary,
+                textColor = MaterialTheme.colorScheme.primary
             )
+            DetailsRow(
+                title = "Thời gian",
+                icon = Icons.Default.DateRange,
+                text = StringUtils.formatDateTime(transaction.createdAt)!!,
+                titleColor = MaterialTheme.colorScheme.outline,
+                textColor = MaterialTheme.colorScheme.onBackground
+
+            )
+
             if (isStaff) {
                 DetailsRow(
-                    title = "Mã khách hàng",
+                    title = "CCCD",
                     icon = Icons.Default.Person,
-                    text = transaction.userId.toString()
-                )
-                DetailsRow(
-                    title = "Tên khách hàng",
-                    icon = Icons.Default.DriveFileRenameOutline,
-                    text = transaction.userFullName
+                    text = transaction.citizenID,
+                    titleColor = MaterialTheme.colorScheme.primary,
+                    textColor = MaterialTheme.colorScheme.onBackground
                 )
             }
 
@@ -190,23 +172,27 @@ fun TransactionDetails(transaction: Transaction, isStaff: Boolean = false) {
                     title = "Giao dịch",
                     icon = Icons.Default.MonetizationOn,
                     text = "-${StringUtils.formatCurrency(transaction.amount)}",
-                    color = MaterialTheme.colorScheme.error
+                    titleColor = MaterialTheme.colorScheme.outline,
+                    textColor = MaterialTheme.colorScheme.error
                 )
             } else {
                 DetailsRow(
                     title = "Giao dịch",
                     icon = Icons.Default.MonetizationOn,
                     text = "+${StringUtils.formatCurrency(transaction.amount)}",
-                    color = MaterialTheme.colorScheme.confirm
+                    titleColor = MaterialTheme.colorScheme.outline,
+                    textColor = MaterialTheme.colorScheme.confirm
                 )
             }
             DetailsRow(
                 title = "Nội dung",
                 icon = Icons.Default.Category,
-                text = TransactionType.fromName(transaction.transactionType).display
+                text = TransactionType.fromName(transaction.transactionType).display,
+                titleColor = MaterialTheme.colorScheme.outline,
+                textColor = MaterialTheme.colorScheme.onBackground
             )
 
 
-        }
+
     }
 }

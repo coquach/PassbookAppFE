@@ -29,12 +29,12 @@ fun <T> CardSample(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(12.dp)
             .clickable {
                 onClick(item)
             },
-        shape = MaterialTheme.shapes.medium,
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        shape = MaterialTheme.shapes.extraLarge,
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
     ) {
         Column(
@@ -51,25 +51,26 @@ fun <T> CardSample(
 fun DetailsRow(
     title: String,
     text: String,
-    icon: ImageVector,
-    color: Color = MaterialTheme.colorScheme.primary,
+   icon: ImageVector,
+    titleColor: Color = MaterialTheme.colorScheme.primary,
+    textColor: Color = MaterialTheme.colorScheme.onBackground,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = color,
-            modifier = Modifier.size(20.dp)
-        )
-        Spacer(modifier = Modifier.size(8.dp))
+       Icon(
+           imageVector = icon,
+           contentDescription = null,
+           tint = titleColor,
+           modifier = Modifier.size(24.dp)
+       )
+        Spacer(modifier = Modifier.size(10.dp))
         Text(
             text = title,
             style = MaterialTheme.typography.titleMedium,
-            color = color,
+            color = titleColor,
             fontWeight = FontWeight.ExtraBold
         )
         Spacer(modifier = Modifier.weight(1f))
@@ -77,7 +78,7 @@ fun DetailsRow(
             text = text,
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.SemiBold,
-            color = color,
+            color = textColor,
             textAlign = androidx.compose.ui.text.style.TextAlign.End
         )
     }

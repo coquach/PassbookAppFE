@@ -43,14 +43,13 @@ class SignUpViewModel @Inject constructor(
     private fun signUp() {
         viewModelScope.launch {
             val request = RegisterRequest(
-                _uiState.value.email,
-                _uiState.value.password,
-                _uiState.value.confirmPassword,
-                _uiState.value.phoneNumber,
-                _uiState.value.fullName,
-                _uiState.value.address,
-                _uiState.value.citizenId,
-                StringUtils.formatLocalDate(_uiState.value.dateOfBirth)!!,
+                email = _uiState.value.email,
+                password = _uiState.value.password,
+                phone = _uiState.value.phoneNumber,
+                fullName = _uiState.value.fullName,
+                address = _uiState.value.address,
+                citizenID = _uiState.value.citizenId,
+                dateOfBirth = StringUtils.formatLocalDate(_uiState.value.dateOfBirth)!!,
 
 
                 )

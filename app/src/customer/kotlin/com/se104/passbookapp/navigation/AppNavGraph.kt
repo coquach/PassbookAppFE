@@ -8,6 +8,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.se104.passbookapp.data.model.SavingType
 import com.se104.passbookapp.ui.screen.auth.AuthScreen
+import com.se104.passbookapp.ui.screen.auth.change_password.ChangePasswordScreen
+import com.se104.passbookapp.ui.screen.auth.change_password.ChangePasswordState
+import com.se104.passbookapp.ui.screen.auth.forgot_password.ForgotPasswordScreen
+import com.se104.passbookapp.ui.screen.auth.forgot_password.SendEmailSuccessScreen
 import com.se104.passbookapp.ui.screen.auth.login.LoginScreen
 import com.se104.passbookapp.ui.screen.auth.signup.SignUpScreen
 import com.se104.passbookapp.ui.screen.auth.verify_email.SendEmailScreen
@@ -65,7 +69,17 @@ fun AppNavGraph(
             }
 
             composable<ForgotPassword> {
+                ForgotPasswordScreen(navController)
+            }
+            composable<SendEmailSuccess> {
+                SendEmailSuccessScreen(navController)
+            }
 
+            composable<ChangePassword> {
+                ChangePasswordScreen(navController)
+            }
+            composable<ResetPasswordSuccess> {
+                SendEmailSuccessScreen(navController)
             }
             
 
@@ -101,6 +115,10 @@ fun AppNavGraph(
 
             composable<Setting> {
                 SettingScreen(navController, isDarkMode, onThemeUpdated, permissions = permissions)
+            }
+
+            composable<Profile> {
+
             }
 
             composable<Report> {

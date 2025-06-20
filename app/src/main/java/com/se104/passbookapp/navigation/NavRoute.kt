@@ -34,6 +34,12 @@ object ForgotPassword : NavRoute
 @Serializable
 object ChangePassword : NavRoute
 
+@Serializable
+object SendEmailSuccess : NavRoute
+
+@Serializable
+object ResetPasswordSuccess : NavRoute
+
 
 
 @Serializable

@@ -120,7 +120,7 @@ fun SearchField(
                 onDismissRequest = { expanded = false },
                 modifier = Modifier
                     .width(220.dp)
-                    .background(MaterialTheme.colorScheme.secondaryContainer)
+                    .background(MaterialTheme.colorScheme.background)
             ) {
                 DropdownMenuItem(
                     text = {
@@ -191,47 +191,6 @@ fun SearchField(
 
 }
 
-@Composable
-fun MultipleCheckboxList() {
-    val items = listOf("Option 1", "Option 2", "Option 3")
-    val checkedStates = remember { mutableStateListOf(false, false, false) }
-
-    Column(
-        modifier = Modifier
-            .padding(16.dp)
-            .background(MaterialTheme.colorScheme.background)
-    ) {
-        items.forEachIndexed { index, item ->
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { checkedStates[index] = !checkedStates[index] }
-                    .padding(8.dp)
-            ) {
-                Checkbox(
-                    checked = checkedStates[index],
-                    onCheckedChange = null
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(item)
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun MultipleCheckboxListPreview() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.background)
-    ) {
-        MultipleCheckboxList()
-    }
-
-}
 
 
 

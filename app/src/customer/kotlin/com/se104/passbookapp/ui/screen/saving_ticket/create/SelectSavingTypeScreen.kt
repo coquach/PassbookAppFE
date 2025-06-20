@@ -18,6 +18,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.MonetizationOn
 import androidx.compose.material.icons.filled.Savings
+import androidx.compose.material.icons.filled.Tag
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -35,6 +36,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
 import com.se104.passbookapp.data.model.SavingType
+import com.se104.passbookapp.navigation.CreateSavingTicket
 import com.se104.passbookapp.ui.screen.components.HeaderDefaultView
 import com.se104.passbookapp.ui.screen.components.LoadingAnimation
 import com.se104.passbookapp.ui.screen.components.Retry
@@ -51,7 +53,7 @@ fun SelectSavingTypeScreen(
         viewModel.event.flowWithLifecycle(lifecycleOwner.lifecycle).collect {
             when (it) {
                 is SelectSavingTypeState.Event.GoToDetail -> {
-
+                        navController.navigate(CreateSavingTicket(it.savingType))
                 }
                 SelectSavingTypeState.Event.OnBack -> {
                     navController.popBackStack()
@@ -116,70 +118,56 @@ fun SelectSavingTypeScreen(
 @Composable
 fun SavingTypeSection(
     savingType: SavingType,
-    onItemClick: () -> Unit,
+    onItemClick: (SavingType) -> Unit,
 ) {
     Box(
         modifier = Modifier
+            .padding(12.dp)
             .fillMaxWidth()
-            .clip(MaterialTheme.shapes.medium)
+            .clip(MaterialTheme.shapes.extraLarge)
             .background(
                 color = MaterialTheme.colorScheme.background,
                 shape = MaterialTheme.shapes.medium
             )
             .padding(16.dp)
             .clickable {
-                onItemClick
+                onItemClick(savingType)
             }
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
 
-        ) {
-            Icon(
-                imageVector = Icons.Default.Savings,
-                contentDescription = "Saving Type",
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(30.dp)
-            )
+
             Column(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 horizontalAlignment = Alignment.Start
             ) {
-                Text(
+                DetailsRow(
+                    title = "Loại tiết kiệm",
                     text = savingType.typeName,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.ExtraBold
-                )
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
+                    icon = Icons.Default.Tag,
+                    titleColor = MaterialTheme.colorScheme.primary,
+                    textColor = MaterialTheme.colorScheme.primary
+
+                    )
+
                     DetailsRow(
                         text = "${savingType.duration} tháng",
                         icon = Icons.Default.DateRange,
                         title = "Kỳ hạn",
+                        titleColor = MaterialTheme.colorScheme.outline,
+                        textColor = MaterialTheme.colorScheme.onBackground
 
                     )
                     DetailsRow(
                         icon = Icons.Default.MonetizationOn,
                         title = "Lãi suất",
-                        text = "${savingType.interestRate}%",
+                        text = "${savingType.interestRate}",
+                        titleColor = MaterialTheme.colorScheme.outline,
+                        textColor = MaterialTheme.colorScheme.onBackground
 
                         )
-                }
-            }
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = "Click",
-                tint = MaterialTheme.colorScheme.outline,
-                modifier = Modifier.size(30.dp)
-            )
 
-        }
+            }
+
     }
 }

@@ -72,16 +72,7 @@ class MainActivity : BasePassbookAppActivity() {
                     }
                 }
 
-
-
-                AnimatedContent(
-                    targetState = screen,
-                    transitionSpec = {
-                        fadeIn(tween(300)) togetherWith (fadeOut(tween(300)))
-                    },
-                    label = "AppNavTransition"
-                ) { target ->
-                    if (target == null) {
+                    if (screen == null) {
                         Box(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
@@ -120,7 +111,7 @@ class MainActivity : BasePassbookAppActivity() {
                             }
                         ) { paddingValues ->
                             AppNavGraph(
-                                startDestination = target,
+                                startDestination = screen,
                                 isDarkMode = isDarkMode,
                                 onThemeUpdated = {
                                     isDarkMode = !isDarkMode
@@ -131,7 +122,7 @@ class MainActivity : BasePassbookAppActivity() {
                             )
                         }
                     }
-                }
+
 
 
             }

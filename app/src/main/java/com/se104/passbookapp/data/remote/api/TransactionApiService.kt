@@ -6,6 +6,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Path
 import retrofit2.http.Query
 import java.math.BigDecimal
 
@@ -20,7 +21,7 @@ interface TransactionApiService {
         @Query("size") size: Int = 10,
         @Query("sortBy") sortBy: String = "id",
         @Query("order") order: String = "asc",
-        @Query("citizenId") citizenId: String? = null,
+        @Query("citizenID") citizenID: String? = null,
         @Query("transactionType") transactionType: String? = null,
         @Query("startDate") startDate: String? = null,
         @Query("endDate") endDate: String? = null,
@@ -32,16 +33,15 @@ interface TransactionApiService {
         @Query("size") size: Int = 10,
         @Query("sortBy") sortBy: String = "id",
         @Query("order") order: String = "asc",
-        @Query("citizenId") citizenId: String? = null,
         @Query("transactionType") transactionType: String? = null,
         @Query("startDate") startDate: String? = null,
         @Query("endDate") endDate: String? = null,
 
     ) : Response<PageResponse<Transaction>>
 
-    @POST("$PR/deposit")
-    suspend fun deposit(@Body userId: Long, @Body amount: BigDecimal) : Response<Transaction>
+    @POST("$PR/deposit/{userId}")
+    suspend fun deposit(@Path("userId") userId: Long, @Body amount: BigDecimal) : Response<Transaction>
 
-    @POST("$PR/withdraw")
-    suspend fun withdraw(@Body userId: Long, @Body amount: BigDecimal) : Response<Transaction>
+    @POST("$PR/withdraw/{userId}")
+    suspend fun withdraw(@Path("userId") userId: Long, @Body amount: BigDecimal) : Response<Transaction>
 }

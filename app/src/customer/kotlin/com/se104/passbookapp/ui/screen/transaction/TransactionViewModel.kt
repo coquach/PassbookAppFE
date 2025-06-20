@@ -53,7 +53,7 @@ class TransactionViewModel @Inject constructor(
 
             is TransactionState.Action.SearchStaff -> {
                 _uiState.update {
-                    it.copy(search = action.search, filter = it.filter.copy(citizenId = action.search))
+                    it.copy(search = action.search, filter = it.filter.copy(citizenID = action.search))
                 }
             }
             is TransactionState.Action.OnChangeOrder -> {

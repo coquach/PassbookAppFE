@@ -16,7 +16,7 @@ class DepositUseCase @Inject constructor(
         try {
             transactionRepository.deposit(userId, amount).collect { emit(it) }
         } catch (e: Exception) {
-            emit(ApiResponse.Failure("Đã có lỗi xảy ra khi nạp tiền", 999))
+            emit(ApiResponse.Failure(e.message.toString(), 999))
         }
     }.flowOn(Dispatchers.IO)
 }

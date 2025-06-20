@@ -25,7 +25,6 @@ class SavingTicketPagingSource @Inject constructor(
                 savingTicketApiService.getSavingTicketsForCustomer(
                     page = page,
                     size = size,
-                    citizenId = filter.citizenId,
                     amount = filter.amount,
                     savingTypeId = filter.savingTypeId,
                     isActive = filter.isActive,
@@ -38,7 +37,7 @@ class SavingTicketPagingSource @Inject constructor(
                 savingTicketApiService.getSavingTickets(
                     page = page,
                     size = size,
-                    citizenId = filter.citizenId,
+                    citizenID = filter.citizenID,
                     amount = filter.amount,
                     savingTypeId = filter.savingTypeId,
                     isActive = filter.isActive,

@@ -6,6 +6,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -30,9 +31,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.se104.passbookapp.ui.screen.components.text_field.PassbookTextField
@@ -45,18 +48,22 @@ fun ComboBoxSample(
     modifier: Modifier = Modifier,
     title:  String?= null,
     textPlaceholder: String,
-    selected: String?,
+    search: String,
+    onSearch: (String) -> Unit,
     onPositionSelected: (String?) -> Unit,
     options: List<String>,
     enabled: Boolean = true
 ) {
     var expanded by remember { mutableStateOf(false) }
-    var textFieldSize by remember { mutableStateOf(IntSize.Zero) }
-    LaunchedEffect(selected, options) {
-        if (selected == null && options.isNotEmpty()) {
-            onPositionSelected(options.first())
+    val searchFocusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(expanded) {
+        if (expanded) {
+            delay(100)
+            searchFocusRequester.requestFocus()
         }
     }
+
 
 
     ExposedDropdownMenuBox(
@@ -65,9 +72,10 @@ fun ComboBoxSample(
         onExpandedChange = { if (enabled) expanded = !expanded }
     ) {
         PassbookTextField(
-            value = selected ?: "",
-            onValueChange = {},
-            readOnly = true,
+            value = search,
+            onValueChange = {
+                onSearch(it)
+            },
             labelText = title,
 
             trailingIcon = {
@@ -75,34 +83,40 @@ fun ComboBoxSample(
             },
             modifier = Modifier.fillMaxWidth()
                 .menuAnchor(MenuAnchorType.PrimaryEditable, true)
-
+                .focusRequester(searchFocusRequester)
 
         )
 
         ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier.heightIn(max = 300.dp)
+            modifier = Modifier.height(300.dp),
+
 
         ) {
             // Thêm mục rỗng
-            DropdownMenuItem(
-                text = { Text(textPlaceholder) },
-                onClick = {
-                    onPositionSelected(null)
-                    expanded = false
-                }
-            )
-
-            options.forEach { item ->
+            if(options.isEmpty()){
                 DropdownMenuItem(
-                    text = { Text(item) },
+                    text = { Text(text =textPlaceholder, modifier = Modifier.fillMaxSize().align(Alignment.CenterHorizontally), textAlign = TextAlign.Center) },
                     onClick = {
-                        onPositionSelected(item)
+                        onPositionSelected(null)
                         expanded = false
                     }
                 )
+            }else{
+                options.forEach { item ->
+                    DropdownMenuItem(
+                        text = { Text(item) },
+                        onClick = {
+                            onPositionSelected(item)
+                            expanded = false
+                        }
+                    )
+                }
             }
+
+
+
         }
     }
 }

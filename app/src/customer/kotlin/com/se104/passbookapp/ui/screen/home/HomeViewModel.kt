@@ -189,6 +189,11 @@ class HomeViewModel @Inject constructor(
                     it.copy(userSelected = action.user)
                 }
             }
+            HomeState.Action.ShowTransactionSheet -> {
+                viewModelScope.launch {
+                    _event.send(HomeState.Event.ShowTransactionSheet)
+                }
+            }
         }
     }
 }
@@ -199,9 +204,10 @@ object HomeState {
         val error: String? = null,
         val amount: BigDecimal = BigDecimal.ZERO,
         val search: String = "",
-        val filter: UserFilter = UserFilter(),
+        val filter: UserFilter = UserFilter(groupName = "CUSTOMER"),
         val getInfoState: GetInfoState = GetInfoState.Loading,
         val userSelected: Long? = null,
+
     )
 
     sealed interface GetInfoState {
@@ -212,6 +218,7 @@ object HomeState {
 
     sealed interface Event {
         object ShowError : Event
+        object ShowTransactionSheet: Event
         data object NavigateToActionSuccess : Event
     }
 
@@ -224,6 +231,7 @@ object HomeState {
         data class OnAmountChange(val amount: BigDecimal?) : Action
         data object SetAmountDefault : Action
         data class OnSelectUser(val user: Long) : Action
+        data object ShowTransactionSheet : Action
     }
 
 

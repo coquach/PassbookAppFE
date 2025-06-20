@@ -32,7 +32,8 @@ class SavingTicketDetailsViewModel @Inject constructor(
     ).savingTicket
 
     private val _uiState = MutableStateFlow(SavingTicketDetailsState.UiState(
-        savingTicket = argument
+        savingTicket = argument,
+        request = WithdrawalTicketRequest(savingTicketId = argument.id)
     ))
     val uiState: StateFlow<SavingTicketDetailsState.UiState> get() = _uiState.asStateFlow()
     
@@ -112,7 +113,6 @@ object SavingTicketDetailsState {
         val isLoading: Boolean = false,
         val error: String? = null,
         val savingTicket: SavingTicket,
-        val savingTicketSelected: SavingTicket? = null,
         val request: WithdrawalTicketRequest = WithdrawalTicketRequest(),
     )
 

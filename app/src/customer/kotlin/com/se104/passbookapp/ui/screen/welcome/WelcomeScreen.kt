@@ -18,6 +18,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -37,8 +38,21 @@ import com.se104.passbookapp.ui.screen.welcome.on_boarding_page.OnBoardingPage
 @Composable
 fun WelcomeScreen(
     navController: NavController,
-    welcomeViewModel: WelcomeViewModel = hiltViewModel()
+    welcomeViewModel: WelcomeViewModel = hiltViewModel(),
 ) {
+    LaunchedEffect(Unit) {
+        welcomeViewModel.uiEvent.collect {
+            when (it) {
+                is Event.NavigateToAuth -> {
+                    navController.navigate(Auth) {
+                        popUpTo(navController.graph.startDestinationId) {
+                            inclusive = true
+                        }
+                    }
+                }
+            }
+        }
+    }
     val pages = listOf(
         OnBoardingPage.First,
         OnBoardingPage.Second,
@@ -49,7 +63,11 @@ fun WelcomeScreen(
         initialPage = 0
     )
 
-    Column(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.secondaryContainer)) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.secondaryContainer)
+    ) {
         HorizontalPager(
             modifier = Modifier.weight(10f),
             state = pagerState,
@@ -69,14 +87,11 @@ fun WelcomeScreen(
             pagerState = pagerState
         ) {
             welcomeViewModel.saveOnBoardingState(completed = true)
-            navController.navigate(Auth) {
-                popUpTo(navController.graph.startDestinationId) {
-                    inclusive = true
-                }
-            }
+
         }
     }
 }
+
 @Composable
 fun PagerScreen(onBoardingPage: OnBoardingPage) {
     Column(
@@ -99,7 +114,7 @@ fun PagerScreen(onBoardingPage: OnBoardingPage) {
             style = MaterialTheme.typography.headlineLarge,
             fontWeight = FontWeight.ExtraBold,
             textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onSecondaryContainer
+            color = MaterialTheme.colorScheme.primary
         )
         Text(
             modifier = Modifier
@@ -119,7 +134,7 @@ fun PagerScreen(onBoardingPage: OnBoardingPage) {
 fun FinishButton(
     modifier: Modifier,
     pagerState: PagerState,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Row(
         modifier = modifier
@@ -136,7 +151,7 @@ fun FinishButton(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = onClick,
 
-            )
+                )
         }
     }
 }

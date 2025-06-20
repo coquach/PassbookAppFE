@@ -74,6 +74,10 @@ fun ReportScreen(
                 is ReportState.Event.ShowErrorToast -> {
                     Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
                 }
+
+                ReportState.Event.OnBack -> {
+                    navController.popBackStack()
+                }
             }
         }
     }
@@ -91,7 +95,11 @@ fun ReportScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        HeaderDefaultView(text = "Thống kê")
+        HeaderDefaultView(
+            text = "Thống kê",
+            onBack = {
+                viewModel.onAction(ReportState.Action.OnBack)
+            })
 
 
         Column(
@@ -165,7 +173,7 @@ fun ReportScreen(
                                                 value = it.totalIncome,
                                             )
                                         }
-                                        LineChartFromEntries(
+                                        BarChartFromEntries(
                                             entries = totalIncomes,
                                         )
                                     }
@@ -217,7 +225,7 @@ fun ReportScreen(
                                                 value = it.totalExpense,
                                             )
                                         }
-                                        LineChartFromEntries(
+                                        BarChartFromEntries(
                                             entries = totalExpenses,
                                         )
                                     }
@@ -268,7 +276,7 @@ fun ReportScreen(
                                                 value = it.difference,
                                             )
                                         }
-                                        LineChartFromEntries(
+                                        BarChartFromEntries(
                                             entries = difference,
                                         )
                                     }
@@ -279,7 +287,9 @@ fun ReportScreen(
 
                     },
                 ),
-                onTabSelected = {},
+                onTabSelected = {
+
+                },
                 modifier = Modifier.fillMaxWidth()
 
             )
@@ -313,7 +323,7 @@ fun ReportScreen(
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 MonthSection(
-                    month = uiState.selectedMonth,
+                    month = uiState.selectedMonth + 1,
                     year = uiState.selectedYear,
                     onClicked = { month, year ->
                         viewModel.onAction(

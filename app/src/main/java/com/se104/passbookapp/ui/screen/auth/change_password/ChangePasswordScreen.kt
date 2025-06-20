@@ -1,7 +1,6 @@
-package com.se104.passbookapp.ui.screen.auth.verify_email
+package com.se104.passbookapp.ui.screen.auth.change_password
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -37,17 +36,16 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
 import com.se104.passbookapp.R
-import com.se104.passbookapp.navigation.Login
-import com.se104.passbookapp.navigation.VerifyEmail
+import com.se104.passbookapp.navigation.ResetPasswordSuccess
 import com.se104.passbookapp.ui.screen.components.AppButton
 import com.se104.passbookapp.ui.screen.components.ErrorModalBottomSheet
-import com.se104.passbookapp.ui.screen.components.text_field.ValidateTextField
+import com.se104.passbookapp.ui.screen.components.text_field.PasswordTextField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SendEmailScreen(
+fun ChangePasswordScreen(
     navController: NavController,
-    viewModel: SendEmailViewModel = hiltViewModel()
+    viewModel: ChangePasswordViewModel = hiltViewModel()
 ){
     val uiState by viewModel.uiState.collectAsState()
     var showErrorSheet by remember { mutableStateOf(false) }
@@ -56,18 +54,16 @@ fun SendEmailScreen(
     LaunchedEffect(Unit) {
         viewModel.event.flowWithLifecycle(lifecycleOwner.lifecycle).collect { event ->
             when (event) {
-                is SendEmailState.Event.NavigateToVerifyEmail -> {
-                    navController.navigate(VerifyEmail(event.email))
+                is ChangePasswordState.Event.NavigateToSuccess -> {
+                    navController.navigate(ResetPasswordSuccess)
                 }
-                is SendEmailState.Event.ShowError -> {
+
+                is ChangePasswordState.Event.ShowError -> {
                     showErrorSheet = true
                 }
-                is SendEmailState.Event.NavigateToLogin -> {
-                    navController.navigate(Login) {
-                        popUpTo(navController.graph.startDestinationId) {
-                            inclusive = true
-                        }
-                    }
+
+                is ChangePasswordState.Event.OnBack -> {
+                    navController.popBackStack()
                 }
             }
         }
@@ -82,7 +78,7 @@ fun SendEmailScreen(
         verticalArrangement = Arrangement.spacedBy(20.dp)
 
 
-    ){
+    ) {
         Text(
             text = stringResource(id = R.string.sign_up_desc),
             fontSize = 32.sp,
@@ -93,7 +89,7 @@ fun SendEmailScreen(
 
         )
         Image(
-            painter = painterResource(id = R.drawable.send_email),
+            painter = painterResource(id = R.drawable.change_password),
             contentDescription = "",
             modifier = Modifier.size(240.dp)
         )
@@ -112,47 +108,49 @@ fun SendEmailScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text(
-                    text = "Nhập email đăng kí tài khoản",
+                    text = "Thay đổi mật khẩu tài khoản",
                     color = MaterialTheme.colorScheme.outline,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.ExtraBold,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 10.dp,),
+                        .padding(top = 10.dp),
 
                     )
-                ValidateTextField(
+                PasswordTextField(
                     modifier = Modifier.fillMaxWidth(),
-                    value = uiState.email,
+                    value = uiState.oldPassword,
                     onValueChange = {
-                        viewModel.onAction(SendEmailState.Action.SetEmail(it))
+                        viewModel.onAction(ChangePasswordState.Action.OnChangeOldPassword(it))
                     },
-                    labelText = stringResource(R.string.email),
-                    errorMessage = uiState.emailError,
+                    errorMessage = uiState.oldPasswordError,
                     validate = {
-                        viewModel.validate("email")
+                        viewModel.validate("oldPassword")
                     },
                     keyboardOptions = KeyboardOptions.Default.copy(
-                        keyboardType = KeyboardType.Email,
-                        imeAction = ImeAction.Done
+                        keyboardType = KeyboardType.Password,
+                        imeAction = ImeAction.Next
                     ),
-                )
-                Text(
-                    text = stringResource(id = R.string.already_have_account),
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .clickable {
-                            viewModel.onAction(SendEmailState.Action.LoginClicked)
-                        }
-                        .fillMaxWidth(),
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.bodyLarge
-
+                    label = "Mật khẩu cũ"
                 )
 
-
+                PasswordTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = uiState.newPassword,
+                    onValueChange = {
+                        viewModel.onAction(ChangePasswordState.Action.OnChangeOldPassword(it))
+                    },
+                    errorMessage = uiState.newPasswordError,
+                    validate = {
+                        viewModel.validate("newPassword")
+                    },
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Password,
+                        imeAction = ImeAction.Next
+                    ),
+                    label = "Mật khẩu mới"
+                )
 
 
             }
@@ -162,20 +160,21 @@ fun SendEmailScreen(
         AppButton(
             modifier = Modifier.fillMaxWidth(),
             onClick = {
-                viewModel.onAction(SendEmailState.Action.SendEmail)
+                viewModel.onAction(ChangePasswordState.Action.OnChangePassword)
             },
-            text = "Gửi",
+            text = "Xác nhận",
             enable = uiState.isValid && !uiState.isLoading
         )
     }
 
-    if(showErrorSheet){
+    if (showErrorSheet) {
         ErrorModalBottomSheet(
             description = uiState.errorMessage.toString(),
             onDismiss = {
                 showErrorSheet = false
             },
 
-        )
+            )
     }
+
 }

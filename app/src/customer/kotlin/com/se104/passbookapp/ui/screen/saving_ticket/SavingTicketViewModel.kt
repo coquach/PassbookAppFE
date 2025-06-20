@@ -100,7 +100,7 @@ class SavingTicketViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         search = action.search,
-                        filter = it.filter.copy(citizenId = action.search)
+                        filter = it.filter.copy(citizenID = action.search)
                     )
                 }
             }

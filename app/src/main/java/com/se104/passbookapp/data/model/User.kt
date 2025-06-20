@@ -24,4 +24,6 @@ data class User(
     @Serializable(with = LocalDateTimeSerializer::class)
     val createdAt: LocalDateTime,
 
+    val groupName: String
+
 )

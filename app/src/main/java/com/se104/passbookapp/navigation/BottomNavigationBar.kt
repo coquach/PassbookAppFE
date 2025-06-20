@@ -202,7 +202,7 @@ fun BottomBarWithCutoutFAB(
                 CutoutBottomAppBar(
                     fabSize = fabSize,
                     fabMargin = fabMargin,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.onPrimary
                 ) {
                     NavigationBar(
                         containerColor = Color.Transparent,
@@ -235,7 +235,7 @@ fun BottomBarWithCutoutFAB(
                                         imageVector = item.icon,
                                         contentDescription = null,
                                         tint = if (selected)
-                                            MaterialTheme.colorScheme.onPrimary
+                                            MaterialTheme.colorScheme.primary
                                         else
                                             MaterialTheme.colorScheme.inversePrimary
                                     )
@@ -270,7 +270,7 @@ fun BottomBarWithCutoutFAB(
                                         imageVector = item.icon,
                                         contentDescription = null,
                                         tint = if (selected)
-                                            MaterialTheme.colorScheme.onPrimary
+                                            MaterialTheme.colorScheme.primary
                                         else
                                             MaterialTheme.colorScheme.inversePrimary
                                     )
@@ -283,7 +283,7 @@ fun BottomBarWithCutoutFAB(
             }
             else{
                 NavigationBar(
-                    containerColor = Color.Transparent,
+                    containerColor = MaterialTheme.colorScheme.onPrimary,
                     tonalElevation = 0.dp
                 ) {
 
@@ -312,7 +312,7 @@ fun BottomBarWithCutoutFAB(
                                     imageVector = item.icon,
                                     contentDescription = null,
                                     tint = if (selected)
-                                        MaterialTheme.colorScheme.onPrimary
+                                        MaterialTheme.colorScheme.primary
                                     else
                                         MaterialTheme.colorScheme.inversePrimary
                                 )

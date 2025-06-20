@@ -9,10 +9,11 @@ import com.se104.passbookapp.data.dto.filter.UserFilter
 import com.se104.passbookapp.data.model.SavingType
 import com.se104.passbookapp.data.model.User
 import com.se104.passbookapp.domain.use_case.saving_ticket.CreateSavingTicketUseCase
+import com.se104.passbookapp.domain.use_case.user.GetMyInfoUseCase
 import com.se104.passbookapp.domain.use_case.user.GetUserIdUseCase
-import com.se104.passbookapp.domain.use_case.user.GetUsersUseCase
 import com.se104.passbookapp.navigation.CreateSavingTicket
 import com.se104.passbookapp.navigation.savingTypeNavType
+import com.se104.passbookapp.ui.screen.saving_ticket.create.CreateSavingTicketState.FindUserState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,8 +29,7 @@ import kotlin.reflect.typeOf
 class CreateSavingTicketViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val createSavingTicketUseCase: CreateSavingTicketUseCase,
-    private val getUsersUseCase: GetUsersUseCase,
-    private val getUserIdUseCase: GetUserIdUseCase
+    private val getMyInfoUseCase: GetMyInfoUseCase
 ) : ViewModel() {
     private val argument = savedStateHandle.toRoute<CreateSavingTicket>(
         typeMap = mapOf(typeOf<SavingType>() to savingTypeNavType)
@@ -40,14 +40,27 @@ class CreateSavingTicketViewModel @Inject constructor(
     private val _event = Channel<CreateSavingTicketState.Event>()
     val event get() = _event.receiveAsFlow()
 
-    fun getUsers(filter: UserFilter) = getUsersUseCase(filter)
 
-    fun getUserId() {
+    fun getCitizenId() {
         viewModelScope.launch {
-            _uiState.update {
-                it.copy(
-                    userId = getUserIdUseCase()
-                )
+            getMyInfoUseCase.invoke().collect { response ->
+                when (response) {
+                    is ApiResponse.Success -> {
+                        _uiState.update {
+                            it.copy(
+                                citizenID = response.data.citizenID
+                            )}}
+                    is ApiResponse.Failure -> {
+                        _uiState.update {
+                            it.copy(
+                                errorMessage = response.errorMessage
+                            )}
+                        _event.send(CreateSavingTicketState.Event.ShowError)
+                    }
+                    ApiResponse.Loading -> {
+
+                    }
+                }
             }
         }
     }
@@ -55,7 +68,7 @@ class CreateSavingTicketViewModel @Inject constructor(
     private fun createSavingTicket() {
         viewModelScope.launch {
             createSavingTicketUseCase(
-                userId = _uiState.value.userId!!,
+                citizenID = _uiState.value.citizenID,
                 savingTypeId = _uiState.value.savingType.id!!,
                 amount = _uiState.value.amount
             ).collect { response ->
@@ -114,21 +127,10 @@ class CreateSavingTicketViewModel @Inject constructor(
                 }
             }
 
-            is CreateSavingTicketState.Action.OnUserSearch -> {
+            is CreateSavingTicketState.Action.OnCitizenIDSearch -> {
                 _uiState.update {
                     it.copy(
-                        userSearch = action.search,
-                        userFilter = it.userFilter.copy(
-                            citizenID = action.search
-                        )
-                    )
-                }
-            }
-
-            is CreateSavingTicketState.Action.OnUserIdSelected -> {
-                _uiState.update {
-                    it.copy(
-                        userId = action.id
+                        citizenID = action.citizenID
                     )
                 }
             }
@@ -138,14 +140,19 @@ class CreateSavingTicketViewModel @Inject constructor(
 
 object CreateSavingTicketState {
     data class UiState(
-        val userId: Long? = null,
+        val citizenID: String = "",
         val isLoading: Boolean = false,
         val errorMessage: String? = null,
         val savingType: SavingType,
         val amount: BigDecimal = BigDecimal.ZERO,
-        val userSearch: String = "",
-        val userFilter: UserFilter = UserFilter(),
+
     )
+
+    sealed interface FindUserState {
+        data object Loading : FindUserState
+        data object Success : FindUserState
+        data class Failure(val message: String) : FindUserState
+    }
 
     sealed interface Event {
         data object ShowError : Event
@@ -157,7 +164,7 @@ object CreateSavingTicketState {
         data class OnAmountChange(val amount: BigDecimal?) : Action
         data object OnCreate : Action
         data object OnBack : Action
-        data class OnUserSearch(val search: String) : Action
-        data class OnUserIdSelected(val id: Long) : Action
+        data class OnCitizenIDSearch(val citizenID: String) : Action
+
     }
 }

@@ -22,9 +22,11 @@ interface UserApiService {
         @Query("size") size: Int = 10,
         @Query("sortBy") sortBy: String = "id",
         @Query("order") order: String = "asc",
+        @Query("groupName") groupName: String? = null,
         @Query("fullName") fullName: String? = null,
         @Query("citizenID") citizenID: String? = null,
     ): Response<PageResponse<User>>
+    
 
     @PUT("$PR/active/{userId}")
     suspend fun setActiveUser(@Path("userId") userId: Long, @Body isActive: Boolean): Response<Unit>

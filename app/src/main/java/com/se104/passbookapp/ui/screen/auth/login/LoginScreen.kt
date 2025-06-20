@@ -80,7 +80,11 @@ fun LoginScreen(
                 }
 
                 Login.Event.NavigateHome -> {
-                    navController.navigate(Home)
+                    navController.navigate(Home){
+                        popUpTo(navController.graph.startDestinationId) {
+                            inclusive = true
+                        }
+                    }
                 }
 
                 Login.Event.ShowError -> {

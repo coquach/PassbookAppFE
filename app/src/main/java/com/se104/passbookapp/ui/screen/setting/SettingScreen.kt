@@ -137,7 +137,8 @@ fun SettingScreen(
                     showDialogLogout = true
                 },
                text = "Đăng xuất",
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                enable = !uiState.isLoading
 
             )
         }

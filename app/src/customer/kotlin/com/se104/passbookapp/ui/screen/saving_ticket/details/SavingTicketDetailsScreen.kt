@@ -29,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -61,13 +62,14 @@ fun SavingTicketDetailsScreen(
     navController: NavController,
     viewModel: SavingTicketDetailsViewModel = hiltViewModel(),
     permissions: List<String>,
-){
-    val isStaff = permissions.hasPermission("VIEW_USERS")
-    val isWithDraw= permissions.hasPermission("CREATE_WITHDRAWALTICKET")
+) {
+    val isStaff by rememberSaveable { mutableStateOf(permissions.hasPermission("VIEW_USERS")) }
+    val isWithDraw by rememberSaveable { mutableStateOf(permissions.hasPermission("CREATE_WITHDRAWALTICKET")) }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showErrorSheet by rememberSaveable { mutableStateOf(false) }
     var showWithDrawSheet by rememberSaveable { mutableStateOf(false) }
+
 
     val lifecycleOwner = LocalLifecycleOwner.current
     LaunchedEffect(Unit) {
@@ -76,6 +78,7 @@ fun SavingTicketDetailsScreen(
                 is SavingTicketDetailsState.Event.Withdraw -> {
                     showWithDrawSheet = true
                 }
+
                 is SavingTicketDetailsState.Event.ShowError -> {
                     showErrorSheet = true
                 }
@@ -83,6 +86,7 @@ fun SavingTicketDetailsScreen(
                 SavingTicketDetailsState.Event.NavigateToActionSuccess -> {
                     navController.navigate(ActionSuccess)
                 }
+
                 SavingTicketDetailsState.Event.OnBack -> {
                     navController.popBackStack()
                 }
@@ -91,97 +95,126 @@ fun SavingTicketDetailsScreen(
     }
 
 
-                Column(
-                    modifier = Modifier.fillMaxSize().padding(start = 16.dp, end = 16.dp, bottom = 20.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(start = 16.dp, end = 16.dp, bottom = 20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
 
 
-                    HeaderDefaultView(
-                        text = "Chi tiết phiếu",
-                        onBack = {
-                            viewModel.onAction(SavingTicketDetailsState.Action.OnBack)
-                        }
-                    )
+        HeaderDefaultView(
+            text = "Chi tiết phiếu",
+            onBack = {
+                viewModel.onAction(SavingTicketDetailsState.Action.OnBack)
+            }
+        )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .clip(MaterialTheme.shapes.extraLarge)
+                .background(MaterialTheme.colorScheme.background, MaterialTheme.shapes.extraLarge)
+                .padding(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            DetailsRow(
+                icon = Icons.Default.Tag,
+                text = uiState.savingTicket.id.toString(),
+                title = "Mã phiếu",
+                titleColor = MaterialTheme.colorScheme.primary,
+                textColor = MaterialTheme.colorScheme.primary
+            )
+            if (isStaff) {
+                DetailsRow(
+                    icon = Icons.Default.Person,
+                    text = uiState.savingTicket.citizenId,
+                    title = "CCCD",
+                    titleColor = MaterialTheme.colorScheme.primary,
+                    textColor = MaterialTheme.colorScheme.primary
+                )
+            }
+            DetailsRow(
+                icon = Icons.Default.Category,
+                title = "Loại tiết kiệm",
+                text = uiState.savingTicket.savingTypeName,
+                titleColor = MaterialTheme.colorScheme.outline,
+                textColor = MaterialTheme.colorScheme.onBackground
+            )
+            DetailsRow(
+                title = "Kỳ hạn",
+                icon = Icons.Default.DateRange,
+                text = if(uiState.savingTicket.duration==0) "Không có" else "${uiState.savingTicket.duration} tháng",
+                titleColor = MaterialTheme.colorScheme.outline,
+                textColor = MaterialTheme.colorScheme.onBackground
+            )
+            DetailsRow(
+                icon = Icons.Default.AttachMoney,
+                title = "Lãi suất",
+                text = "${uiState.savingTicket.interestRate}",
+                titleColor = MaterialTheme.colorScheme.outline,
+                textColor = MaterialTheme.colorScheme.onBackground
+            )
+            DetailsRow(
+                title = "Số tiền gửi",
+                icon = Icons.Default.MonetizationOn,
+                text = StringUtils.formatCurrency(uiState.savingTicket.amount),
+                titleColor = MaterialTheme.colorScheme.outline,
+                textColor = MaterialTheme.colorScheme.onBackground
+            )
+            DetailsRow(
+                title = "Số dư còn lại",
+                icon = Icons.Default.MonetizationOn,
+                text = StringUtils.formatCurrency(uiState.savingTicket.balance),
+                titleColor = MaterialTheme.colorScheme.outline,
+                textColor = MaterialTheme.colorScheme.onBackground
+            )
 
-                        DetailsRow(
-                            icon = Icons.Default.Tag,
-                            text = uiState.savingTicketSelected!!.id.toString(),
-                            title = "Mã phiếu",
-                        )
-                        if (isStaff) {
-                            DetailsRow(
-                                icon = Icons.Default.Person,
-                                text = uiState.savingTicketSelected!!.citizenId,
-                                title = "Mã CCCD"
-                            )
-                        }
-                        DetailsRow(
-                            icon = Icons.Default.Category,
-                            title = "Loại tiết kiệm",
-                            text = uiState.savingTicketSelected!!.savingTypeName
-                        )
-                        DetailsRow(
-                            title = "Kỳ hạn",
-                            icon = Icons.Default.DateRange,
-                            text = "${uiState.savingTicketSelected!!.duration} tháng"
-                        )
-                        DetailsRow(
-                            icon = Icons.Default.AttachMoney,
-                            title = "Lãi suất",
-                            text = "${uiState.savingTicketSelected!!.interestRate}%",
+            DetailsRow(
+                title = "Ngày tạo",
+                icon = Icons.Default.Timer,
+                text = StringUtils.formatDateTime(uiState.savingTicket.createdAt)!!,
+                titleColor = MaterialTheme.colorScheme.outline,
+                textColor = MaterialTheme.colorScheme.onBackground
+            )
+            if(uiState.savingTicket.maturityDate!=null){
+                DetailsRow(
+                    title = "Ngày đáo hạn",
+                    icon = Icons.Default.Timer,
+                    text = StringUtils.formatLocalDate(uiState.savingTicket.maturityDate)!!,
+                    titleColor = MaterialTheme.colorScheme.outline,
+                    textColor = MaterialTheme.colorScheme.onBackground
+                )
+            }
 
-                            )
-                        DetailsRow(
-                            title = "Số tiền gửi",
-                            icon = Icons.Default.MonetizationOn,
-                            text = StringUtils.formatCurrency(uiState.savingTicketSelected!!.amount)
-                        )
-                        DetailsRow(
-                            title = "Số dư còn lại",
-                            icon = Icons.Default.MonetizationOn,
-                            text = StringUtils.formatCurrency(uiState.savingTicketSelected!!.balance)
-                        )
-
-                        DetailsRow(
-                            title = "Ngày tạo",
-                            icon = Icons.Default.Timer,
-                            text = StringUtils.formatDateTime(uiState.savingTicketSelected!!.createdAt)!!
-                        )
-                        DetailsRow(
-                            title = "Ngày đáo hạn",
-                            icon = Icons.Default.Timer,
-                            text = StringUtils.formatLocalDate(uiState.savingTicketSelected!!.maturityDate)!!
-                        )
-                        Text(
-                            text = "Danh sách lần rút",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.primary,
-                            textAlign = TextAlign.Start,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                        WithDrawTicketList(
-                            withDrawTickets = uiState.savingTicketSelected!!.withdrawalTickets,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(1f)
-                        )
+            Text(
+                text = "Danh sách lần rút",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary,
+                textAlign = TextAlign.Start,
+                modifier = Modifier.fillMaxWidth()
+            )
+            WithDrawTicketList(
+                withDrawTickets = uiState.savingTicket.withdrawalTickets,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            )
+        }
 
 
+        AppButton(
+            text = "Rút tiền",
+            onClick = {
+                viewModel.onAction(SavingTicketDetailsState.Action.Withdraw)
+            },
+            enable = isWithDraw && uiState.savingTicket.balance != BigDecimal.ZERO && !uiState.isLoading,
+            modifier = Modifier.fillMaxWidth()
+        )
 
-
-
-                        AppButton(
-                            text = "Rút tiền",
-                            onClick = {
-                                viewModel.onAction(SavingTicketDetailsState.Action.Withdraw)
-                            },
-                            enable = isWithDraw && uiState.savingTicketSelected!!.balance != BigDecimal.ZERO && !uiState.isLoading,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-
-                }
+    }
 
 
 
@@ -202,7 +235,11 @@ fun SavingTicketDetailsScreen(
                     PassbookTextField(
                         value = uiState.request.withdrawalAmount.toPlainString(),
                         onValueChange = {
-                            viewModel.onAction(SavingTicketDetailsState.Action.OnChangeAmountWithdrawal(it.toBigDecimalOrNull()))
+                            viewModel.onAction(
+                                SavingTicketDetailsState.Action.OnChangeAmountWithdrawal(
+                                    it.toBigDecimalOrNull()
+                                )
+                            )
                         },
                         leadingIcon = {
                             Icon(
@@ -249,6 +286,7 @@ fun SavingTicketDetailsScreen(
         )
     }
 }
+
 @Composable
 fun WithDrawTicketList(
     modifier: Modifier = Modifier,
@@ -288,7 +326,7 @@ fun WithDrawTicketCard(withDrawTicket: WithdrawalTicket) {
         modifier = Modifier
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.medium)
-            .background(MaterialTheme.colorScheme.background)
+            .background(MaterialTheme.colorScheme.inversePrimary, MaterialTheme.shapes.medium)
             .padding(12.dp),
     ) {
         Column(
@@ -299,13 +337,15 @@ fun WithDrawTicketCard(withDrawTicket: WithdrawalTicket) {
             DetailsRow(
                 icon = Icons.Default.Timer,
                 title = "Thời gian",
-                text = StringUtils.formatDateTime(withDrawTicket.createdAt)!!
+                text = StringUtils.formatDateTime(withDrawTicket.createdAt)!!,
+                titleColor = MaterialTheme.colorScheme.outline
             )
             DetailsRow(
                 icon = Icons.Default.MonetizationOn,
                 title = "Giao dịch",
                 text = "-${StringUtils.formatCurrency(withDrawTicket.withdrawalAmount)}",
-                color = MaterialTheme.colorScheme.error
+                titleColor = MaterialTheme.colorScheme.outline,
+                textColor = MaterialTheme.colorScheme.error
             )
         }
     }

@@ -37,6 +37,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
 import com.se104.passbookapp.R
 import com.se104.passbookapp.navigation.Login
+import com.se104.passbookapp.navigation.SignUp
 import com.se104.passbookapp.navigation.VerifyEmail
 import com.se104.passbookapp.ui.screen.components.AppButton
 import com.se104.passbookapp.ui.screen.components.ErrorModalBottomSheet
@@ -58,7 +59,7 @@ fun VerifyEmailScreen(
         viewModel.event.flowWithLifecycle(lifecycleOwner.lifecycle).collect { event ->
             when (event) {
                 is VerifyEmailState.Event.NavigateToSignUp -> {
-                    navController.navigate(VerifyEmail(event.email))
+                    navController.navigate(SignUp(event.email))
                 }
 
                 is VerifyEmailState.Event.ShowError -> {

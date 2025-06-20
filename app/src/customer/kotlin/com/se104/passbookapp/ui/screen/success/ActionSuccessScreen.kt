@@ -53,7 +53,8 @@ fun ActionSuccessScreen(
 
             Text(
                 text = "Thao tác thành công",
-                style = MaterialTheme.typography.headlineLarge,
+                style = MaterialTheme.typography.titleLarge,
+                textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.confirm,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.fillMaxWidth(),

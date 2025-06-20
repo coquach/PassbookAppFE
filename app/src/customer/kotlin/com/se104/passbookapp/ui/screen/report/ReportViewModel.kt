@@ -85,7 +85,7 @@ class ReportViewModel @Inject constructor(
 
     fun getDailyReports() {
         viewModelScope.launch {
-            reportRepository.getDailyReports(_uiState.value.selectedYear, _uiState.value.selectedMonth)
+            reportRepository.getDailyReports(year = _uiState.value.selectedYear, month = _uiState.value.selectedMonth +1)
                 .collect { result ->
                     when (result) {
                         is ApiResponse.Loading -> {
@@ -177,6 +177,11 @@ class ReportViewModel @Inject constructor(
             ReportState.Action.GetMonthlyReport -> {
                 getMonthlyReports()
             }
+            ReportState.Action.OnBack -> {
+                viewModelScope.launch {
+                    _event.send(OnBack)
+                }
+            }
 
         }
     }
@@ -216,6 +221,7 @@ object ReportState {
 
     sealed interface Event {
         data class ShowErrorToast(val message: String) : Event
+        data object OnBack: Event
 
     }
 
@@ -225,6 +231,7 @@ object ReportState {
         data class OnChangeSelectedMonthYear(val year: Int, val month: Int) : Action
         data object GetMonthlyReport : Action
         data object GetDailyReport : Action
+        data object OnBack: Action
 
 
     }

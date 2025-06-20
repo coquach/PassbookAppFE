@@ -66,6 +66,7 @@ import com.se104.passbookapp.ui.theme.button
 import com.se104.passbookapp.utils.StringUtils
 import com.se104.passbookapp.utils.hasAllPermissions
 import com.se104.passbookapp.utils.hasPermission
+import java.math.BigDecimal
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -74,8 +75,15 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     permissions: List<String>,
 ) {
-    val isStaff = permissions.hasAllPermissions("VIEW_USERS", "VIEW_MY_INFO")
-    val isTransaction = permissions.hasAllPermissions("DEPOSIT", "WITHDRAWAL")
+    val isStaff by remember(permissions) {
+        mutableStateOf(permissions.hasAllPermissions("VIEW_USERS", "VIEW_MY_INFO"))
+    }
+    val showInfo by remember(permissions) {
+        mutableStateOf(permissions.hasPermission("VIEW_MY_INFO"))
+    }
+    val isTransaction by remember(permissions) {
+        mutableStateOf(permissions.hasAllPermissions("DEPOSIT", "WITHDRAWAL"))
+    }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var isOpenTransactionSheet by remember { mutableStateOf(false) }
@@ -88,12 +96,18 @@ fun HomeScreen(
                 is HomeState.Event.ShowError -> {
                     showErrorSheet = true
                 }
+                HomeState.Event.ShowTransactionSheet -> {
+                    isOpenTransactionSheet = true
+                }
 
                 HomeState.Event.NavigateToActionSuccess -> {
                     navController.navigate(ActionSuccess)
                 }
             }
         }
+    }
+    LaunchedEffect(Unit) {
+        viewModel.getMyInfo()
     }
 
 
@@ -106,97 +120,7 @@ fun HomeScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.Start)
-        ) {
-
-            BoxAvatar(
-                modifier = Modifier.size(50.dp),
-            )
-            Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                horizontalAlignment = Alignment.Start
-
-            ) {
-                Text(
-                    text = viewModel.getGreetingTitle(),
-                    style = MaterialTheme.typography.bodyLarge,
-
-                    )
-                Text(
-                    text = "Nguyễn Văn A",
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold
-                )
-
-            }
-        }
-
-        if (isStaff) {
-            val users = remember(uiState.filter) {
-                viewModel.getUsers(uiState.filter)
-
-            }.collectAsLazyPagingItems()
-            SearchField(
-                searchInput = uiState.search,
-                searchChange = {
-                    viewModel.onAction(HomeState.Action.OnSearch(it))
-
-                },
-                switchChange = {
-                    when (it) {
-                        true -> viewModel.onAction(HomeState.Action.OnChangeOrder("desc"))
-                        false -> viewModel.onAction(HomeState.Action.OnChangeOrder("asc"))
-                    }
-                },
-                filterChange = {
-                    when (it) {
-                        "Tên" -> viewModel.onAction(HomeState.Action.OnChangeSortBy("fullName"))
-                        "Số dư" -> viewModel.onAction(HomeState.Action.OnChangeSortBy("balance"))
-                        "Năm sinh" -> viewModel.onAction(HomeState.Action.OnChangeSortBy("dateOfBirth"))
-                        else -> viewModel.onAction(HomeState.Action.OnChangeSortBy("fullName"))
-
-                    }
-                    Log.d("Home", "filterChange: ${uiState.filter}")
-                },
-                filters = listOf("Tên", "Số dư", "Năm sinh"),
-                filterSelected = when (uiState.filter.sortBy) {
-                    "fullName" -> "Tên"
-                    "balance" -> "Số dư"
-                    "dateOfBirth" -> "Năm sinh"
-                    else -> "Số dư"
-                },
-                switchState = uiState.filter.order == "desc",
-                placeHolder = "Tìm kiếm theo CCCD..."
-            )
-            LazyPagingSample(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                items = users,
-                textNothing = "Không có khách hàng nào",
-                iconNothing = Icons.Default.People,
-                columns = 1,
-                key = {
-                    it.id
-                },
-
-                ) {
-                UserSection(
-                    onClick = {
-                        viewModel.onAction(HomeState.Action.OnSelectUser(it.id))
-                        isOpenTransactionSheet = true
-                    },
-                    user = it,
-                    isStaff = true,
-                    enabled = isTransaction
-                )
-            }
-
-        } else  {
+        if (showInfo) {
             when (uiState.getInfoState) {
                 is HomeState.GetInfoState.Error -> {
                     val message = (uiState.getInfoState as HomeState.GetInfoState.Error).message
@@ -205,33 +129,123 @@ fun HomeScreen(
                         onClicked = {
                             viewModel.getMyInfo()
                         },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
+                        modifier = Modifier.fillMaxSize()
                     )
                 }
 
                 HomeState.GetInfoState.Loading -> {
                     LoadingAnimation(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
+                        modifier = Modifier.fillMaxSize(),
                     )
                 }
-
                 is HomeState.GetInfoState.Success -> {
                     val user = (uiState.getInfoState as HomeState.GetInfoState.Success).data
-                    UserSection(
-                        onClick = {
-                            viewModel.onAction(HomeState.Action.OnSelectUser(user.id))
-                            isOpenTransactionSheet = true
-                        },
-                        user = user,
-                        enabled = isTransaction
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.Start)
+                    ) {
+
+                        BoxAvatar(
+                            modifier = Modifier.size(50.dp),
+                        )
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            horizontalAlignment = Alignment.Start
+
+                        ) {
+                            Text(
+                                text = viewModel.getGreetingTitle(),
+                                style = MaterialTheme.typography.bodyLarge,
+
+
+                                )
+                            Text(
+                                text = user.fullName,
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.Bold
+                            )
+
+                        }
+                    }
+
+                    if (isStaff) {
+                        val users = remember(uiState.filter) {
+                            viewModel.getUsers(uiState.filter)
+
+                        }.collectAsLazyPagingItems()
+                        SearchField(
+                            searchInput = uiState.search,
+                            searchChange = {
+                                viewModel.onAction(HomeState.Action.OnSearch(it))
+
+                            },
+                            switchChange = {
+                                when (it) {
+                                    true -> viewModel.onAction(HomeState.Action.OnChangeOrder("desc"))
+                                    false -> viewModel.onAction(HomeState.Action.OnChangeOrder("asc"))
+                                }
+                            },
+                            filterChange = {
+                                when (it) {
+                                    "Tên" -> viewModel.onAction(HomeState.Action.OnChangeSortBy("fullName"))
+                                    "Số dư" -> viewModel.onAction(HomeState.Action.OnChangeSortBy("balance"))
+                                    else -> viewModel.onAction(HomeState.Action.OnChangeSortBy("fullName"))
+
+                                }
+                                Log.d("Home", "filterChange: ${uiState.filter}")
+                            },
+                            filters = listOf("Tên", "Số dư"),
+                            filterSelected = when (uiState.filter.sortBy) {
+                                "fullName" -> "Tên"
+                                "balance" -> "Số dư"
+                                else -> "Tên"
+                            },
+                            switchState = uiState.filter.order == "desc",
+                            placeHolder = "Tìm kiếm theo CCCD..."
+                        )
+                        LazyPagingSample(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f),
+                            items = users,
+                            textNothing = "Không có khách hàng nào",
+                            iconNothing = Icons.Default.People,
+                            columns = 1,
+                            key = {
+                                it.id
+                            },
+
+                            ) {
+                            UserSection(
+                                onClick = {
+                                    viewModel.onAction(HomeState.Action.OnSelectUser(it.id))
+                                    viewModel.onAction(HomeState.Action.ShowTransactionSheet)
+                                },
+                                user = it,
+                                isStaff = true,
+                                enabled = isTransaction
+                            )
+                        }
+
+                    } else  {
+                                UserSection(
+                                    onClick = {
+                                        viewModel.onAction(HomeState.Action.OnSelectUser(user.id))
+                                       viewModel.onAction(HomeState.Action.ShowTransactionSheet)
+                                    },
+                                    user = user,
+                                    enabled = isTransaction
+                                )
+
+
+                    }
                 }
+
             }
         }
+
     }
     if (isOpenTransactionSheet) {
         CustomBottomSheet(
@@ -277,11 +291,14 @@ fun HomeScreen(
 
                                 )
                             AppButton(
-                                onClick = {},
+                                onClick = {
+                                    viewModel.onAction(HomeState.Action.Deposit)
+                                },
                                 modifier = Modifier
                                     .fillMaxWidth(),
                                 text = "Nạp",
                                 backgroundColor = MaterialTheme.colorScheme.primary,
+                                enable = isTransaction && uiState.amount != BigDecimal.ZERO && !uiState.loading
                             )
                         }
                     },
@@ -319,11 +336,14 @@ fun HomeScreen(
 
                                 )
                             AppButton(
-                                onClick = {},
+                                onClick = {
+                                    viewModel.onAction(HomeState.Action.Withdraw)
+                                },
                                 modifier = Modifier
                                     .fillMaxWidth(),
                                 text = "Rút",
                                 backgroundColor = MaterialTheme.colorScheme.primary,
+                                enable = isTransaction && uiState.amount != BigDecimal.ZERO && !uiState.loading
                             )
                         }
                     }
@@ -331,7 +351,8 @@ fun HomeScreen(
                 modifier = Modifier.fillMaxWidth(),
                 onTabSelected =
                     {
-                        viewModel.onAction(HomeState.Action.SetAmountDefault)
+                        viewModel.onAction(HomeState.Action.OnAmountChange(BigDecimal.ZERO))
+
                     },
             )
         }
@@ -356,6 +377,7 @@ fun UserSection(
 ) {
     Box(
         modifier = Modifier
+            .padding(8.dp)
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.medium)
             .background(

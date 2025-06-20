@@ -94,7 +94,7 @@ private val _uiState = MutableStateFlow(Login.UiState())
                 _uiState.value = _uiState.value.copy(password = action.password)
             }
             is Login.Action.OnLoginClick -> {
-                login(LoginRequest(_uiState.value.email, _uiState.value.password, ""))
+                login(LoginRequest(_uiState.value.email, _uiState.value.password))
             }
             is Login.Action.OnSignUpClick -> {
                 viewModelScope.launch {

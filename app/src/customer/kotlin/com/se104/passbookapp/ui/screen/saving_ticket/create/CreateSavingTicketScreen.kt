@@ -1,6 +1,7 @@
 package com.se104.passbookapp.ui.screen.saving_ticket.create
 
 import DetailsRow
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Category
@@ -29,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -42,6 +45,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.se104.passbookapp.data.model.User
 import com.se104.passbookapp.navigation.ActionSuccess
 import com.se104.passbookapp.ui.screen.components.AppButton
+import com.se104.passbookapp.ui.screen.components.ComboBoxSample
 import com.se104.passbookapp.ui.screen.components.CustomPagingDropdown
 import com.se104.passbookapp.ui.screen.components.ErrorModalBottomSheet
 import com.se104.passbookapp.ui.screen.components.HeaderDefaultView
@@ -60,8 +64,8 @@ fun CreateSavingTicketsScreen(
     permissions: List<String>,
 ) {
 
-    val isStaff = permissions.hasAllPermissions("VIEW_USERS")
-    val isCreate = permissions.hasPermission("CREATE_SAVINGTICKETS")
+    val isStaff by remember(permissions) { mutableStateOf(permissions.hasAllPermissions("VIEW_USERS")) }
+    val isCreate by remember(permissions) { mutableStateOf(permissions.hasPermission("CREATE_SAVINGTICKET")) }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     var showErrorSheet by remember { mutableStateOf(false) }
@@ -99,87 +103,99 @@ fun CreateSavingTicketsScreen(
                 viewModel.onAction(CreateSavingTicketState.Action.OnBack)
             }
         )
-
-        DetailsRow(
-            icon = Icons.Default.Category,
-            title = "Loại tiết kiệm",
-            text = uiState.savingType.typeName,
-        )
-        DetailsRow(
-            icon = Icons.Default.DateRange,
-            title = "Kỳ hạn",
-            text = "${uiState.savingType.duration} tháng",
-        )
-        DetailsRow(
-            icon = Icons.Default.MonetizationOn,
-            title = "Lãi suất",
-            text = "${uiState.savingType.interestRate}%",
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(MaterialTheme.shapes.extraLarge)
+                .background(MaterialTheme.colorScheme.background, MaterialTheme.shapes.extraLarge)
+                .padding(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            DetailsRow(
+                icon = Icons.Default.Category,
+                title = "Loại tiết kiệm",
+                text = uiState.savingType.typeName,
+                titleColor = MaterialTheme.colorScheme.outline,
+                textColor = MaterialTheme.colorScheme.onBackground
+            )
+            DetailsRow(
+                icon = Icons.Default.DateRange,
+                title = "Kỳ hạn",
+                text = "${uiState.savingType.duration} tháng",
+                titleColor = MaterialTheme.colorScheme.outline,
+                textColor = MaterialTheme.colorScheme.onBackground
+            )
+            DetailsRow(
+                icon = Icons.Default.MonetizationOn,
+                title = "Lãi suất",
+                text = "${uiState.savingType.interestRate}",
+                titleColor = MaterialTheme.colorScheme.outline,
+                textColor = MaterialTheme.colorScheme.onBackground
 
             )
-        DetailsRow(
-            title = "Ngày đáo hạn",
-            icon = Icons.Default.Timer,
-            text = "${
-                StringUtils.formatLocalDate(
-                    LocalDate.now().plusMonths(uiState.savingType.duration.toLong())
-                )
-            }"
-        )
-        if (isStaff) {
-            val users = remember(uiState.userFilter){
-                viewModel.getUsers(uiState.userFilter)
-
-            }.collectAsLazyPagingItems()
-            CustomPagingDropdown(
-                modifier = Modifier.fillMaxWidth(),
-                title = "Chọn khách hàng",
-                textPlaceholder = "Tìm kiếm theo CCCD...",
-                search = uiState.userSearch,
-                onSearch = {
-                    viewModel.onAction(CreateSavingTicketState.Action.OnUserSearch(it))
-                },
-                dropdownContent = {onDismissDropdown->
-                    UserComboBox(
-                        items = users,
-                        onItemSelected = {
-                            viewModel.onAction(CreateSavingTicketState.Action.OnUserIdSelected(it))
-                            onDismissDropdown()
-                        }
+            DetailsRow(
+                title = "Ngày đáo hạn",
+                icon = Icons.Default.Timer,
+                text = "${
+                    StringUtils.formatLocalDate(
+                        LocalDate.now().plusMonths(uiState.savingType.duration.toLong())
                     )
-                }
+                }",
+                titleColor = MaterialTheme.colorScheme.outline,
+                textColor = MaterialTheme.colorScheme.onBackground
             )
-        }
-        else{
-            viewModel.getUserId()
+            if (isStaff) {
+                PassbookTextField(
+                    value = uiState.citizenID,
+                    onValueChange = {
+                        viewModel.onAction(CreateSavingTicketState.Action.OnCitizenIDSearch(it))
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    labelText = "Khách hàng",
+                    placeholder = {
+                        Text(text = "Nhập mã số CMND")
+                    },
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Next
+                    ),
+                )
+
+            } else {
+                viewModel.getCitizenId()
+            }
+
+            PassbookTextField(
+                labelText = "Số tiền gửi",
+                value = uiState.amount.toPlainString(),
+                onValueChange = {
+                    viewModel.onAction(CreateSavingTicketState.Action.OnAmountChange(it.toBigDecimalOrNull()))
+                },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.MonetizationOn,
+                        tint = MaterialTheme.colorScheme.outline,
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp)
+                    )
+                },
+                placeholder = {
+                    Text(
+                        text = "50.0000",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.outline
+                    )
+                },
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Done
+                ),
+
+                )
         }
 
-        PassbookTextField(
-            labelText = "Số tiền gửi",
-            value = uiState.amount.toPlainString(),
-            onValueChange = {
-                viewModel.onAction(CreateSavingTicketState.Action.OnAmountChange(it.toBigDecimalOrNull()))
-            },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.MonetizationOn,
-                    tint = MaterialTheme.colorScheme.outline,
-                    contentDescription = null,
-                    modifier = Modifier.size(24.dp)
-                )
-            },
-            placeholder = {
-                Text(
-                    text = "50.0000",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.outline
-                )
-            },
-            keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Done
-            ),
 
-            )
         Spacer(modifier = Modifier.weight(1f))
 
         AppButton(
@@ -190,7 +206,7 @@ fun CreateSavingTicketsScreen(
                 .fillMaxWidth(),
             text = "Xác nhận",
             backgroundColor = MaterialTheme.colorScheme.primary,
-            enable = isCreate && uiState.userId !=null && !uiState.isLoading
+            enable = isCreate && uiState.citizenID.isNotBlank() && !uiState.isLoading
         )
 
 
@@ -207,36 +223,3 @@ fun CreateSavingTicketsScreen(
 
 }
 
-@Composable
-fun UserComboBox(
-    items: LazyPagingItems<User>,
-    onItemSelected: (Long) -> Unit,
-) {
-    LazyPagingSample(
-        modifier = Modifier.fillMaxSize(),
-        items = items,
-        textNothing = "Không có khách hàng nào",
-        iconNothing = Icons.Default.People,
-        columns = 1,
-        key = {
-            it.id
-        }
-    ) {
-        DropdownMenuItem(
-            text = {
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(text = it.fullName, color = MaterialTheme.colorScheme.primary)
-                    Spacer(modifier = Modifier.weight(1f))
-                    Text(text = it.citizenID, color = MaterialTheme.colorScheme.primary)
-                }
-            },
-            onClick = {
-                    onItemSelected(it.id)
-            }
-        )
-    }
-}

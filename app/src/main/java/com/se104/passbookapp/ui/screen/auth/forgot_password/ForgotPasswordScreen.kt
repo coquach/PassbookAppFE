@@ -1,7 +1,6 @@
-package com.se104.passbookapp.ui.screen.auth.verify_email
+package com.se104.passbookapp.ui.screen.auth.forgot_password
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -37,18 +36,17 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
 import com.se104.passbookapp.R
-import com.se104.passbookapp.navigation.Login
-import com.se104.passbookapp.navigation.VerifyEmail
+import com.se104.passbookapp.navigation.SendEmailSuccess
 import com.se104.passbookapp.ui.screen.components.AppButton
 import com.se104.passbookapp.ui.screen.components.ErrorModalBottomSheet
 import com.se104.passbookapp.ui.screen.components.text_field.ValidateTextField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SendEmailScreen(
+fun ForgotPasswordScreen(
     navController: NavController,
-    viewModel: SendEmailViewModel = hiltViewModel()
-){
+    viewModel: ForgotPasswordViewModel = hiltViewModel(),
+) {
     val uiState by viewModel.uiState.collectAsState()
     var showErrorSheet by remember { mutableStateOf(false) }
 
@@ -56,18 +54,16 @@ fun SendEmailScreen(
     LaunchedEffect(Unit) {
         viewModel.event.flowWithLifecycle(lifecycleOwner.lifecycle).collect { event ->
             when (event) {
-                is SendEmailState.Event.NavigateToVerifyEmail -> {
-                    navController.navigate(VerifyEmail(event.email))
+                is ForgotPasswordState.Event.NavigateToSuccess -> {
+                    navController.navigate(SendEmailSuccess)
                 }
-                is SendEmailState.Event.ShowError -> {
+
+                is ForgotPasswordState.Event.ShowError -> {
                     showErrorSheet = true
                 }
-                is SendEmailState.Event.NavigateToLogin -> {
-                    navController.navigate(Login) {
-                        popUpTo(navController.graph.startDestinationId) {
-                            inclusive = true
-                        }
-                    }
+
+                is ForgotPasswordState.Event.OnBack -> {
+                    navController.popBackStack()
                 }
             }
         }
@@ -82,7 +78,7 @@ fun SendEmailScreen(
         verticalArrangement = Arrangement.spacedBy(20.dp)
 
 
-    ){
+    ) {
         Text(
             text = stringResource(id = R.string.sign_up_desc),
             fontSize = 32.sp,
@@ -93,7 +89,7 @@ fun SendEmailScreen(
 
         )
         Image(
-            painter = painterResource(id = R.drawable.send_email),
+            painter = painterResource(id = R.drawable.forgot_password),
             contentDescription = "",
             modifier = Modifier.size(240.dp)
         )
@@ -112,21 +108,21 @@ fun SendEmailScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text(
-                    text = "Nhập email đăng kí tài khoản",
+                    text = "Nhập email để đặt lại mật khẩu",
                     color = MaterialTheme.colorScheme.outline,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.ExtraBold,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 10.dp,),
+                        .padding(top = 10.dp),
 
                     )
                 ValidateTextField(
                     modifier = Modifier.fillMaxWidth(),
                     value = uiState.email,
                     onValueChange = {
-                        viewModel.onAction(SendEmailState.Action.SetEmail(it))
+                        viewModel.onAction(ForgotPasswordState.Action.OnChangeEmail(it))
                     },
                     labelText = stringResource(R.string.email),
                     errorMessage = uiState.emailError,
@@ -138,21 +134,6 @@ fun SendEmailScreen(
                         imeAction = ImeAction.Done
                     ),
                 )
-                Text(
-                    text = stringResource(id = R.string.already_have_account),
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .clickable {
-                            viewModel.onAction(SendEmailState.Action.LoginClicked)
-                        }
-                        .fillMaxWidth(),
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.bodyLarge
-
-                )
-
-
 
 
             }
@@ -162,20 +143,21 @@ fun SendEmailScreen(
         AppButton(
             modifier = Modifier.fillMaxWidth(),
             onClick = {
-                viewModel.onAction(SendEmailState.Action.SendEmail)
+                viewModel.onAction(ForgotPasswordState.Action.OnForgot)
             },
             text = "Gửi",
             enable = uiState.isValid && !uiState.isLoading
         )
     }
 
-    if(showErrorSheet){
+    if (showErrorSheet) {
         ErrorModalBottomSheet(
             description = uiState.errorMessage.toString(),
             onDismiss = {
                 showErrorSheet = false
             },
 
-        )
+            )
     }
+
 }

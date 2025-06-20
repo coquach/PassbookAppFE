@@ -29,7 +29,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -57,7 +59,7 @@ fun SavingTicketScreen(
     permissions: List<String>,
 ) {
 
-    val isStaff = permissions.hasPermission("VIEW_ALL_SAVINGTICKETS")
+    val isStaff by rememberSaveable { mutableStateOf(permissions.hasPermission("VIEW_ALL_SAVINGTICKETS")) }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -223,43 +225,47 @@ fun SavingTicketDetails(savingTicket: SavingTicket, isStaff: Boolean = false) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        Icon(
-            imageVector = Icons.Default.CreditCard,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(80.dp)
-        )
         Column(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             DetailsRow(
                 icon = Icons.Default.Tag,
-                text = savingTicket.userId.toString(),
+                text = savingTicket.id.toString(),
                 title = "Mã phiếu",
+                titleColor = MaterialTheme.colorScheme.primary,
+                textColor = MaterialTheme.colorScheme.onBackground
             )
             if (isStaff) {
                 DetailsRow(
                     icon = Icons.Default.Person,
-                    text = savingTicket.userId.toString(),
-                    title = "Mã khách hàng"
+                    text = savingTicket.citizenId,
+                    title = "CCCD",
+                    titleColor = MaterialTheme.colorScheme.primary,
+                    textColor = MaterialTheme.colorScheme.onBackground
                 )
             }
             DetailsRow(
                 icon = Icons.Default.Category,
                 title = "Loại tiết kiệm",
-                text = savingTicket.savingTypeName
+                text = savingTicket.savingTypeName,
+                titleColor = MaterialTheme.colorScheme.outline,
+                textColor = MaterialTheme.colorScheme.outline
             )
             DetailsRow(
                 title = "Kỳ hạn",
                 icon = Icons.Default.DateRange,
-                text = "${savingTicket.duration} tháng"
+                text =if(savingTicket.duration==0) "Không có" else "${savingTicket.duration} tháng",
+                titleColor = MaterialTheme.colorScheme.outline,
+                textColor = MaterialTheme.colorScheme.outline
             )
 
             DetailsRow(
                 title = "Ngày tạo",
                 icon = Icons.Default.Timer,
-                text = StringUtils.formatDateTime(savingTicket.createdAt)!!
+                text = StringUtils.formatDateTime(savingTicket.createdAt)!!,
+                titleColor = MaterialTheme.colorScheme.outline,
+                textColor = MaterialTheme.colorScheme.outline
             )
 
         }
