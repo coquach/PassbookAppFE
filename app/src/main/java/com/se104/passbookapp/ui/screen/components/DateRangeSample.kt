@@ -30,6 +30,7 @@ import com.se104.passbookapp.ui.screen.components.text_field.PassbookTextField
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,9 +46,9 @@ fun DateRangePickerSample(
 ) {
     var showDialog by remember { mutableStateOf(false) }
     val dateRangePickerState = rememberDateRangePickerState(
-        initialSelectedStartDateMillis = startDate?.atStartOfDay(ZoneId.systemDefault())
+        initialSelectedStartDateMillis = startDate?.atStartOfDay(ZoneOffset.UTC)
             ?.toInstant()?.toEpochMilli(),
-        initialSelectedEndDateMillis = endDate?.atStartOfDay(ZoneId.systemDefault())?.toInstant()
+        initialSelectedEndDateMillis = endDate?.atStartOfDay(ZoneOffset.UTC)?.toInstant()
             ?.toEpochMilli()
     )
     val interactionSource = remember { MutableInteractionSource() }

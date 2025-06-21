@@ -13,7 +13,6 @@ class RegisterUseCase @Inject constructor(
     private val authRepository: AuthRepository,
 ) {
     operator fun invoke(request: RegisterRequest) = flow<ApiResponse<TokenResponse>> {
-        emit(ApiResponse.Loading)
         try {
             authRepository.register(request).collect {
                 emit(it)

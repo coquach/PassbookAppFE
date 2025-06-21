@@ -1,8 +1,6 @@
 package com.se104.passbookapp.ui.screen.components
 
 
-
-
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -136,7 +134,7 @@ fun FoodAppTextField(
         cursorColor = MaterialTheme.colorScheme.primary,
 
 
-    ),
+        ),
 ) {
 
     Column(
@@ -162,7 +160,7 @@ fun FoodAppTextField(
             modifier = Modifier.fillMaxWidth(),
             enabled,
             readOnly,
-            textStyle ,
+            textStyle,
             null,
             placeholder,
             leadingIcon,
@@ -184,6 +182,7 @@ fun FoodAppTextField(
         )
     }
 }
+
 //if (errorText != null) {
 //    Text(
 //        text = errorText,
@@ -301,27 +300,6 @@ fun FoodItemCounter(
 
 
 
-@Composable
-fun BoxScope.ItemCount(count: Int) {
-    Box(
-        modifier = Modifier
-            .padding(6.dp)
-            .background(MaterialTheme.colorScheme.error, shape = CircleShape)
-            .padding(vertical = 3.dp, horizontal = 4.dp)
-            .align(Alignment.TopEnd)
-            .wrapContentSize(align = Alignment.Center),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = if (count > 99) "99+" else "$count",
-            modifier = Modifier
-                .align(Alignment.Center),
-            color = MaterialTheme.colorScheme.onError,
-            style = TextStyle(fontSize = 8.sp)
-        )
-    }
-}
-
 
 @Composable
 fun Loading() {
@@ -343,12 +321,11 @@ fun Loading() {
 }
 
 
-
 @Composable
 fun Retry(
     message: String,
     onClicked: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier,
@@ -367,9 +344,9 @@ fun Retry(
 @Composable
 fun PassbookAppDialog(
     title: String,
-    titleColor: Color = MaterialTheme.colorScheme.scrim,
+    titleColor: Color = MaterialTheme.colorScheme.primary,
     message: String,
-    messageColor: Color = MaterialTheme.colorScheme.onBackground,
+    messageColor: Color = MaterialTheme.colorScheme.outline,
     onDismiss: () -> Unit,
     containerConfirmButtonColor: Color = MaterialTheme.colorScheme.error,
     labelConfirmButtonColor: Color = MaterialTheme.colorScheme.onError,
@@ -385,16 +362,18 @@ fun PassbookAppDialog(
                 text = title,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = titleColor
+                color = titleColor,
+                textAlign = TextAlign.Start
             )
         },
         text = { Text(text = message, fontSize = 16.sp, color = messageColor, lineHeight = 24.sp) },
-        containerColor = MaterialTheme.colorScheme.background,
+        containerColor = MaterialTheme.colorScheme.secondaryContainer,
         confirmButton = {
             if (showConfirmButton) {
                 AppButton(
                     onClick = { onConfirm?.invoke(); onDismiss() },
-                    text = confirmText
+                    text = confirmText,
+                    shape = MaterialTheme.shapes.medium,
                 )
             }
         },
@@ -402,9 +381,10 @@ fun PassbookAppDialog(
             AppButton(
                 onClick = onDismiss,
                 text = dismissText,
-                backgroundColor = MaterialTheme.colorScheme.outline
+                backgroundColor = MaterialTheme.colorScheme.outline,
+                shape = MaterialTheme.shapes.medium,
 
-            )
+                )
         }
     )
 }
@@ -425,12 +405,13 @@ fun ThemeSwitcher(
         animationSpec = animationSpec
     )
 
-    Box(modifier = Modifier
-        .width(size * 1.625f)
-        .height(size)
-        .clip(shape = parentShape)
-        .clickable { onClick() }
-        .background(MaterialTheme.colorScheme.secondaryContainer)
+    Box(
+        modifier = Modifier
+            .width(size * 1.625f)
+            .height(size)
+            .clip(shape = parentShape)
+            .clickable { onClick() }
+            .background(MaterialTheme.colorScheme.secondaryContainer)
     ) {
         Box(
             modifier = Modifier
@@ -553,7 +534,6 @@ fun <T : Any> LazyListScope.gridItems(
 }
 
 
-
 @Composable
 fun DetailsTextRow(
     modifier: Modifier = Modifier,
@@ -612,7 +592,9 @@ fun <T : Any> LazyPagingSample(
             // 2. Đang loading lần đầu
             loadState.refresh is LoadState.Loading -> {
                 LoadingAnimation(
-                    modifier = modifier.fillMaxSize().align(Alignment.Center),
+                    modifier = modifier
+                        .fillMaxSize()
+                        .align(Alignment.Center),
                 )
             }
 
@@ -621,7 +603,9 @@ fun <T : Any> LazyPagingSample(
                 Nothing(
                     text = textNothing,
                     icon = iconNothing,
-                    modifier = Modifier.fillMaxSize().align(Alignment.Center)
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .align(Alignment.Center)
                 )
             }
 
@@ -670,14 +654,15 @@ fun <T : Any> LazyPagingSample(
         }
     }
 }
+
 @Composable
 fun NoteInput(
     modifier: Modifier = Modifier.height(200.dp),
     note: String,
     onNoteChange: (String) -> Unit,
-    maxLines: Int = 5 ,
+    maxLines: Int = 5,
     textHolder: String,
-    readOnly: Boolean = false
+    readOnly: Boolean = false,
 ) {
     OutlinedTextField(
         value = note,
@@ -703,12 +688,13 @@ fun NoteInput(
         maxLines = maxLines
     )
 }
+
 @Composable
 fun ExpandableText(
     modifier: Modifier = Modifier,
     text: String,
     minimizedMaxLines: Int,
-    style: TextStyle
+    style: TextStyle,
 ) {
     var expanded by remember { mutableStateOf(false) }
     var hasVisualOverflow by remember { mutableStateOf(false) }
@@ -731,7 +717,10 @@ fun ExpandableText(
                         .height(lineHeightDp)
                         .background(
                             brush = Brush.horizontalGradient(
-                                colors = listOf(Color.Transparent, MaterialTheme.colorScheme.background)
+                                colors = listOf(
+                                    Color.Transparent,
+                                    MaterialTheme.colorScheme.background
+                                )
                             )
                         )
                 )
@@ -790,22 +779,22 @@ fun ErrorModalBottomSheet(
 
             Text(
                 text = description,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(bottom = 24.dp)
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
             )
 
-            Button(
+            AppButton(
                 onClick = {
                     scope.launch {
                         sheetState.hide()
                         onDismiss()
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Đóng")
-            }
+                modifier = Modifier.fillMaxWidth(),
+                text = "Đóng"
+            )
         }
     }
 }
@@ -819,7 +808,7 @@ fun CustomBottomSheet(
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
     content: @Composable ColumnScope.() -> Unit,
 
-) {
+    ) {
     val scope = rememberCoroutineScope()
 
     ModalBottomSheet(
@@ -863,7 +852,7 @@ fun CustomBottomSheet(
                 backgroundColor = MaterialTheme.colorScheme.outline,
 
 
-            )
+                )
         }
     }
 }

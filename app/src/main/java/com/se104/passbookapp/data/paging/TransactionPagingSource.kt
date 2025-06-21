@@ -24,19 +24,22 @@ class TransactionPagingSource @Inject constructor(
                 transactionApiService.getTransactionsForCustomer(
                     page = page,
                     size = size,
-                    userId = filter.userId,
                     transactionType = filter.transactionType,
                     startDate = StringUtils.formatLocalDate(filter.startDate),
                     endDate = StringUtils.formatLocalDate(filter.endDate),
+                    order = filter.order,
+                    sortBy = filter.sortBy,
                 )
             } else {
                 transactionApiService.getTransactions(
                     page = page,
                     size = size,
-                    userId = filter.userId,
+                    citizenID = filter.citizenID,
                     transactionType = filter.transactionType,
                     startDate = StringUtils.formatLocalDate(filter.startDate),
                     endDate = StringUtils.formatLocalDate(filter.endDate),
+                    order = filter.order,
+                    sortBy = filter.sortBy,
                 )
             }
         }

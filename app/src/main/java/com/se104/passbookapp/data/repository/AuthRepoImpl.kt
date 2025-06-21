@@ -27,16 +27,31 @@ class AuthRepoImpl @Inject constructor(
         }
     }
 
-    override fun refreshToken(token: String): Flow<ApiResponse<TokenResponse>> {
+
+    override fun logout(tokenAccess: String?): Flow<ApiResponse<Unit>> {
         return apiRequestFlow {
-            authApiService.refreshToken(token)
+
+            authApiService.logout(tokenAccess)
         }
     }
 
-    override fun logout(): Flow<ApiResponse<Unit>> {
+    override fun forgotPassword(request: Map<String, String>): Flow<ApiResponse<Unit>> {
         return apiRequestFlow {
+            authApiService.forgotPassword(request)
+        }
+    }
 
-            authApiService.logout()
+
+
+    override fun verifyEmail(request: Map<String, String>): Flow<ApiResponse<Unit>> {
+        return apiRequestFlow {
+            authApiService.verifyEmail(request)
+        }
+    }
+
+    override fun postMethodName(request: Map<String, String>): Flow<ApiResponse<Unit>> {
+        return apiRequestFlow {
+            authApiService.postMethodName(request)
         }
     }
 }

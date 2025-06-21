@@ -24,10 +24,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntOffset
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import com.se104.passbookapp.navigation.AppNavGraph
 import com.se104.passbookapp.navigation.Auth
 import com.se104.passbookapp.navigation.BottomBarWithCutoutFAB
+import com.se104.passbookapp.navigation.BottomNavItem
 import com.se104.passbookapp.navigation.SelectSavingType
 import com.se104.passbookapp.navigation.bottomBarAnimatedScroll
 import com.se104.passbookapp.navigation.bottomBarVisibility
@@ -50,6 +52,7 @@ class MainActivity : BasePassbookAppActivity() {
             var isDarkMode by remember { mutableStateOf(darkMode) }
             val navController = rememberNavController()
             val screen = viewModel.startDestination.value
+            val permissions by viewModel.permissions.collectAsStateWithLifecycle()
 
             PassBookAppTheme(darkTheme = isDarkMode) {
 
@@ -69,16 +72,7 @@ class MainActivity : BasePassbookAppActivity() {
                     }
                 }
 
-
-
-                AnimatedContent(
-                    targetState = screen,
-                    transitionSpec = {
-                        fadeIn(tween(300)) togetherWith (fadeOut(tween(300)))
-                    },
-                    label = "AppNavTransition"
-                ) { target ->
-                    if (target == null) {
+                    if (screen == null) {
                         Box(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
@@ -86,6 +80,12 @@ class MainActivity : BasePassbookAppActivity() {
                             LoadingAnimation()
                         }
                     } else {
+                        val navItems = listOf(
+                            BottomNavItem.Home,
+                            BottomNavItem.SavingTicket,
+                            BottomNavItem.Transaction,
+                            BottomNavItem.Setting,
+                        )
                         val bottomBarOffsetHeightPx = remember { mutableFloatStateOf(0f) }
                         Scaffold(
                             modifier = Modifier.bottomBarAnimatedScroll(
@@ -105,23 +105,24 @@ class MainActivity : BasePassbookAppActivity() {
                                                 x = 0,
                                                 y = -bottomBarOffsetHeightPx.floatValue.roundToInt()
                                             )
-                                        }
-
+                                        },
+                                    navItems = navItems,
                                 )
                             }
                         ) { paddingValues ->
                             AppNavGraph(
-                                startDestination = target,
+                                startDestination = screen,
                                 isDarkMode = isDarkMode,
                                 onThemeUpdated = {
                                     isDarkMode = !isDarkMode
                                 },
                                 navController = navController,
-                                paddingValues = paddingValues
+                                paddingValues = paddingValues,
+                                permissions = permissions
                             )
                         }
                     }
-                }
+
 
 
             }

@@ -1,55 +1,61 @@
 package com.se104.passbookapp.ui.screen.transaction
 
+import DetailsRow
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccessTime
+import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.CurrencyExchange
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.DriveFileRenameOutline
+import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.MonetizationOn
+import androidx.compose.material.icons.filled.MoneyOff
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Tag
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.se104.passbookapp.ui.screen.components.SearchField
-import com.se104.passbookapp.ui.screen.components.HeaderDefaultView
-import com.se104.passbookapp.ui.screen.components.LazyPagingSample
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.ui.draw.clip
 import com.se104.passbookapp.data.model.Transaction
 import com.se104.passbookapp.data.model.enums.TransactionType
-import com.se104.passbookapp.ui.component.CardSample
-import com.se104.passbookapp.ui.component.DetailsRow
 import com.se104.passbookapp.ui.screen.components.DateRangePickerSample
+import com.se104.passbookapp.ui.screen.components.HeaderDefaultView
+import com.se104.passbookapp.ui.screen.components.LazyPagingSample
+import com.se104.passbookapp.ui.screen.components.SearchField
 import com.se104.passbookapp.ui.theme.confirm
 import com.se104.passbookapp.utils.StringUtils
-import java.time.LocalDate
+import com.se104.passbookapp.utils.hasPermission
 
 @Composable
 fun TransactionScreen(
-    navController: NavController,
     viewModel: TransactionViewModel = hiltViewModel(),
+    permissions: List<String>,
 ) {
+    val isStaff by rememberSaveable { mutableStateOf(permissions.hasPermission("VIEW_ALL_TRANSACTIONS")) }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val transactions = remember(uiState.filter) {
-        viewModel.getTransactions(uiState.filter)
+        if (isStaff) {
+            viewModel.getTransactions(uiState.filter)
+        } else {
+            viewModel.getTransactionsForCustomer(uiState.filter)
+        }
     }.collectAsLazyPagingItems()
     Column(
         modifier = Modifier
@@ -64,7 +70,8 @@ fun TransactionScreen(
         SearchField(
             searchInput = uiState.search,
             searchChange = {
-                viewModel.onAction(TransactionState.Action.Search(it))
+                if (isStaff) viewModel.onAction(TransactionState.Action.SearchStaff(it)) else
+                    viewModel.onAction(TransactionState.Action.SearchCustomer(it))
             },
             switchState = uiState.filter.order == "desc",
             switchChange = {
@@ -81,16 +88,17 @@ fun TransactionScreen(
                     else -> viewModel.onAction(TransactionState.Action.OnChangeSortBy("id"))
 
                 }
+                Log.d("Transaction filter", "filterChange: ${uiState.filter}")
             },
-            filters = listOf("Id","Giao dịch", "Thời gian"),
+            filters = listOf("Id", "Giao dịch", "Thời gian"),
             filterSelected =
-                when(uiState.filter.sortBy){
+                when (uiState.filter.sortBy) {
                     "id" -> "Id"
                     "amount" -> "Giao dịch"
                     "createdAt" -> "Thời gian"
                     else -> ""
-                }
-
+                },
+            placeHolder = if (isStaff) "Tìm kiếm theo CCCD.." else "Tìm kiếm"
         )
         DateRangePickerSample(
             modifier = Modifier.width(170.dp),
@@ -114,92 +122,81 @@ fun TransactionScreen(
                 it.id
             },
         ) {
-            TransactionCard(transaction = it, onClick = {})
+            TransactionDetails(transaction = it, isStaff = isStaff)
         }
     }
 }
 
-@Composable
-fun TransactionCard(transaction: Transaction, onClick: (Transaction) -> Unit) {
-    CardSample(
-        item = transaction,
-        onClick = onClick
-    ) {
-        TransactionDetails(transaction)
 
-    }
-}
 
 @Composable
 fun TransactionDetails(transaction: Transaction, isStaff: Boolean = false) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(MaterialTheme.shapes.medium)
-            .background(
-                color = MaterialTheme.colorScheme.onBackground,
-                shape = MaterialTheme.shapes.medium
-            )
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
 
-        Icon(
-            imageVector = Icons.Default.CurrencyExchange,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(100.dp)
-        )
         Column(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .padding(8.dp)
+                .fillMaxWidth()
+                .clip(MaterialTheme.shapes.extraLarge)
+                .background(
+                    color = MaterialTheme.colorScheme.background,
+                    shape = MaterialTheme.shapes.extraLarge
+                )
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            DetailsRow(
-                title = "Thời gian",
-                icon = Icons.Default.DateRange,
-                text = StringUtils.formatDateTime(transaction.createdAt)!!
-            )
             DetailsRow(
                 title = "Mã giao dịch",
                 icon = Icons.Default.Tag,
                 text = transaction.id.toString(),
+                titleColor = MaterialTheme.colorScheme.primary,
+                textColor = MaterialTheme.colorScheme.primary
             )
+            DetailsRow(
+                title = "Thời gian",
+                icon = Icons.Default.AccessTime,
+                text = StringUtils.formatDateTime(transaction.createdAt)!!,
+                titleColor = MaterialTheme.colorScheme.outline,
+                textColor = MaterialTheme.colorScheme.onBackground
+
+            )
+
             if (isStaff) {
                 DetailsRow(
-                    title = "Mã khách hàng",
+                    title = "CCCD",
                     icon = Icons.Default.Person,
-                    text = transaction.userId.toString()
-                )
-                DetailsRow(
-                    title = "Tên khách hàng",
-                    icon = Icons.Default.DriveFileRenameOutline,
-                    text = transaction.userFullName
+                    text = transaction.citizenID,
+                    titleColor = MaterialTheme.colorScheme.primary,
+                    textColor = MaterialTheme.colorScheme.onBackground
                 )
             }
 
-            if (transaction.transactionType == TransactionType.WITHDRAWAL.name || transaction.transactionType == TransactionType.WITHDRAW_SAVING.name) {
+            if (transaction.transactionType == TransactionType.WITHDRAWAL.name || transaction.transactionType == TransactionType.SAVE.name) {
                 DetailsRow(
                     title = "Giao dịch",
-                    icon = Icons.Default.MonetizationOn,
+                    icon = Icons.Default.MoneyOff,
                     text = "-${StringUtils.formatCurrency(transaction.amount)}",
-                    color = MaterialTheme.colorScheme.error
+                    titleColor = MaterialTheme.colorScheme.outline,
+                    textColor = MaterialTheme.colorScheme.error
                 )
             } else {
                 DetailsRow(
                     title = "Giao dịch",
-                    icon = Icons.Default.MonetizationOn,
+                    icon = Icons.Default.AttachMoney,
                     text = "+${StringUtils.formatCurrency(transaction.amount)}",
-                    color = MaterialTheme.colorScheme.confirm
+                    titleColor = MaterialTheme.colorScheme.outline,
+                    textColor = MaterialTheme.colorScheme.confirm
                 )
             }
             DetailsRow(
                 title = "Nội dung",
-                icon = Icons.Default.Category,
-                text = TransactionType.fromName(transaction.transactionType).display
+                icon = Icons.Default.Description,
+                text = TransactionType.fromName(transaction.transactionType).display,
+                titleColor = MaterialTheme.colorScheme.outline,
+                textColor = MaterialTheme.colorScheme.onBackground
             )
 
 
-        }
+
     }
 }

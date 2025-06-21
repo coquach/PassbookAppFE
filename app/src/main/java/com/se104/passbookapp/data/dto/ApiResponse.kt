@@ -45,6 +45,7 @@ fun<T> apiRequestFlow(call: suspend () -> Response<T>): Flow<ApiResponse<T>> = f
             }
         } catch (e: Exception) {
             emit(ApiResponse.Failure(e.message ?: "Unexpected error", 400))
+            Log.e("API Error", e.message ?: "Unexpected error")
         }
     } ?: emit(ApiResponse.Failure("Timeout! Please try again.", 408))
 }.flowOn(Dispatchers.IO)

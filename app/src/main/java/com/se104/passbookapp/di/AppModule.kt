@@ -13,10 +13,11 @@ import com.google.gson.GsonBuilder
 import com.se104.passbookapp.BuildConfig
 import com.se104.passbookapp.data.remote.api.AuthApiService
 import com.se104.passbookapp.data.remote.api.ParameterApiService
-import com.se104.passbookapp.data.remote.api.SalesReportApiService
+import com.se104.passbookapp.data.remote.api.ReportApiService
 import com.se104.passbookapp.data.remote.api.SavingTicketApiService
 import com.se104.passbookapp.data.remote.api.SavingTypeApiService
 import com.se104.passbookapp.data.remote.api.TransactionApiService
+import com.se104.passbookapp.data.remote.api.UserApiService
 import com.se104.passbookapp.data.remote.api.WithdrawalApiService
 import com.se104.passbookapp.data.remote.interceptor.AuthAuthenticator
 import com.se104.passbookapp.data.remote.interceptor.AuthInterceptor
@@ -34,12 +35,23 @@ import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import javax.inject.Named
 import javax.inject.Singleton
 
 
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+    @Provides
+    @Singleton
+    fun provideAuthInterceptor(tokenManager: TokenManager): AuthInterceptor =
+        AuthInterceptor(tokenManager)
+
+    @Provides
+    @Singleton
+    fun provideAuthAuthenticator(tokenManager: TokenManager, authApiService: AuthApiService): AuthAuthenticator =
+        AuthAuthenticator(tokenManager, authApiService)
+
 
     @Provides
     @Singleton
@@ -52,24 +64,17 @@ object AppModule {
 
         return OkHttpClient.Builder()
             .addInterceptor(authInterceptor)
-            .addInterceptor(loggingInterceptor)
             .authenticator(authAuthenticator)
+            .addInterceptor(loggingInterceptor)
             .build()
     }
 
-    @Provides
-    @Singleton
-    fun provideAuthInterceptor(tokenManager: TokenManager): AuthInterceptor =
-        AuthInterceptor(tokenManager)
+
 
     @Provides
     @Singleton
-    fun provideAuthAuthenticator(tokenManager: TokenManager): AuthAuthenticator =
-        AuthAuthenticator(tokenManager)
-
-    @Provides
-    @Singleton
-    fun provideRetrofit(): Retrofit.Builder {
+    @Named("MainApi")
+    fun provideRetrofitMainApi(client: OkHttpClient): Retrofit {
         val gson = GsonBuilder()
             .registerTypeAdapter(LocalDate::class.java, LocalDateDeserializer())
             .registerTypeAdapter(LocalTime::class.java, LocalTimeDeserializer())
@@ -78,85 +83,49 @@ object AppModule {
             .setLenient()
             .create()
         return Retrofit.Builder()
+            .client(client)
             .baseUrl(BuildConfig.BACKEND_URL)
             .addConverterFactory(GsonConverterFactory.create(gson))
-
+            .build()
     }
 
     @Provides
     @Singleton
-    fun provideAuthAPIService(retrofit: Retrofit.Builder): AuthApiService {
-        return retrofit
+    fun provideRetrofitAuth(): Retrofit {
+        val gson = GsonBuilder()
+            .registerTypeAdapter(LocalDate::class.java, LocalDateDeserializer())
+            .registerTypeAdapter(LocalTime::class.java, LocalTimeDeserializer())
+            .registerTypeAdapter(BigDecimal::class.java, BigDecimalDeserializer())
+            .registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeDeserializer())
+            .setLenient()
+            .create()
+        return Retrofit.Builder()
+
+            .baseUrl(BuildConfig.BACKEND_URL)
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideAuthAPIService(retrofit: Retrofit): AuthApiService {
+        return retrofit
             .create(AuthApiService::class.java)
     }
 
 
-    @Provides
-    @Singleton
-    fun provideSavingTypeAPIService(
-        okHttpClient: OkHttpClient,
-        retrofit: Retrofit.Builder,
-    ): SavingTypeApiService =
-        retrofit
-            .client(okHttpClient)
-            .build()
-            .create(SavingTypeApiService::class.java)
+
 
     @Provides
     @Singleton
-    fun provideSavingTicketAPIService(
-        okHttpClient: OkHttpClient,
-        retrofit: Retrofit.Builder,
-    ): SavingTicketApiService =
+    fun provideUserAPIService(
+        @Named("MainApi") retrofit: Retrofit,
+    ): UserApiService =
         retrofit
-            .client(okHttpClient)
-            .build()
-            .create(SavingTicketApiService::class.java)
+            .create(UserApiService::class.java
+    )
 
-    @Provides
-    @Singleton
-    fun provideTransactionAPIService(
-        okHttpClient: OkHttpClient,
-        retrofit: Retrofit.Builder,
-    ): TransactionApiService =
-        retrofit
-            .client(okHttpClient)
-            .build()
-            .create(TransactionApiService::class.java)
 
-    @Provides
-    @Singleton
-    fun provideWithdrawalAPIService(
-        okHttpClient: OkHttpClient,
-        retrofit: Retrofit.Builder,
-    ): WithdrawalApiService =
-        retrofit
-            .client(okHttpClient)
-            .build()
-            .create(WithdrawalApiService::class.java)
-
-    @Provides
-    @Singleton
-    fun provideSalesReportAPIService(
-        okHttpClient: OkHttpClient,
-        retrofit: Retrofit.Builder,
-    ): SalesReportApiService =
-        retrofit
-            .client(okHttpClient)
-            .build()
-            .create(SalesReportApiService::class.java)
-
-    @Provides
-    @Singleton
-    fun provideParameterAPIService(
-        okHttpClient: OkHttpClient,
-        retrofit: Retrofit.Builder,
-    ): ParameterApiService =
-        retrofit
-            .client(okHttpClient)
-            .build()
-            .create(ParameterApiService::class.java)
 
     @Provides
     @Singleton

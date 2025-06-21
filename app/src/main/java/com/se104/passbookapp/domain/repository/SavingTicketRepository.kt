@@ -11,6 +11,6 @@ interface SavingTicketRepository {
     fun getSavingTickets(filter: SavingTicketFilter): Flow<PagingData<SavingTicket>>
     fun getSavingTicketsForCustomer(filter: SavingTicketFilter): Flow<PagingData<SavingTicket>>
     fun createSavingTicket(request: SavingTicketRequest): Flow<ApiResponse<SavingTicket>>
-    fun setSavingTicketActive(id: Long, isActive: Boolean): Flow<ApiResponse<Unit>>
+
 
 }

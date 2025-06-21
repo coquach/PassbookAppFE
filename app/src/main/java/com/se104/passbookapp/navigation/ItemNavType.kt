@@ -3,6 +3,7 @@ package com.se104.passbookapp.navigation
 import android.os.Bundle
 import androidx.navigation.NavType
 import com.se104.passbookapp.data.model.SavingType
+import com.se104.passbookapp.data.model.User
 import kotlinx.serialization.json.Json
 
 val savingTypeNavType = object : NavType<SavingType>(false) {
@@ -23,21 +24,40 @@ val savingTypeNavType = object : NavType<SavingType>(false) {
         bundle.putString(key, serializeAsValue(value))
     }
 }
-val savingTicketNavType = object : NavType<SavingTicket>(false) {
-    override fun get(bundle: Bundle, key: String): SavingTicket {
+val savingTicketNavType = object : NavType<com.se104.passbookapp.data.model.SavingTicket>(false) {
+    override fun get(bundle: Bundle, key: String): com.se104.passbookapp.data.model.SavingTicket {
         return parseValue(bundle.getString(key).toString())
 
     }
 
-    override fun parseValue(value: String): SavingTicket {
-        return Json.decodeFromString(SavingTicket.serializer(), value)
+    override fun parseValue(value: String): com.se104.passbookapp.data.model.SavingTicket {
+        return Json.decodeFromString(com.se104.passbookapp.data.model.SavingTicket.serializer(), value)
     }
 
-    override fun serializeAsValue(value: SavingTicket): String {
-        return Json.encodeToString(SavingTicket.serializer(), value)
+    override fun serializeAsValue(value: com.se104.passbookapp.data.model.SavingTicket): String {
+        return Json.encodeToString(com.se104.passbookapp.data.model.SavingTicket.serializer(), value)
     }
 
-    override fun put(bundle: Bundle, key: String, value: SavingTicket) {
+    override fun put(bundle: Bundle, key: String, value: com.se104.passbookapp.data.model.SavingTicket) {
+        bundle.putString(key, serializeAsValue(value))
+    }
+}
+
+val userNavType = object : NavType<User>(false) {
+    override fun get(bundle: Bundle, key: String): User {
+        return parseValue(bundle.getString(key).toString())
+
+    }
+
+    override fun parseValue(value: String): User {
+        return Json.decodeFromString(User.serializer(), value)
+    }
+
+    override fun serializeAsValue(value: User): String {
+        return Json.encodeToString(User.serializer(), value)
+    }
+
+    override fun put(bundle: Bundle, key: String, value: User) {
         bundle.putString(key, serializeAsValue(value))
     }
 }

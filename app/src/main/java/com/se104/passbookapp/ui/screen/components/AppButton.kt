@@ -22,7 +22,7 @@ fun AppButton(
     onClick: () -> Unit,
     backgroundColor: Color = MaterialTheme.colorScheme.button,
     textColor: Color = MaterialTheme.colorScheme.onPrimary,
-    shape: Shape = MaterialTheme.shapes.small ,
+    shape: Shape = MaterialTheme.shapes.medium ,
     padding: PaddingValues = PaddingValues(vertical = 18.dp, horizontal = 24.dp),
     enable: Boolean = true
 ) {

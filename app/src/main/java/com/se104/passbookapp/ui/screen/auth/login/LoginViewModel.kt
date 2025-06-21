@@ -8,7 +8,6 @@ import com.se104.passbookapp.data.dto.request.LoginRequest
 import com.se104.passbookapp.domain.use_case.auth.LoginUseCase
 import com.se104.passbookapp.ui.screen.components.text_field.validateField
 import dagger.hilt.android.lifecycle.HiltViewModel
-
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,7 +15,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-
 import javax.inject.Inject
 
 @HiltViewModel
@@ -31,18 +29,18 @@ private val _uiState = MutableStateFlow(Login.UiState())
 
     private fun login(request: LoginRequest) {
         viewModelScope.launch {
-            loginUseCase.invoke(request).collect {
-                when (it) {
+            loginUseCase.invoke(request).collect {response->
+                when (response) {
                     is ApiResponse.Success -> {
-                        _uiState.value = _uiState.value.copy(isLoading = false)
+                        _uiState.update { it.copy(isLoading = false) }
                         _event.send(Login.Event.NavigateHome)
                     }
                     is ApiResponse.Failure -> {
-                        _uiState.value = _uiState.value.copy(isLoading = false)
+                        _uiState.update { it.copy(isLoading = false, error = response.errorMessage) }
                         _event.send(Login.Event.ShowError)
                     }
                     is ApiResponse.Loading -> {
-                        _uiState.value = _uiState.value.copy(isLoading = true)
+                        _uiState.update { it.copy(isLoading = false) }
                     }
 
                 }
@@ -56,7 +54,7 @@ private val _uiState = MutableStateFlow(Login.UiState())
         var passwordError: String? = current.passwordError
         when (type) {
             "email" -> {
-                val emailError = validateField(
+                 emailError = validateField(
                     current.email.trim(),
                     "Email không hợp lệ"
                 ) { it.matches(Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) }
@@ -65,7 +63,7 @@ private val _uiState = MutableStateFlow(Login.UiState())
             }
 
             "password" -> {
-                val passwordError = validateField(
+                 passwordError = validateField(
                     current.password.trim(),
                     "Mật khẩu phải có ít nhất 6 ký tự"
                 ) { it.length >= 6 }
@@ -74,7 +72,7 @@ private val _uiState = MutableStateFlow(Login.UiState())
             }
 
         }
-        val isValid = emailError == null && passwordError == null
+        val isValid = current.email.isNotBlank() && current.password.isNotBlank() && emailError == null && passwordError == null
         _uiState.update {
             it.copy(
                 emailError = emailError,
@@ -93,7 +91,7 @@ private val _uiState = MutableStateFlow(Login.UiState())
                 _uiState.value = _uiState.value.copy(password = action.password)
             }
             is Login.Action.OnLoginClick -> {
-                login(LoginRequest(_uiState.value.email, _uiState.value.password, ""))
+                login(LoginRequest(_uiState.value.email, _uiState.value.password))
             }
             is Login.Action.OnSignUpClick -> {
                 viewModelScope.launch {
@@ -105,11 +103,7 @@ private val _uiState = MutableStateFlow(Login.UiState())
                     _event.send(Login.Event.NavigateForgot)
                 }
             }
-            is Login.Action.OnBack -> {
-                viewModelScope.launch {
-                    _event.send(Login.Event.OnBack)
-                }
-            }
+
 
         }
     }
@@ -134,7 +128,7 @@ object Login{
         data object NavigateSignUp : Event
         data object NavigateHome : Event
         data object NavigateForgot : Event
-        data object OnBack: Event
+
 
     }
     sealed interface Action {
@@ -143,7 +137,7 @@ object Login{
         data object OnForgotClick : Action
         data class OnEmailChanged(val email: String) : Action
         data class OnPasswordChanged(val password: String) : Action
-        data object OnBack: Action
+
 
     }
 }

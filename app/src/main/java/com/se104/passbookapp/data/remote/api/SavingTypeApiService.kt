@@ -34,6 +34,6 @@ interface SavingTypeApiService {
     @DELETE("$PR/{id}")
     suspend fun deleteSavingType(@Path("id") id: Long): Response<Unit>
 
-    @PUT("$PR/set-activate/{id}")
+    @PUT("$PR/set-active/{id}")
     suspend fun setActivateSavingType(@Path("id") id: Long, @Body isActive: Boolean): Response<Unit>
 }

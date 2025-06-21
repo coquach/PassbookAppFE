@@ -1,16 +1,11 @@
 package com.se104.passbookapp.data.di
 
-import com.se104.passbookapp.data.remote.api.AuthApiService
 import com.se104.passbookapp.data.repository.AuthRepoImpl
-import com.se104.passbookapp.data.repository.SalesReportRepoImpl
-import com.se104.passbookapp.data.repository.SavingTicketRepoImpl
-import com.se104.passbookapp.data.repository.TransactionRepoImpl
-import com.se104.passbookapp.data.repository.WithdrawalRepoImpl
+import com.se104.passbookapp.data.repository.SavingTypeRepoImpl
+import com.se104.passbookapp.data.repository.UserRepoImpl
 import com.se104.passbookapp.domain.repository.AuthRepository
-import com.se104.passbookapp.domain.repository.SalesReportRepository
-import com.se104.passbookapp.domain.repository.SavingTicketRepository
-import com.se104.passbookapp.domain.repository.TransactionRepository
-import com.se104.passbookapp.domain.repository.WithdrawalRepository
+import com.se104.passbookapp.domain.repository.SavingTypeRepository
+import com.se104.passbookapp.domain.repository.UserRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -22,15 +17,7 @@ abstract class MainDataModule {
     @Binds
     abstract fun provideAuthRepository(impl: AuthRepoImpl): AuthRepository
 
-    @Binds
-    abstract fun provideSavingTicketRepository(impl: SavingTicketRepoImpl): SavingTicketRepository
 
-    @Binds
-    abstract fun provideTransactionRepository(impl: TransactionRepoImpl): TransactionRepository
-
-    @Binds
-    abstract fun provideSalesReportRepository(impl: SalesReportRepoImpl): SalesReportRepository
-
-    @Binds
-    abstract fun provideWithdrawalRepository(impl: WithdrawalRepoImpl): WithdrawalRepository
+   @Binds
+   abstract fun provideUserRepository(impl: UserRepoImpl): UserRepository
 }

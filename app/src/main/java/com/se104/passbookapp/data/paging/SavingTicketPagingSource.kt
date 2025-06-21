@@ -13,40 +13,40 @@ import javax.inject.Inject
 class SavingTicketPagingSource @Inject constructor(
     private val savingTicketApiService: SavingTicketApiService,
     private val filter: SavingTicketFilter,
-    private val isCustomer: Boolean
+    private val isCustomer: Boolean,
 ) : ApiPagingSource<SavingTicket>() {
     override suspend fun fetch(
         page: Int,
         size: Int,
     ): Flow<ApiResponse<PageResponse<SavingTicket>>> {
         return apiRequestFlow {
-            if (isCustomer){
+
+            if (isCustomer) {
                 savingTicketApiService.getSavingTicketsForCustomer(
                     page = page,
                     size = size,
-                    userId = filter.userId,
-                    order = filter.order,
-                    sortBy = filter.sortBy,
-                    isActive = filter.isActive,
-                    startDate = StringUtils.formatLocalDate(filter.startDate),
-                    endDate = StringUtils.formatLocalDate(filter.endDate),
-                    savingTypeId = filter.savingTypeId
-                )
-            }
-
-            else {
-                savingTicketApiService.getSavingTickets(
-                    page = page,
-                    size = size,
-                    userId = filter.userId,
+                    amount = filter.amount,
                     savingTypeId = filter.savingTypeId,
                     isActive = filter.isActive,
                     order = filter.order,
                     sortBy = filter.sortBy,
-                    startDate =StringUtils.formatLocalDate(filter.startDate),
+                    startDate = StringUtils.formatLocalDate(filter.startDate),
+                    endDate = StringUtils.formatLocalDate(filter.endDate),
+                )
+            } else {
+                savingTicketApiService.getSavingTickets(
+                    page = page,
+                    size = size,
+                    citizenID = filter.citizenID,
+                    amount = filter.amount,
+                    savingTypeId = filter.savingTypeId,
+                    isActive = filter.isActive,
+                    order = filter.order,
+                    sortBy = filter.sortBy,
+                    startDate = StringUtils.formatLocalDate(filter.startDate),
                     endDate = StringUtils.formatLocalDate(filter.endDate),
 
-                )
+                    )
             }
 
 

@@ -13,11 +13,10 @@ import javax.inject.Inject
 class CreateSavingTicketUseCase @Inject constructor(
     private val savingTicketRepository: SavingTicketRepository,
 ) {
-    operator fun invoke(userId: Long, savingTypeId: Long, amount: BigDecimal) =
-        flow<ApiResponse<SavingTicket>> {
+    operator fun invoke(citizenID: String, savingTypeId: Long, amount: BigDecimal) = flow<ApiResponse<SavingTicket>> {
             try {
                 emit(ApiResponse.Loading)
-                val request = SavingTicketRequest(userId, savingTypeId, amount)
+                val request = SavingTicketRequest(citizenID, savingTypeId, amount)
                 savingTicketRepository.createSavingTicket(request).collect {
 
                     emit(it)

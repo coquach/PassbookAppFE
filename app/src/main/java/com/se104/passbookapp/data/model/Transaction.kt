@@ -9,7 +9,7 @@ import java.time.LocalDateTime
 @Serializable
 data class Transaction(
     val id: Long,
-    val userId: Long,
+    val citizenID: String,
     val userFullName: String,
     @Serializable(with = BigDecimalSerializer::class)
     val amount: BigDecimal,

@@ -6,11 +6,10 @@ import java.time.LocalDate
 data class SavingTicketFilter (
     val order: String = "desc",
     val sortBy: String = "id",
-    val userId: Long?=null,
+    val citizenID: String?=null,
+    val amount: BigDecimal?=null,
     val savingTypeId: Long?=null,
     val isActive: Boolean=true,
-    val minAmount: BigDecimal?=null,
-    val maxAmount: BigDecimal?=null,
     val startDate: LocalDate?=null,
     val endDate: LocalDate?=null,
 

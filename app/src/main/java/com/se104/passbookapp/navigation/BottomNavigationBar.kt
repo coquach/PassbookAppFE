@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.CurrencyExchange
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.PostAdd
 import androidx.compose.material.icons.filled.Savings
 import androidx.compose.material.icons.filled.Settings
@@ -86,8 +87,9 @@ sealed class BottomNavItem(val route: NavRoute, val icon: ImageVector) {
     data object Transaction :
         BottomNavItem(com.se104.passbookapp.navigation.Transaction, Icons.Default.CurrencyExchange)
 
-    data object Notification :
-        BottomNavItem(com.se104.passbookapp.navigation.Notification, Icons.Default.Notifications)
+    data object UserManage :
+           BottomNavItem(com.se104.passbookapp.navigation.UserManage, Icons.Default.People)
+
 }
 
 @Composable
@@ -163,18 +165,16 @@ fun Modifier.noRippleClickable(onClick: () -> Unit): Modifier = composed {
 @Composable
 fun BottomBarWithCutoutFAB(
     navController: NavHostController,
+    navItems: List<BottomNavItem>,
     state: MutableState<Boolean>,
     modifier: Modifier = Modifier,
     fabSize: Dp = 56.dp,
     fabMargin: Dp = 16.dp,
-    onFabClick: () -> Unit,
+    onFabClick: (() -> Unit)?=null,
 ) {
-    val navItems = listOf(
-        BottomNavItem.Home,
-        BottomNavItem.SavingTicket,
-        BottomNavItem.Transaction,
-        BottomNavItem.Setting,
-    )
+
+    val currentRoute =
+        navController.currentBackStackEntryAsState().value?.destination
     AnimatedVisibility(
         visible = state.value,
         enter = slideInVertically(initialOffsetY = { it }),
@@ -185,33 +185,110 @@ fun BottomBarWithCutoutFAB(
                 .fillMaxWidth()
                 .wrapContentHeight()
         ) {
-            // FloatingActionButton
-            FloatingActionButton(
-                onClick = onFabClick,
-                shape = RoundedCornerShape(50),
-                containerColor = MaterialTheme.colorScheme.primary,
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .offset(y = (-fabSize / 2)) // Đẩy lên vừa nửa FAB
-            ) {
-                Icon(Icons.Filled.PostAdd, contentDescription = "Add", tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(30.dp))
-            }
+            if(onFabClick!=null){
+                // FloatingActionButton
+                FloatingActionButton(
+                    onClick = onFabClick,
+                    shape = RoundedCornerShape(50),
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .offset(y = (-fabSize / 2)) // Đẩy lên vừa nửa FAB
+                ) {
+                    Icon(Icons.Filled.PostAdd, contentDescription = "Add", tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(30.dp))
+                }
 
-            // BottomAppBar with Cutout
-            CutoutBottomAppBar(
-                fabSize = fabSize,
-                fabMargin = fabMargin,
-                color = MaterialTheme.colorScheme.primary
-            ) {
+                // BottomAppBar with Cutout
+                CutoutBottomAppBar(
+                    fabSize = fabSize,
+                    fabMargin = fabMargin,
+                    color = MaterialTheme.colorScheme.onPrimary
+                ) {
+                    NavigationBar(
+                        containerColor = Color.Transparent,
+                        tonalElevation = 0.dp
+                    ) {
+
+                        val itemsLeft = navItems.take(navItems.size / 2)
+                        val itemsRight = navItems.takeLast(navItems.size / 2)
+                        itemsLeft.forEach { item ->
+                            val selected = currentRoute?.hierarchy?.any {
+                                it.route == item.route::class.qualifiedName
+                            } == true
+
+                            NavigationBarItem(
+                                selected = selected,
+                                onClick = {
+                                    navController.navigate(item.route) {
+
+                                        popUpTo(navController.graph.findStartDestination().id) {
+                                            saveState = true
+                                        }
+
+                                        launchSingleTop = true
+
+                                        restoreState = true
+                                    }
+                                },
+                                icon = {
+                                    Icon(
+                                        imageVector = item.icon,
+                                        contentDescription = null,
+                                        tint = if (selected)
+                                            MaterialTheme.colorScheme.primary
+                                        else
+                                            MaterialTheme.colorScheme.inversePrimary
+                                    )
+                                }
+                            )
+                        }
+
+                        // Spacer giữa để né FAB
+                        Spacer(modifier = Modifier.width(fabSize + fabMargin * 2))
+
+                        itemsRight.forEach { item ->
+                            val selected = currentRoute?.hierarchy?.any {
+                                it.route == item.route::class.qualifiedName
+                            } == true
+
+                            NavigationBarItem(
+                                selected = selected,
+                                onClick = {
+                                    navController.navigate(item.route) {
+
+                                        popUpTo(navController.graph.findStartDestination().id) {
+                                            saveState = true
+                                        }
+
+                                        launchSingleTop = true
+
+                                        restoreState = true
+                                    }
+                                },
+                                icon = {
+                                    Icon(
+                                        imageVector = item.icon,
+                                        contentDescription = null,
+                                        tint = if (selected)
+                                            MaterialTheme.colorScheme.primary
+                                        else
+                                            MaterialTheme.colorScheme.inversePrimary
+                                    )
+                                }
+                            )
+                        }
+
+                    }
+                }
+            }
+            else{
                 NavigationBar(
-                    containerColor = Color.Transparent,
+                    containerColor = MaterialTheme.colorScheme.onPrimary,
                     tonalElevation = 0.dp
                 ) {
-                    val currentRoute =
-                        navController.currentBackStackEntryAsState().value?.destination
-                    val itemsLeft = navItems.take(navItems.size / 2)
-                    val itemsRight = navItems.takeLast(navItems.size / 2)
-                    itemsLeft.forEach { item ->
+
+
+                    navItems.forEach { item ->
                         val selected = currentRoute?.hierarchy?.any {
                             it.route == item.route::class.qualifiedName
                         } == true
@@ -235,7 +312,7 @@ fun BottomBarWithCutoutFAB(
                                     imageVector = item.icon,
                                     contentDescription = null,
                                     tint = if (selected)
-                                        MaterialTheme.colorScheme.onPrimary
+                                        MaterialTheme.colorScheme.primary
                                     else
                                         MaterialTheme.colorScheme.inversePrimary
                                 )
@@ -243,40 +320,8 @@ fun BottomBarWithCutoutFAB(
                         )
                     }
 
-                    // Spacer giữa để né FAB
-                    Spacer(modifier = Modifier.width(fabSize + fabMargin * 2))
 
-                    itemsRight.forEach { item ->
-                        val selected = currentRoute?.hierarchy?.any {
-                            it.route == item.route::class.qualifiedName
-                        } == true
 
-                        NavigationBarItem(
-                            selected = selected,
-                            onClick = {
-                                navController.navigate(item.route) {
-
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
-                                    }
-
-                                    launchSingleTop = true
-
-                                    restoreState = true
-                                }
-                            },
-                            icon = {
-                                Icon(
-                                    imageVector = item.icon,
-                                    contentDescription = null,
-                                    tint = if (selected)
-                                        MaterialTheme.colorScheme.onPrimary
-                                    else
-                                        MaterialTheme.colorScheme.inversePrimary
-                                )
-                            }
-                        )
-                    }
 
                 }
             }
@@ -375,9 +420,9 @@ fun bottomBarVisibility(
     when (navBackStackEntry?.destination?.route) {
         Home::class.qualifiedName -> bottomBarState.value = true
         SavingTicket::class.qualifiedName -> bottomBarState.value = true
-        SavingType::class.qualifiedName -> bottomBarState.value = true
         Setting::class.qualifiedName -> bottomBarState.value = true
         Transaction::class.qualifiedName -> bottomBarState.value = true
+        UserManage::class.qualifiedName -> bottomBarState.value = true
         else -> bottomBarState.value = false
     }
 
@@ -386,7 +431,7 @@ fun bottomBarVisibility(
 
 
 fun Modifier.bottomBarAnimatedScroll(
-    height: Dp = 80.dp,
+    height: Dp = 108.dp,
     offsetHeightPx: MutableState<Float>
 ): Modifier = composed {
     val bottomBarHeightPx = with(LocalDensity.current) {

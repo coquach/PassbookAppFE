@@ -39,11 +39,13 @@ class SavingTicketRepoImpl @Inject constructor(
                 initialLoadSize = ITEMS_PER_PAGE,
                 prefetchDistance = 2,
                 enablePlaceholders = true
-        ),
+            ),
             pagingSourceFactory = {
                 SavingTicketPagingSource(savingTicketApiService, filter, true)
-            }).flow
+            }
+        ).flow
     }
+
 
     override fun createSavingTicket(request: SavingTicketRequest): Flow<ApiResponse<SavingTicket>> {
         return apiRequestFlow {
@@ -51,12 +53,4 @@ class SavingTicketRepoImpl @Inject constructor(
         }
     }
 
-    override fun setSavingTicketActive(
-        id: Long,
-        isActive: Boolean,
-    ): Flow<ApiResponse<Unit>> {
-        return apiRequestFlow {
-            savingTicketApiService.setSavingTicketActive(id, isActive)
-        }
-    }
 }

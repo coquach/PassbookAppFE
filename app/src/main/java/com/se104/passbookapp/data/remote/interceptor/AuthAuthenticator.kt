@@ -1,35 +1,41 @@
 package com.se104.passbookapp.data.remote.interceptor
 
-import com.se104.passbookapp.BuildConfig
+import android.util.Log
 import com.se104.passbookapp.data.dto.response.TokenResponse
 import com.se104.passbookapp.data.remote.api.AuthApiService
 import com.se104.passbookapp.di.TokenManager
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import okhttp3.Authenticator
-import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import okhttp3.Route
-import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 class AuthAuthenticator(
     private val tokenManager: TokenManager,
+    private val authApiService: AuthApiService
 ) : Authenticator {
     override fun authenticate(route: Route?, response: Response): Request? {
+        if (responseCount(response) >= 2) {
+            println("⛔ Retry exceeded, stop attempting to refresh.")
+            return null
+        }
         return runBlocking{ // Prevent multiple refresh calls
-
+            Log.d("call authenticator:", "ok")
             val currentAccessToken = tokenManager.getAccessToken().first()
-            val refreshToken = tokenManager.getRefreshToken().first()
+            val requestAccessToken = response.request.header("Authorization")?.removePrefix("Bearer ")
+
             // If the access token changed since the first failed request, retry with new token
-            if (currentAccessToken != response.request.header("Authorization")?.removePrefix("Bearer ")) {
+            if (currentAccessToken != null && currentAccessToken != requestAccessToken) {
                 return@runBlocking response.request.newBuilder()
                     .header("Authorization", "Bearer $currentAccessToken")
                     .build()
             }
-
+            val refreshToken = tokenManager.getRefreshToken().first()
+            if (refreshToken.isNullOrBlank()) {
+                tokenManager.deleteToken()
+                return@runBlocking null
+            }
             val newTokensResponse = getNewToken(refreshToken)
             if (!newTokensResponse.isSuccessful || newTokensResponse.body() == null) {
                 tokenManager.deleteToken()
@@ -47,16 +53,16 @@ class AuthAuthenticator(
         }
     }
     private suspend fun getNewToken(refreshToken: String?): retrofit2.Response<TokenResponse> {
-        val loggingInterceptor = HttpLoggingInterceptor()
-        loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
-        val okHttpClient = OkHttpClient.Builder().addInterceptor(loggingInterceptor).build()
-
-        val retrofit = Retrofit.Builder()
-            .baseUrl(BuildConfig.BACKEND_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .client(okHttpClient)
-            .build()
-        val service = retrofit.create(AuthApiService::class.java)
-        return service.refreshToken(refreshToken)
+        return authApiService.refreshToken(refreshToken)
     }
+}
+
+private fun responseCount(response: okhttp3.Response): Int {
+    var count = 1
+    var prior = response.priorResponse
+    while (prior != null) {
+        count++
+        prior = prior.priorResponse
+    }
+    return count
 }

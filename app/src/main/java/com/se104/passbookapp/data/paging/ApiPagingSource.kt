@@ -37,7 +37,7 @@ abstract class ApiPagingSource<T : Any> : PagingSource<Int, T>() {
                 }
 
 
-                is ApiResponse.Failure -> LoadResult.Error(Exception("Đã xảy ra lỗi khi tải..."))
+                is ApiResponse.Failure -> LoadResult.Error(Exception(response.errorMessage))
                 else -> LoadResult.Error(Exception("Đã xảy ra lỗi bất thường..."))
             }
         }catch (ex: Exception) {
