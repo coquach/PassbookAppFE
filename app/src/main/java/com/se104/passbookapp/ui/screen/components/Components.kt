@@ -299,26 +299,6 @@ fun FoodItemCounter(
 }
 
 
-@Composable
-fun BoxScope.ItemCount(count: Int) {
-    Box(
-        modifier = Modifier
-            .padding(6.dp)
-            .background(MaterialTheme.colorScheme.error, shape = CircleShape)
-            .padding(vertical = 3.dp, horizontal = 4.dp)
-            .align(Alignment.TopEnd)
-            .wrapContentSize(align = Alignment.Center),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = if (count > 99) "99+" else "$count",
-            modifier = Modifier
-                .align(Alignment.Center),
-            color = MaterialTheme.colorScheme.onError,
-            style = TextStyle(fontSize = 8.sp)
-        )
-    }
-}
 
 
 @Composable
@@ -364,9 +344,9 @@ fun Retry(
 @Composable
 fun PassbookAppDialog(
     title: String,
-    titleColor: Color = MaterialTheme.colorScheme.scrim,
+    titleColor: Color = MaterialTheme.colorScheme.primary,
     message: String,
-    messageColor: Color = MaterialTheme.colorScheme.onBackground,
+    messageColor: Color = MaterialTheme.colorScheme.outline,
     onDismiss: () -> Unit,
     containerConfirmButtonColor: Color = MaterialTheme.colorScheme.error,
     labelConfirmButtonColor: Color = MaterialTheme.colorScheme.onError,
@@ -382,17 +362,18 @@ fun PassbookAppDialog(
                 text = title,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = titleColor
+                color = titleColor,
+                textAlign = TextAlign.Start
             )
         },
         text = { Text(text = message, fontSize = 16.sp, color = messageColor, lineHeight = 24.sp) },
-        containerColor = MaterialTheme.colorScheme.background,
+        containerColor = MaterialTheme.colorScheme.secondaryContainer,
         confirmButton = {
             if (showConfirmButton) {
                 AppButton(
                     onClick = { onConfirm?.invoke(); onDismiss() },
                     text = confirmText,
-                    shape = MaterialTheme.shapes.extraLarge,
+                    shape = MaterialTheme.shapes.medium,
                 )
             }
         },
@@ -401,7 +382,7 @@ fun PassbookAppDialog(
                 onClick = onDismiss,
                 text = dismissText,
                 backgroundColor = MaterialTheme.colorScheme.outline,
-                shape = MaterialTheme.shapes.extraLarge,
+                shape = MaterialTheme.shapes.medium,
 
                 )
         }
@@ -804,17 +785,16 @@ fun ErrorModalBottomSheet(
                 modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
             )
 
-            Button(
+            AppButton(
                 onClick = {
                     scope.launch {
                         sheetState.hide()
                         onDismiss()
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Đóng")
-            }
+                modifier = Modifier.fillMaxWidth(),
+                text = "Đóng"
+            )
         }
     }
 }

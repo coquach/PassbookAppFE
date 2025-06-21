@@ -75,14 +75,12 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     permissions: List<String>,
 ) {
-    val isStaff by remember(permissions) {
-        mutableStateOf(permissions.hasAllPermissions("VIEW_USERS", "VIEW_MY_INFO"))
+    val isViewAllUsersActive by remember(permissions) {
+        mutableStateOf(permissions.hasPermission("VIEW_USERS"))
     }
-    val showInfo by remember(permissions) {
-        mutableStateOf(permissions.hasPermission("VIEW_MY_INFO"))
-    }
+
     val isTransaction by remember(permissions) {
-        mutableStateOf(permissions.hasAllPermissions("DEPOSIT", "WITHDRAWAL"))
+        mutableStateOf(permissions.hasAllPermissions("DEPOSIT", "WITHDRAW"))
     }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -120,7 +118,7 @@ fun HomeScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        if (showInfo) {
+
             when (uiState.getInfoState) {
                 is HomeState.GetInfoState.Error -> {
                     val message = (uiState.getInfoState as HomeState.GetInfoState.Error).message
@@ -170,7 +168,7 @@ fun HomeScreen(
                         }
                     }
 
-                    if (isStaff) {
+                    if (isViewAllUsersActive) {
                         val users = remember(uiState.filter) {
                             viewModel.getUsers(uiState.filter)
 
@@ -243,7 +241,7 @@ fun HomeScreen(
                     }
                 }
 
-            }
+
         }
 
     }

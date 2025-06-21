@@ -1,5 +1,6 @@
 package com.se104.passbookapp.data.remote.interceptor
 
+import android.util.Log
 import com.se104.passbookapp.data.dto.response.TokenResponse
 import com.se104.passbookapp.data.remote.api.AuthApiService
 import com.se104.passbookapp.di.TokenManager
@@ -20,7 +21,7 @@ class AuthAuthenticator(
             return null
         }
         return runBlocking{ // Prevent multiple refresh calls
-
+            Log.d("call authenticator:", "ok")
             val currentAccessToken = tokenManager.getAccessToken().first()
             val requestAccessToken = response.request.header("Authorization")?.removePrefix("Bearer ")
 

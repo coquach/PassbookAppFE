@@ -11,7 +11,6 @@ interface AuthRepository {
     fun register(request: RegisterRequest): Flow<ApiResponse<TokenResponse>>
     fun logout(tokenAccess: String?): Flow<ApiResponse<Unit>>
     fun forgotPassword(request: Map<String, String>): Flow<ApiResponse<Unit>>
-    fun changePassword(request: Map<String, String>): Flow<ApiResponse<Unit>>
     fun verifyEmail(request: Map<String, String>): Flow<ApiResponse<Unit>>
     fun postMethodName(request: Map<String, String>): Flow<ApiResponse<Unit>>
 

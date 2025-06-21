@@ -12,12 +12,12 @@ import java.time.LocalDateTime
 data class User(
     val id: Long,
     val email: String,
-    val phone: String,
+    val phone: String?=null,
     val fullName: String,
     @Serializable(with = LocalDateSerializer::class)
-    val dateOfBirth: LocalDate,
+    val dateOfBirth: LocalDate?=null,
     val citizenID: String,
-    val address: String,
+    val address: String?=null,
     @Serializable(with = BigDecimalSerializer::class)
     val balance: BigDecimal,
 

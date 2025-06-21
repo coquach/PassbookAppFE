@@ -80,16 +80,17 @@ class ParametersViewModel @Inject constructor(
                             )
                         }
                         _event.send(ParametersState.Event.ShowToastSuccess("Cập nhật tham số thành công"))
-                        getParameters()
                     }
 
                     is ApiResponse.Success -> {
                         _uiState.update {
                             it.copy(
                                 isLoading = false,
-                                error = null
+                                error = null,
+
                             )
                         }
+                        getParameters()
                     }
 
                     is ApiResponse.Failure -> {

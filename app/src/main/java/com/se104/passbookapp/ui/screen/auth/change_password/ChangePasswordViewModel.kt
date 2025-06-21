@@ -3,7 +3,7 @@ package com.se104.passbookapp.ui.screen.auth.change_password
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.se104.passbookapp.data.dto.ApiResponse
-import com.se104.passbookapp.domain.use_case.auth.ChangePasswordUseCase
+import com.se104.passbookapp.domain.use_case.user.ChangePasswordUseCase
 import com.se104.passbookapp.ui.screen.components.text_field.validateField
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -44,15 +44,14 @@ class ChangePasswordViewModel @Inject constructor(
             "newPassword" -> {
                 newPasswordError = validateField(
                     current.newPassword.trim(),
-                    "Mật khẩu phải có ít nhất 6 ký tự"
+                    "Mật khẩu phải có ít nhất 6 ký tự và khác mật khẩu cũ"
 
                 ) { it.length >= 6 && current.oldPassword != it }
             }
 
 
         }
-        val isValid = current.oldPassword.isNotBlank() && current.newPassword.isNotBlank() &&
-                oldPasswordError == null && newPasswordError == null
+        val isValid = current.oldPassword.isNotBlank() && current.newPassword.isNotBlank() && oldPasswordError == null && newPasswordError == null
         _uiState.update {
             it.copy(
                 oldPasswordError = oldPasswordError,
@@ -65,7 +64,7 @@ class ChangePasswordViewModel @Inject constructor(
 
     private fun changePassword() {
         viewModelScope.launch {
-            changePasswordUseCase.invoke(_uiState.value.oldPassword, _uiState.value.newPassword)
+            changePasswordUseCase.invoke(oldPassword = _uiState.value.oldPassword, newPassword =  _uiState.value.newPassword)
                 .collect { response ->
                     when (response) {
                         is ApiResponse.Loading -> {

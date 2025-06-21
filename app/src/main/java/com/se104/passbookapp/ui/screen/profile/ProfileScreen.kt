@@ -30,16 +30,22 @@ import androidx.navigation.NavController
 import com.se104.passbookapp.navigation.ChangePassword
 import com.se104.passbookapp.ui.screen.components.HeaderDefaultView
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import com.se104.passbookapp.ui.screen.components.AppButton
 import com.se104.passbookapp.ui.screen.components.LoadingAnimation
 import com.se104.passbookapp.ui.screen.components.Retry
 import com.se104.passbookapp.utils.StringUtils
+import com.se104.passbookapp.utils.hasPermission
+
 
 @Composable
 fun ProfileScreen(
     navController: NavController,
     viewModel: ProfileViewModel = hiltViewModel(),
+    permissions: List<String>,
 ) {
+    val isChangePassword by rememberSaveable { mutableStateOf(permissions.hasPermission("CHANGE_PASSWORD"))  }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val lifecycleOwner = LocalLifecycleOwner.current
     LaunchedEffect(Unit) {
@@ -96,9 +102,9 @@ fun ProfileScreen(
                         .fillMaxWidth()
                         .clip(MaterialTheme.shapes.extraLarge)
                         .background(MaterialTheme.colorScheme.background, MaterialTheme.shapes.extraLarge)
-                        .padding(12.dp),
+                        .padding(18.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    verticalArrangement = Arrangement.spacedBy(18.dp)
                 ) {
                     DetailsRow(
                         title = "Họ và tên",
@@ -131,7 +137,7 @@ fun ProfileScreen(
                         )
                     DetailsRow(
                         title = "Số điện thoại",
-                        text = user.phone,
+                        text = user.phone?: "Không có",
                         icon = Icons.Default.Phone,
                         titleColor = MaterialTheme.colorScheme.outline,
                         textColor = MaterialTheme.colorScheme.onBackground
@@ -139,14 +145,14 @@ fun ProfileScreen(
 
                     DetailsRow(
                         title = "Ngày sinh",
-                        text = StringUtils.formatLocalDate(user.dateOfBirth)!!,
+                        text = StringUtils.formatLocalDate(user.dateOfBirth)?: "Không có",
                         icon = Icons.Default.DateRange,
                         titleColor = MaterialTheme.colorScheme.outline,
                         textColor = MaterialTheme.colorScheme.onBackground
                     )
                     DetailsRow(
                         title = "Địa chỉ",
-                        text = user.address,
+                        text = user.address?: "Không có",
                         icon = Icons.Default.Person,
                         titleColor = MaterialTheme.colorScheme.outline,
                         textColor = MaterialTheme.colorScheme.onBackground
@@ -164,6 +170,7 @@ fun ProfileScreen(
                         viewModel.onAction(ProfileState.Action.NavigateToChangePassword)
 
                     },
+                    enable = isChangePassword
                 )
             }
         }

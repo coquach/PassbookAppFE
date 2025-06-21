@@ -130,7 +130,7 @@ fun SavingTicketScreen(
                 "interestRate" -> "Lãi suất"
                 "createdAt" -> "Ngày tạo"
                 "maturityDate" -> "Ngày đáo hạn"
-                else -> ""
+                else -> "Id"
             },
             switchState = uiState.filter.order == "desc",
             placeHolder = if (isStaff) "Tìm kiếm theo CCCD" else ""
@@ -145,35 +145,27 @@ fun SavingTicketScreen(
             startDate = uiState.filter.startDate,
             endDate = uiState.filter.endDate,
         )
-        AnimatedContent(
-            targetState = uiState.search.isBlank(),
-            transitionSpec = {
-                (slideInVertically { it } + fadeIn()) togetherWith
-                        (slideOutVertically { -it } + fadeOut())
+
+        ChipsGroupWrap(
+            modifier = Modifier.padding(8.dp),
+            options = uiState.savingTypes.map { it.typeName },
+            selectedOption = uiState.savingTypeName,
+            onOptionSelected = { savingTypeName ->
+                val savingType = uiState.savingTypes.find { it.typeName == savingTypeName }
+                savingType?.let {
+                    viewModel.onAction(
+                        SavingTicketState.Action.OnChangeSavingType(
+                            it.id!!,
+                            it.typeName
+                        )
+                    )
+                }
             },
-            label = "Creating Switch"
-        ) {
-            if (it) {
-                ChipsGroupWrap(
-                    modifier = Modifier.padding(8.dp),
-                    options = uiState.savingTypes.map { it.typeName },
-                    selectedOption = uiState.savingTypeName,
-                    onOptionSelected = { savingTypeName ->
-                        val savingType = uiState.savingTypes.find { it.typeName == savingTypeName }
-                        savingType?.let {
-                            viewModel.onAction(
-                                SavingTicketState.Action.OnChangeSavingType(
-                                    it.id!!,
-                                    it.typeName
-                                )
-                            )
-                        }
-                    },
-                    containerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
-                    isFlowLayout = false,
-                )
-            }
-        }
+            containerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
+            isFlowLayout = false,
+        )
+
+
 
 
         LazyPagingSample(
@@ -207,7 +199,7 @@ fun SavingTicketCard(
     savingTicket: SavingTicket,
     onClick: (SavingTicket) -> Unit,
     isStaff: Boolean = false,
-    ) {
+) {
     CardSample(
         item = savingTicket,
         onClick = onClick
@@ -227,14 +219,14 @@ fun SavingTicketDetails(savingTicket: SavingTicket, isStaff: Boolean = false) {
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             DetailsRow(
                 icon = Icons.Default.Tag,
                 text = savingTicket.id.toString(),
                 title = "Mã phiếu",
                 titleColor = MaterialTheme.colorScheme.primary,
-                textColor = MaterialTheme.colorScheme.onBackground
+                textColor = MaterialTheme.colorScheme.primary
             )
             if (isStaff) {
                 DetailsRow(
@@ -242,7 +234,7 @@ fun SavingTicketDetails(savingTicket: SavingTicket, isStaff: Boolean = false) {
                     text = savingTicket.citizenId,
                     title = "CCCD",
                     titleColor = MaterialTheme.colorScheme.primary,
-                    textColor = MaterialTheme.colorScheme.onBackground
+                    textColor = MaterialTheme.colorScheme.primary
                 )
             }
             DetailsRow(
@@ -255,7 +247,7 @@ fun SavingTicketDetails(savingTicket: SavingTicket, isStaff: Boolean = false) {
             DetailsRow(
                 title = "Kỳ hạn",
                 icon = Icons.Default.DateRange,
-                text =if(savingTicket.duration==0) "Không có" else "${savingTicket.duration} tháng",
+                text = if (savingTicket.duration == 0) "Không có" else "${savingTicket.duration} tháng",
                 titleColor = MaterialTheme.colorScheme.outline,
                 textColor = MaterialTheme.colorScheme.outline
             )

@@ -41,11 +41,7 @@ class AuthRepoImpl @Inject constructor(
         }
     }
 
-    override fun changePassword(request: Map<String, String>): Flow<ApiResponse<Unit>> {
-       return apiRequestFlow {
-           authApiService.changePassword(request)
-       }
-    }
+
 
     override fun verifyEmail(request: Map<String, String>): Flow<ApiResponse<Unit>> {
         return apiRequestFlow {

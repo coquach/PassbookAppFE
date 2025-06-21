@@ -6,11 +6,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
+import com.se104.passbookapp.data.model.User
 import com.se104.passbookapp.ui.screen.auth.AuthScreen
 import com.se104.passbookapp.ui.screen.auth.login.LoginScreen
-import com.se104.passbookapp.ui.screen.parameters.ParametersScreen
-import com.se104.passbookapp.ui.screen.saving_type.SavingTypeScreen
+import com.se104.passbookapp.ui.screen.permission.PermissionsSettingScreen
+import com.se104.passbookapp.ui.screen.profile.ProfileScreen
 import com.se104.passbookapp.ui.screen.setting.SettingScreen
+import com.se104.passbookapp.ui.screen.user_manage.UserManageScreen
+import com.se104.passbookapp.ui.screen.user_manage.details.UserDetailsScreen
+import kotlin.reflect.typeOf
 
 
 @Composable
@@ -41,19 +45,27 @@ fun AppNavGraph(
         }
 
         composable<Home> {
-
+            PermissionsSettingScreen(permissions = permissions)
 
         }
-        composable<SavingType> {
-            SavingTypeScreen(permissions = permissions)
-        }
 
-        composable<Parameters>{
-            ParametersScreen(navController, permissions = permissions)
+
+       composable<UserManage> {
+           UserManageScreen(navController, permission = permissions)
+       }
+
+        composable<UserDetail>(
+            typeMap =mapOf(typeOf<User>() to userNavType)
+        ) {
+            UserDetailsScreen(navController, permission= permissions)
         }
 
         composable<Setting> {
             SettingScreen(navController, isDarkMode, onThemeUpdated, permissions = permissions)
+        }
+
+        composable<Profile> {
+            ProfileScreen(navController, permissions = permissions)
         }
 
 

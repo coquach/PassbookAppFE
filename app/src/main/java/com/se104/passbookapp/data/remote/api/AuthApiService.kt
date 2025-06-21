@@ -42,12 +42,6 @@ interface AuthApiService {
     ) : Response<Unit>
 
 
-    @POST("$PR/change-password")
-    suspend fun changePassword(
-        @Body request: Map<String, String>
-    ) : Response<Unit>
-
-
     @POST("$PR/send-otp")
     suspend fun verifyEmail(
         @Body request: Map<String, String>

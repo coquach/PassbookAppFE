@@ -1,5 +1,6 @@
 package com.se104.passbookapp.data.datastore
 
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -22,10 +23,12 @@ class UserSessionRepository @Inject constructor(
     }
 
     suspend fun saveUserSession(userId: Long, permissions: List<String>) {
+        Log.d("userSession", permissions.toString())
         dataStore.edit { prefs ->
             prefs[UserPreferencesKeys.USER_ID] = userId
             prefs[UserPreferencesKeys.PERMISSIONS] = permissions.joinToString(",")
         }
+
     }
 
     suspend fun getUserId(): Long? {

@@ -118,7 +118,7 @@ fun SavingTicketDetailsScreen(
                 .weight(1f)
                 .clip(MaterialTheme.shapes.extraLarge)
                 .background(MaterialTheme.colorScheme.background, MaterialTheme.shapes.extraLarge)
-                .padding(12.dp),
+                .padding(18.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
@@ -272,6 +272,7 @@ fun SavingTicketDetailsScreen(
                             .fillMaxWidth(),
                         text = "Rút",
                         backgroundColor = MaterialTheme.colorScheme.primary,
+                        enable = isWithDraw && !uiState.isLoading
                     )
                 }
 

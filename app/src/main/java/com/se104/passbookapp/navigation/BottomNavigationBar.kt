@@ -420,9 +420,9 @@ fun bottomBarVisibility(
     when (navBackStackEntry?.destination?.route) {
         Home::class.qualifiedName -> bottomBarState.value = true
         SavingTicket::class.qualifiedName -> bottomBarState.value = true
-        SavingType::class.qualifiedName -> bottomBarState.value = true
         Setting::class.qualifiedName -> bottomBarState.value = true
         Transaction::class.qualifiedName -> bottomBarState.value = true
+        UserManage::class.qualifiedName -> bottomBarState.value = true
         else -> bottomBarState.value = false
     }
 

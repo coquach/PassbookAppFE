@@ -3,6 +3,7 @@ package com.se104.passbookapp.navigation
 import android.os.Bundle
 import androidx.navigation.NavType
 import com.se104.passbookapp.data.model.SavingType
+import com.se104.passbookapp.data.model.User
 import kotlinx.serialization.json.Json
 
 val savingTypeNavType = object : NavType<SavingType>(false) {
@@ -38,6 +39,25 @@ val savingTicketNavType = object : NavType<com.se104.passbookapp.data.model.Savi
     }
 
     override fun put(bundle: Bundle, key: String, value: com.se104.passbookapp.data.model.SavingTicket) {
+        bundle.putString(key, serializeAsValue(value))
+    }
+}
+
+val userNavType = object : NavType<User>(false) {
+    override fun get(bundle: Bundle, key: String): User {
+        return parseValue(bundle.getString(key).toString())
+
+    }
+
+    override fun parseValue(value: String): User {
+        return Json.decodeFromString(User.serializer(), value)
+    }
+
+    override fun serializeAsValue(value: User): String {
+        return Json.encodeToString(User.serializer(), value)
+    }
+
+    override fun put(bundle: Bundle, key: String, value: User) {
         bundle.putString(key, serializeAsValue(value))
     }
 }

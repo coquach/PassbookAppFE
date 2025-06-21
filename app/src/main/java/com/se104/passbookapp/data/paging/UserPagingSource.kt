@@ -23,7 +23,8 @@ class UserPagingSource @Inject constructor(
                 size = size,
                 fullName = filter.fullName,
                 citizenID = filter.citizenID,
-                groupName = filter.groupName,
+                groupId = filter.groupId,
+                isActive = filter.isActive,
                 order = filter.order,
                 sortBy = filter.sortBy,
             )

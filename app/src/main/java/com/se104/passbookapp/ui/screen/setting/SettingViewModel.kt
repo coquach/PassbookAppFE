@@ -82,6 +82,12 @@ class SettingViewModel @Inject constructor(
                     _event.send(SettingState.Event.NavigateToProfile)
                 }
             }
+
+            SettingState.Action.OnClickSavingType -> {
+                viewModelScope.launch {
+                    _event.send(SettingState.Event.NavigateToSavingType)
+                }
+            }
         }
     }
 }
@@ -97,6 +103,7 @@ object SettingState {
         data object NavigateToReport : Event
         data object NavigateToParameters : Event
         data object NavigateToProfile : Event
+        data object NavigateToSavingType : Event
 
     }
 
@@ -106,6 +113,7 @@ object SettingState {
         data object OnClickReport : Action()
         data object OnClickParameters : Action()
         data object OnClickProfile : Action()
+        data object OnClickSavingType: Action()
     }
 
 }

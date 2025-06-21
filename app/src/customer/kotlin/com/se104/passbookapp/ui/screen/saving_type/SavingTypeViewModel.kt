@@ -328,6 +328,11 @@ class SavingTypeViewModel @Inject constructor(
                     _event.send(SavingTypeState.Event.ShowToastUnEnableAction)
                 }
             }
+            is SavingTypeState.Action.OnBack -> {
+                viewModelScope.launch {
+                    _event.send(SavingTypeState.Event.OnBack)
+                }
+            }
         }
     }
 }
@@ -360,6 +365,7 @@ object SavingTypeState {
     }
 
     sealed interface Event {
+        data object OnBack : Event
         data object ShowError : Event
         data object ShowToastUnEnableAction : Event
         data class ShowToastSuccess(val message: String) : Event
@@ -379,6 +385,7 @@ object SavingTypeState {
         data class OnHideStatus(val isHide: Boolean) : Action
         data object OnDeleteSavingType : Action
         data object ShowToast : Action
+        data object OnBack: Action
 
     }
 }

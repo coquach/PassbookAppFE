@@ -5,6 +5,8 @@ import com.se104.passbookapp.data.model.User
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.PATCH
+import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -22,7 +24,8 @@ interface UserApiService {
         @Query("size") size: Int = 10,
         @Query("sortBy") sortBy: String = "id",
         @Query("order") order: String = "asc",
-        @Query("groupName") groupName: String? = null,
+        @Query("groupId") groupId: Int? = null,
+        @Query("isActive") isActive: Boolean= true,
         @Query("fullName") fullName: String? = null,
         @Query("citizenID") citizenID: String? = null,
     ): Response<PageResponse<User>>
@@ -30,5 +33,14 @@ interface UserApiService {
 
     @PUT("$PR/active/{userId}")
     suspend fun setActiveUser(@Path("userId") userId: Long, @Body isActive: Boolean): Response<Unit>
+
+
+    @PATCH("$PR/{userId}/group")
+    suspend fun setGroupUser(@Path("userId") userId: Long, @Body request: Map<String, Int>): Response<Unit>
+
+    @POST("auth/change-password")
+    suspend fun changePassword(
+        @Body request: Map<String, String>
+    ) : Response<Unit>
 
 }

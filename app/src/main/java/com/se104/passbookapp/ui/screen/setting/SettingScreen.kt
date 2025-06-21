@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.BrightnessMedium
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PrivacyTip
+import androidx.compose.material.icons.filled.Savings
 import androidx.compose.material.icons.filled.SettingsSuggest
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -36,6 +37,7 @@ import androidx.navigation.NavController
 import com.se104.passbookapp.navigation.Parameters
 import com.se104.passbookapp.navigation.Profile
 import com.se104.passbookapp.navigation.Report
+import com.se104.passbookapp.navigation.SavingType
 import com.se104.passbookapp.ui.screen.components.AppButton
 import com.se104.passbookapp.ui.screen.components.ErrorModalBottomSheet
 import com.se104.passbookapp.ui.screen.components.HeaderDefaultView
@@ -60,88 +62,100 @@ fun SettingScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
 
-
     val lifecycleOwner = LocalLifecycleOwner.current
     LaunchedEffect(Unit) {
         viewModel.event.flowWithLifecycle(lifecycleOwner.lifecycle).collect { event ->
             when (event) {
                 is SettingState.Event.ShowError -> {
-                    showErrorSheet = true}
+                    showErrorSheet = true
+                }
+
                 is SettingState.Event.NavigateToReport -> {
                     navController.navigate(Report)
                 }
+
                 is SettingState.Event.NavigateToParameters -> {
                     navController.navigate(Parameters)
                 }
+
                 is SettingState.Event.NavigateToProfile -> {
                     navController.navigate(Profile)
+                }
+
+                SettingState.Event.NavigateToSavingType -> {
+                    navController.navigate(SavingType)
                 }
             }
         }
     }
 
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
-        ) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top
+    ) {
 
 
-            HeaderDefaultView(
-                text = "Cài đặt",
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-            Spacer(modifier = Modifier.size(200.dp))
-            SettingGroup(
-                items = listOf(
-                    {
-                        SettingItem(
-                            Icons.Default.BrightnessMedium,
-                            "Chủ đề ",
-                            customView = {
-                                ThemeSwitcher(
-                                    darkTheme = darkTheme,
-                                    size = 35.dp,
-                                    padding = 6.dp,
-                                    onClick = onThemeUpdated
-                                )
-                            }
-                        )
-                        if (permissions.contains("VIEW_MY_INFO")) {
-                            SettingItem(Icons.Default.Person, "Thông tin cá nhân", onClick = {
-                                viewModel.onAction(SettingState.Action.OnClickProfile)
-                            })
+        HeaderDefaultView(
+            text = "Cài đặt",
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+        Spacer(modifier = Modifier.size(200.dp))
+        SettingGroup(
+            items = listOf(
+                {
+                    SettingItem(
+                        Icons.Default.BrightnessMedium,
+                        "Chủ đề ",
+                        customView = {
+                            ThemeSwitcher(
+                                darkTheme = darkTheme,
+                                size = 35.dp,
+                                padding = 6.dp,
+                                onClick = onThemeUpdated
+                            )
                         }
+                    )
 
-                        if (permissions.contains("VIEW_PARAMETERS")) {
-                            SettingItem(Icons.Default.SettingsSuggest, "Quản lí hệ thống", onClick = {
-                                viewModel.onAction(SettingState.Action.OnClickParameters)
-                            })
-                        }
-                        if (permissions.contains("VIEW_REPORTS")) {
-                            SettingItem(Icons.Default.BarChart, "Thống kê", onClick = {
-                                viewModel.onAction(SettingState.Action.OnClickReport)
-                            })
-                        }
+                    SettingItem(Icons.Default.Person, "Thông tin cá nhân", onClick = {
+                        viewModel.onAction(SettingState.Action.OnClickProfile)
+                    })
 
-                    },
-                )
-            )
+                    if (permissions.contains("CREATE_SAVINGTYPE")) {
+                        SettingItem(Icons.Default.Savings, "Loại tiết kiệm", onClick = {
+                            viewModel.onAction(SettingState.Action.OnClickSavingType)
+                        })
+                    }
 
-            Spacer(modifier = Modifier.height(20.dp))
-            AppButton(
-                onClick = {
-                    showDialogLogout = true
+                    if (permissions.contains("VIEW_PARAMETERS")) {
+                        SettingItem(Icons.Default.SettingsSuggest, "Quản lí quy định", onClick = {
+                            viewModel.onAction(SettingState.Action.OnClickParameters)
+                        })
+                    }
+                    if (permissions.contains("VIEW_REPORTS")) {
+                        SettingItem(Icons.Default.BarChart, "Thống kê", onClick = {
+                            viewModel.onAction(SettingState.Action.OnClickReport)
+                        })
+                    }
+
                 },
-               text = "Đăng xuất",
-                modifier = Modifier.fillMaxWidth(),
-                enable = !uiState.isLoading
-
             )
-        }
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
+        AppButton(
+            onClick = {
+                showDialogLogout = true
+            },
+            text = "Đăng xuất",
+            modifier = Modifier.fillMaxWidth(),
+            enable = !uiState.isLoading
+
+        )
+    }
 
     if (showDialogLogout) {
 

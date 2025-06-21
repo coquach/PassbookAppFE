@@ -39,6 +39,7 @@ import com.se104.passbookapp.R
 import com.se104.passbookapp.navigation.ResetPasswordSuccess
 import com.se104.passbookapp.ui.screen.components.AppButton
 import com.se104.passbookapp.ui.screen.components.ErrorModalBottomSheet
+import com.se104.passbookapp.ui.screen.components.HeaderDefaultView
 import com.se104.passbookapp.ui.screen.components.text_field.PasswordTextField
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -79,14 +80,11 @@ fun ChangePasswordScreen(
 
 
     ) {
-        Text(
-            text = stringResource(id = R.string.sign_up_desc),
-            fontSize = 32.sp,
-            lineHeight = 40.sp,
-            fontWeight = FontWeight.Bold,
-
-            color = MaterialTheme.colorScheme.primary
-
+        HeaderDefaultView(
+            text = "Thay đổi mật khẩu",
+            onBack = {
+                viewModel.onAction(ChangePasswordState.Action.OnBack)
+            }
         )
         Image(
             painter = painterResource(id = R.drawable.change_password),
@@ -139,7 +137,7 @@ fun ChangePasswordScreen(
                     modifier = Modifier.fillMaxWidth(),
                     value = uiState.newPassword,
                     onValueChange = {
-                        viewModel.onAction(ChangePasswordState.Action.OnChangeOldPassword(it))
+                        viewModel.onAction(ChangePasswordState.Action.OnChangeNewPassword(it))
                     },
                     errorMessage = uiState.newPasswordError,
                     validate = {
@@ -147,7 +145,7 @@ fun ChangePasswordScreen(
                     },
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = KeyboardType.Password,
-                        imeAction = ImeAction.Next
+                        imeAction = ImeAction.Done
                     ),
                     label = "Mật khẩu mới"
                 )
@@ -163,7 +161,7 @@ fun ChangePasswordScreen(
                 viewModel.onAction(ChangePasswordState.Action.OnChangePassword)
             },
             text = "Xác nhận",
-            enable = uiState.isValid && !uiState.isLoading
+            enable = !uiState.isLoading
         )
     }
 

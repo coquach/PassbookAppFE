@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -16,6 +17,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,7 +48,7 @@ fun ParametersScreen(
     viewModel: ParametersViewModel = hiltViewModel(),
     permissions: List<String>,
 ) {
-    val isModify = permissions.hasPermission("UPDATE_PARAMETERS")
+    val isModify by rememberSaveable { mutableStateOf(permissions.hasPermission("UPDATE_PARAMETER")) }
 
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -121,11 +123,11 @@ fun ParametersScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(MaterialTheme.shapes.medium)
+                        .clip(MaterialTheme.shapes.extraLarge)
                         .background(
-                            MaterialTheme.colorScheme.background, MaterialTheme.shapes.medium
+                            MaterialTheme.colorScheme.background, MaterialTheme.shapes.extraLarge
                         )
-                        .padding(12.dp),
+                        .padding(18.dp),
                 ) {
                     Column(
                         modifier = Modifier
@@ -144,7 +146,7 @@ fun ParametersScreen(
                             },
                             readOnly = !isModify,
                             modifier = Modifier.fillMaxWidth(),
-                            labelText = "Tuổi tối thiểu đăng kí",
+                            labelText = "Tuổi tối thiểu đăng kí tài khoản",
                             keyboardOptions = KeyboardOptions.Default.copy(
                                 keyboardType = KeyboardType.Number,
                                 imeAction = ImeAction.Next
@@ -201,19 +203,19 @@ fun ParametersScreen(
                                 imeAction = ImeAction.Done
                             ),
                         )
+                        Spacer(modifier = Modifier.weight(1f))
+                        AppButton(
+                            text = "Cập nhật",
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            onClick = {
+                                viewModel.onAction(ParametersState.Action.OnUpdate)
+                            },
 
+                            enable = isModify && !uiState.isLoading
+                        )
                     }
-                    AppButton(
-                        text = "Cập nhật",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .align(Alignment.BottomCenter),
-                        onClick = {
-                            viewModel.onAction(ParametersState.Action.OnUpdate)
-                        },
 
-                        enable = isModify && !uiState.isLoading
-                    )
                 }
             }
         }

@@ -17,8 +17,6 @@ abstract class MainDataModule {
     @Binds
     abstract fun provideAuthRepository(impl: AuthRepoImpl): AuthRepository
 
-    @Binds
-    abstract fun provideSavingTypeRepository(impl: SavingTypeRepoImpl): SavingTypeRepository
 
    @Binds
    abstract fun provideUserRepository(impl: UserRepoImpl): UserRepository

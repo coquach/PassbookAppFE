@@ -204,7 +204,7 @@ object HomeState {
         val error: String? = null,
         val amount: BigDecimal = BigDecimal.ZERO,
         val search: String = "",
-        val filter: UserFilter = UserFilter(groupName = "CUSTOMER"),
+        val filter: UserFilter = UserFilter(groupId = 2),
         val getInfoState: GetInfoState = GetInfoState.Loading,
         val userSelected: Long? = null,
 

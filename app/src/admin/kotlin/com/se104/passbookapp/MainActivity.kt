@@ -92,7 +92,6 @@ class MainActivity : BasePassbookAppActivity() {
                     } else {
                         val navItems = listOf(
                             BottomNavItem.Home,
-                            BottomNavItem.SavingType,
                             BottomNavItem.UserManage,
                             BottomNavItem.Setting,
                         )

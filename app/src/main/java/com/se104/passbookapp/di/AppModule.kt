@@ -114,13 +114,7 @@ object AppModule {
     }
 
 
-    @Provides
-    @Singleton
-    fun provideSavingTypeAPIService(
-        @Named("MainApi") retrofit: Retrofit,
-    ): SavingTypeApiService =
-        retrofit
-            .create(SavingTypeApiService::class.java)
+
 
     @Provides
     @Singleton
@@ -132,14 +126,6 @@ object AppModule {
     )
 
 
-
-    @Provides
-    @Singleton
-    fun provideParameterAPIService(
-        @Named("MainApi") retrofit: Retrofit,
-    ): ParameterApiService =
-        retrofit
-            .create(ParameterApiService::class.java)
 
     @Provides
     @Singleton

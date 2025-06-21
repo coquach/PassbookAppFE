@@ -9,7 +9,6 @@ import androidx.navigation.compose.composable
 import com.se104.passbookapp.data.model.SavingType
 import com.se104.passbookapp.ui.screen.auth.AuthScreen
 import com.se104.passbookapp.ui.screen.auth.change_password.ChangePasswordScreen
-import com.se104.passbookapp.ui.screen.auth.change_password.ChangePasswordState
 import com.se104.passbookapp.ui.screen.auth.forgot_password.ForgotPasswordScreen
 import com.se104.passbookapp.ui.screen.auth.forgot_password.SendEmailSuccessScreen
 import com.se104.passbookapp.ui.screen.auth.login.LoginScreen
@@ -17,12 +16,14 @@ import com.se104.passbookapp.ui.screen.auth.signup.SignUpScreen
 import com.se104.passbookapp.ui.screen.auth.verify_email.SendEmailScreen
 import com.se104.passbookapp.ui.screen.auth.verify_email.VerifyEmailScreen
 import com.se104.passbookapp.ui.screen.home.HomeScreen
+import com.se104.passbookapp.ui.screen.parameters.ParametersScreen
 import com.se104.passbookapp.ui.screen.profile.ProfileScreen
 import com.se104.passbookapp.ui.screen.report.ReportScreen
 import com.se104.passbookapp.ui.screen.saving_ticket.SavingTicketScreen
 import com.se104.passbookapp.ui.screen.saving_ticket.create.CreateSavingTicketsScreen
 import com.se104.passbookapp.ui.screen.saving_ticket.create.SelectSavingTypeScreen
 import com.se104.passbookapp.ui.screen.saving_ticket.details.SavingTicketDetailsScreen
+import com.se104.passbookapp.ui.screen.saving_type.SavingTypeScreen
 import com.se104.passbookapp.ui.screen.setting.SettingScreen
 import com.se104.passbookapp.ui.screen.success.ActionSuccessScreen
 import com.se104.passbookapp.ui.screen.transaction.TransactionScreen
@@ -92,6 +93,14 @@ fun AppNavGraph(
                 SavingTicketScreen(navController, permissions = permissions)
             }
 
+            composable<com.se104.passbookapp.navigation.SavingType> {
+                SavingTypeScreen(navController,permissions = permissions)
+            }
+
+            composable<Parameters> {
+                ParametersScreen(navController, permissions = permissions)
+            }
+
             composable<SavingTicketDetails>(
                 typeMap =mapOf(typeOf<com.se104.passbookapp.data.model.SavingTicket>() to savingTicketNavType)
             ) {
@@ -119,7 +128,7 @@ fun AppNavGraph(
             }
 
             composable<Profile> {
-                ProfileScreen(navController)
+                ProfileScreen(navController, permissions = permissions)
             }
 
             composable<Report> {

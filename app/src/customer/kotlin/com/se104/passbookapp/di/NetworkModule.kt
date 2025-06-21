@@ -1,7 +1,9 @@
 package com.se104.passbookapp.di
 
+import com.se104.passbookapp.data.remote.api.ParameterApiService
 import com.se104.passbookapp.data.remote.api.ReportApiService
 import com.se104.passbookapp.data.remote.api.SavingTicketApiService
+import com.se104.passbookapp.data.remote.api.SavingTypeApiService
 import com.se104.passbookapp.data.remote.api.TransactionApiService
 import com.se104.passbookapp.data.remote.api.WithdrawalApiService
 import dagger.Module
@@ -46,4 +48,22 @@ object NetworkModule {
     ): ReportApiService =
         retrofit
             .create(ReportApiService::class.java)
+
+
+    @Provides
+    @Singleton
+    fun provideParameterAPIService(
+        @Named("MainApi") retrofit: Retrofit,
+    ): ParameterApiService =
+        retrofit.create(ParameterApiService::class.java)
+
+
+    @Provides
+    @Singleton
+    fun provideSavingTypeAPIService(
+        @Named("MainApi") retrofit: Retrofit,
+    ): SavingTypeApiService =
+        retrofit
+            .create(SavingTypeApiService::class.java)
+
 }

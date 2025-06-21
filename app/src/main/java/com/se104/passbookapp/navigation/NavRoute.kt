@@ -85,3 +85,5 @@ object UserManage: NavRoute
 
 @Serializable
 data class UserDetail(val user: User): NavRoute
+
+

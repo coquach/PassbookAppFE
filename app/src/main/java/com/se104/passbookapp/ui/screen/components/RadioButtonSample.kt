@@ -14,6 +14,7 @@ import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,37 +28,40 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun RadioGroupWrap(
-    text: String,
     modifier: Modifier = Modifier,
+    text: String?=null,
+
     options: List<String>,
-    selectedOption: String?=null,
+    selectedOption: String,
     onOptionSelected: (String) -> Unit,
-    optionIcons: List<ImageVector>? = null, // <-- giờ là nullable
-    isFlowLayout: Boolean = true
+    optionIcons: List<ImageVector>? = null,
+    useFlowLayout: Boolean = true // true = FlowLayout, false = Column
 ) {
     LaunchedEffect(options, selectedOption) {
-        if (options.isNotEmpty() && selectedOption == null) {
+        if (options.isNotEmpty() && selectedOption.isBlank()) {
             onOptionSelected(options.first())
         }
     }
 
     Column(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text = text,
-            color = MaterialTheme.colorScheme.outline,
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.ExtraBold,
-            modifier = Modifier.padding(start = 4.dp, bottom = 4.dp)
-        )
+        text?.let {
+            Text(
+                text = it,
+                color = MaterialTheme.colorScheme.outline,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.ExtraBold,
+                modifier = Modifier.padding(start = 4.dp, bottom = 4.dp)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+        }
 
-        Spacer(modifier = Modifier.height(8.dp))
 
         val layoutModifier = modifier
             .fillMaxWidth()
             .selectableGroup()
 
-        val optionLayout: @Composable (content: @Composable () -> Unit) -> Unit =
-            if (isFlowLayout) {
+        val optionLayout: @Composable (@Composable () -> Unit) -> Unit =
+            if (useFlowLayout) {
                 { content ->
                     FlowRow(
                         modifier = layoutModifier,
@@ -92,7 +96,11 @@ fun RadioGroupWrap(
                 ) {
                     RadioButton(
                         selected = (optionText == selectedOption),
-                        onClick = null
+                        onClick = null,
+                        colors = RadioButtonDefaults.colors(
+                            selectedColor = MaterialTheme.colorScheme.primary,
+                            unselectedColor = MaterialTheme.colorScheme.outline
+                        )
                     )
                     if (icon != null) {
                         Icon(
@@ -104,6 +112,7 @@ fun RadioGroupWrap(
                     Text(
                         text = optionText,
                         style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onBackground,
                         modifier = Modifier.padding(start = 6.dp)
                     )
                 }

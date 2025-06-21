@@ -23,7 +23,7 @@ class LoginUseCase @Inject constructor(
             authRepository.login(request).collect{ response ->
                 when(response){
                     is ApiResponse.Success -> {
-                        val role = if (response.data.permissions.contains("UPDATE_PARAMETERS")) "admin" else "customer"
+                        val role = if (response.data.permissions.contains("ADMIN_PREVILAGE")) "admin" else "customer"
                         if(role != BuildConfig.FLAVOR){
                             authRepository.logout(response.data.accessToken)
                             emit(ApiResponse.Failure("App này không hỗ trợ tài khoản này", 403))
