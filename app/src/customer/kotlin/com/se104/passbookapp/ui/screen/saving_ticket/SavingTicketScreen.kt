@@ -18,9 +18,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.NotInterested
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Tag
 import androidx.compose.material.icons.filled.Timer
@@ -47,7 +49,9 @@ import com.se104.passbookapp.ui.screen.components.ChipsGroupWrap
 import com.se104.passbookapp.ui.screen.components.DateRangePickerSample
 import com.se104.passbookapp.ui.screen.components.HeaderDefaultView
 import com.se104.passbookapp.ui.screen.components.LazyPagingSample
+import com.se104.passbookapp.ui.screen.components.Nothing
 import com.se104.passbookapp.ui.screen.components.SearchField
+import com.se104.passbookapp.ui.screen.components.TabWithPager
 import com.se104.passbookapp.utils.StringUtils
 import com.se104.passbookapp.utils.hasPermission
 
@@ -59,14 +63,14 @@ fun SavingTicketScreen(
     permissions: List<String>,
 ) {
 
-    val isStaff by rememberSaveable { mutableStateOf(permissions.hasPermission("VIEW_ALL_SAVINGTICKETS")) }
-
+    val isViewAllTickets by rememberSaveable { mutableStateOf(permissions.hasPermission("VIEW_ALL_SAVINGTICKETS")) }
+    val isViewMyTickets by rememberSaveable { mutableStateOf(permissions.hasPermission("VIEW_MY_SAVINGTICKETS")) }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val savingTickets = remember(uiState.filter) {
-        if (isStaff) {
+        if (isViewAllTickets) {
             viewModel.getSavingTickets(uiState.filter)
-        } else {
+        } else  {
             viewModel.getSavingTicketsForCustomer(uiState.filter)
         }
     }.collectAsLazyPagingItems()
@@ -81,6 +85,9 @@ fun SavingTicketScreen(
                 }
             }
         }
+    }
+    LaunchedEffect(Unit) {
+        viewModel.getActiveSavingTypes()
     }
 
 
@@ -97,7 +104,7 @@ fun SavingTicketScreen(
         SearchField(
             searchInput = uiState.search,
             searchChange = {
-                if (isStaff) viewModel.onAction(
+                if (isViewAllTickets) viewModel.onAction(
                     SavingTicketState.Action.SearchStaff(
                         it
                     )
@@ -133,7 +140,7 @@ fun SavingTicketScreen(
                 else -> "Id"
             },
             switchState = uiState.filter.order == "desc",
-            placeHolder = if (isStaff) "Tìm kiếm theo CCCD" else ""
+            placeHolder = if (isViewAllTickets) "Tìm kiếm theo CCCD" else "Tìm kiếm theo số tiền gửi..."
         )
         DateRangePickerSample(
             modifier = Modifier.width(170.dp),
@@ -166,28 +173,98 @@ fun SavingTicketScreen(
         )
 
 
-
-
-        LazyPagingSample(
-            items = savingTickets,
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
-            textNothing = "Không có phiếu tiết kiệm nào",
-            iconNothing = Icons.Default.CreditCard,
-            columns = 1,
-            key = {
-                it.id
-            },
-        ) {
-            SavingTicketCard(
-                savingTicket = it,
-                onClick = {
-                    viewModel.onAction(SavingTicketState.Action.OnSelectSavingTicket(it))
+        if (isViewAllTickets){
+            TabWithPager(
+                modifier = Modifier.fillMaxWidth().weight(1f),
+                tabs = listOf("Đang hoạt động", "Đã ẩn"),
+                pages = listOf(
+                    {
+                        LazyPagingSample(
+                            items = savingTickets,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f),
+                            textNothing = "Không có phiếu tiết kiệm nào",
+                            iconNothing = Icons.Default.CreditCard,
+                            columns = 1,
+                            key = {
+                                it.id
+                            },
+                        ) {
+                            SavingTicketCard(
+                                savingTicket = it,
+                                onClick = {
+                                    viewModel.onAction(SavingTicketState.Action.OnSelectSavingTicket(it))
+                                },
+                                isStaff = true
+                            )
+                        }
+                    },
+                    {
+                        LazyPagingSample(
+                            items = savingTickets,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f),
+                            textNothing = "Không có phiếu tiết kiệm nào",
+                            iconNothing = Icons.Default.CreditCard,
+                            columns = 1,
+                            key = {
+                                it.id
+                            },
+                        ) {
+                            SavingTicketCard(
+                                savingTicket = it,
+                                onClick = {
+                                    viewModel.onAction(SavingTicketState.Action.OnSelectSavingTicket(it))
+                                },
+                                isStaff = true
+                            )
+                        }
+                    }
+                ),
+                onTabSelected = {
+                    when(it){
+                        0 -> viewModel.onAction(SavingTicketState.Action.OnChangeIsActive(true))
+                        1-> viewModel.onAction(SavingTicketState.Action.OnChangeIsActive(false))
+                    }
                 },
-                isStaff = isStaff
+            )
+        }else if (isViewMyTickets){
+            LazyPagingSample(
+                items = savingTickets,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                textNothing = "Không có phiếu tiết kiệm nào",
+                iconNothing = Icons.Default.CreditCard,
+                columns = 1,
+                key = {
+                    it.id
+                },
+            ) {
+                SavingTicketCard(
+                    savingTicket = it,
+                    onClick = {
+                        viewModel.onAction(SavingTicketState.Action.OnSelectSavingTicket(it))
+                    },
+                    isStaff = false
+                )
+            }
+        }else{
+            Nothing(
+                modifier = Modifier.fillMaxWidth().weight(1f),
+                icon = Icons.Default.NotInterested,
+                text = "Bạn không có quyền truy cập"
             )
         }
+
+
+
+
+
+
+
     }
 
 
@@ -254,7 +331,7 @@ fun SavingTicketDetails(savingTicket: SavingTicket, isStaff: Boolean = false) {
 
             DetailsRow(
                 title = "Ngày tạo",
-                icon = Icons.Default.Timer,
+                icon = Icons.Default.AccessTime,
                 text = StringUtils.formatDateTime(savingTicket.createdAt)!!,
                 titleColor = MaterialTheme.colorScheme.outline,
                 textColor = MaterialTheme.colorScheme.outline

@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -30,6 +31,7 @@ fun <T> CardSample(
         modifier = Modifier
             .fillMaxWidth()
             .padding(12.dp)
+            .clip(MaterialTheme.shapes.extraLarge)
             .clickable {
                 onClick(item)
             },
@@ -79,7 +81,8 @@ fun DetailsRow(
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.SemiBold,
             color = textColor,
-            textAlign = androidx.compose.ui.text.style.TextAlign.End
+            textAlign = androidx.compose.ui.text.style.TextAlign.End,
+            modifier = Modifier.weight(0.5f)
         )
     }
 }

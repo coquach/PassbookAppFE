@@ -122,6 +122,7 @@ class PermissionsSettingViewModel @Inject constructor(
                             )
                         }
                         _event.send(PermissionsSettingState.Event.ShowSuccessToast("Tạo nhóm thành công"))
+                        getGroups()
                     }
 
                     is ApiResponse.Failure -> {
@@ -163,6 +164,7 @@ class PermissionsSettingViewModel @Inject constructor(
                                 errorMessage = null
                             )
                         }
+
                         _event.send(PermissionsSettingState.Event.ShowSuccessToast("Cập nhật nhóm thành công"))
                     }
 
@@ -174,6 +176,7 @@ class PermissionsSettingViewModel @Inject constructor(
                             )
                         }
                         _event.send(PermissionsSettingState.Event.ShowError)
+                        getGroups()
 
                     }
 
@@ -202,6 +205,7 @@ class PermissionsSettingViewModel @Inject constructor(
 
                         }
                         _event.send(PermissionsSettingState.Event.ShowSuccessToast("Xóa nhóm thành công"))
+                        getGroups()
                     }
 
                     is ApiResponse.Failure -> {

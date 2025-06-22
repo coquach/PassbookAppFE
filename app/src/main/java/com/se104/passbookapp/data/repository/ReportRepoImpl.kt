@@ -2,7 +2,6 @@ package com.se104.passbookapp.data.repository
 
 import com.se104.passbookapp.data.dto.ApiResponse
 import com.se104.passbookapp.data.dto.apiRequestFlow
-import com.se104.passbookapp.data.model.DailyReport
 import com.se104.passbookapp.data.model.MonthlyReport
 import com.se104.passbookapp.data.remote.api.ReportApiService
 import com.se104.passbookapp.domain.repository.ReportRepository
@@ -12,12 +11,12 @@ import javax.inject.Inject
 class ReportRepoImpl @Inject constructor(
     private val reportApiService: ReportApiService
 ) : ReportRepository {
-    override fun getDailyReports(
+    override fun getMonthlyReport(
         month: Int,
         year: Int,
-    ): Flow<ApiResponse<List<DailyReport>>> {
+    ): Flow<ApiResponse<MonthlyReport>> {
         return apiRequestFlow {
-            reportApiService.getDailyReports(month, year)
+            reportApiService.getMonthlyReport(month, year)
         }
     }
 

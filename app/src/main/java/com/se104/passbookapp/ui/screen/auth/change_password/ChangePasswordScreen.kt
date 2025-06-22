@@ -161,7 +161,7 @@ fun ChangePasswordScreen(
                 viewModel.onAction(ChangePasswordState.Action.OnChangePassword)
             },
             text = "Xác nhận",
-            enable = !uiState.isLoading
+            enable = uiState.isValid && !uiState.isLoading
         )
     }
 

@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
@@ -46,6 +47,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -373,7 +376,7 @@ fun SavingTypeScreen(
                     )
                     PassbookTextField(
                         readOnly = uiState.savingTypeSelected.duration == 0,
-                        labelText = "Thời hạn",
+                        labelText = "Thời hạn (tháng)",
                         value = uiState.savingTypeSelected.duration.toString(),
                         onValueChange = {
                             viewModel.onAction(SavingTypeState.Action.OnDurationChange(it.toIntOrNull()))
@@ -381,11 +384,17 @@ fun SavingTypeScreen(
                         singleLine = true
                     )
                     PassbookTextField(
-                        labelText = "Lãi suất",
-                        value = uiState.savingTypeSelected.interestRate.toString(),
+                        labelText = "Lãi suất(0.****)",
+                        value = uiState.interestRateInput,
                         onValueChange = {
-                            viewModel.onAction(SavingTypeState.Action.OnInterestRateChange(it.toBigDecimalOrNull()))
+                            if (it.matches(Regex("^\\d*(\\.\\d{0,4})?$"))) {
+                                viewModel.onAction(SavingTypeState.Action.OnInterestRateChange(it))
+                            }
                         },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Decimal,
+                            imeAction = ImeAction.Done
+                        ),
                         singleLine = true
                     )
                     Row(

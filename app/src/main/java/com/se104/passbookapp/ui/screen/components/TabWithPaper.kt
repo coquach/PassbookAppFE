@@ -123,7 +123,8 @@ fun TabWithPager(
                                 if (pagerState.currentPage == index)
                                     MaterialTheme.colorScheme.primary
                                 else
-                                    Color.Transparent
+                                    Color.Transparent,
+                                RoundedCornerShape(32.dp)
                             )
                     )
                 }

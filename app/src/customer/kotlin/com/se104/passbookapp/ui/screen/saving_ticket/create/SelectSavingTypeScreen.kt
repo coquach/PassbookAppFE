@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.MonetizationOn
+import androidx.compose.material.icons.filled.NotInterested
 import androidx.compose.material.icons.filled.Savings
 import androidx.compose.material.icons.filled.Tag
 import androidx.compose.material3.Icon
@@ -25,6 +26,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,13 +42,18 @@ import com.se104.passbookapp.data.model.SavingType
 import com.se104.passbookapp.navigation.CreateSavingTicket
 import com.se104.passbookapp.ui.screen.components.HeaderDefaultView
 import com.se104.passbookapp.ui.screen.components.LoadingAnimation
+import com.se104.passbookapp.ui.screen.components.Nothing
 import com.se104.passbookapp.ui.screen.components.Retry
+import com.se104.passbookapp.utils.hasAllPermissions
+import com.se104.passbookapp.utils.hasPermission
 
 @Composable
 fun SelectSavingTypeScreen(
     navController: NavController,
     viewModel: SelectSavingTypeViewModel = hiltViewModel(),
+    permissions: List<String>
 ) {
+    val isView by rememberSaveable { mutableStateOf(permissions.hasPermission("VIEW_ACTIVE_SAVINGTYPES"))}
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -76,41 +84,50 @@ fun SelectSavingTypeScreen(
                 viewModel.onAction(SelectSavingTypeState.Action.OnBack)
             }
         )
-        when(uiState.savingTypesState){
-            is SelectSavingTypeState.SavingTypes.Loading -> {
-                LoadingAnimation(
-                    modifier = Modifier.fillMaxWidth().weight(1f)
-                )
-            }
-            is SelectSavingTypeState.SavingTypes.Error -> {
-                val message = (uiState.savingTypesState as SelectSavingTypeState.SavingTypes.Error).message
-                Retry(
-                    message = message,
-                    onClicked = {
-                        viewModel.getSavingTypes()
-                    },
-                    modifier = Modifier.fillMaxWidth().weight(1f)
-                )
-            }
-            is SelectSavingTypeState.SavingTypes.Success -> {
-                LazyColumn(
-                    modifier = Modifier.fillMaxWidth().weight(1f),
+        if (isView){
+            when(uiState.savingTypesState){
+                is SelectSavingTypeState.SavingTypes.Loading -> {
+                    LoadingAnimation(
+                        modifier = Modifier.fillMaxWidth().weight(1f)
+                    )
+                }
+                is SelectSavingTypeState.SavingTypes.Error -> {
+                    val message = (uiState.savingTypesState as SelectSavingTypeState.SavingTypes.Error).message
+                    Retry(
+                        message = message,
+                        onClicked = {
+                            viewModel.getSavingTypes()
+                        },
+                        modifier = Modifier.fillMaxWidth().weight(1f)
+                    )
+                }
+                is SelectSavingTypeState.SavingTypes.Success -> {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxWidth().weight(1f),
 
-                    verticalArrangement = Arrangement.Top,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    content = {
-                        items(items= uiState.savingTypes, key = { it.id!!}) {
-                            SavingTypeSection(
-                                savingType = it,
-                                onItemClick = {
-                                    viewModel.onAction(SelectSavingTypeState.Action.OnSelectSavingType(it))
-                                })
+                        verticalArrangement = Arrangement.Top,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        content = {
+                            items(items= uiState.savingTypes, key = { it.id!!}) {
+                                SavingTypeSection(
+                                    savingType = it,
+                                    onItemClick = {
+                                        viewModel.onAction(SelectSavingTypeState.Action.OnSelectSavingType(it))
+                                    })
+                            }
                         }
-                    }
-                )
-            }
+                    )
+                }
 
+            }
+        } else{
+            Nothing(
+                modifier = Modifier.fillMaxWidth().weight(1f),
+                icon = Icons.Default.NotInterested,
+                text = "Bạn không có quyền truy cập"
+            )
         }
+
 
     }
 }

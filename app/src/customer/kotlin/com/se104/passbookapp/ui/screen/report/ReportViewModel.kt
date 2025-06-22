@@ -3,12 +3,12 @@ package com.se104.passbookapp.ui.screen.report
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.se104.passbookapp.data.dto.ApiResponse
-import com.se104.passbookapp.data.model.DailyReport
 import com.se104.passbookapp.data.model.MonthlyReport
 import com.se104.passbookapp.domain.repository.ReportRepository
-import com.se104.passbookapp.ui.screen.report.ReportState.DailyReportState
-import com.se104.passbookapp.ui.screen.report.ReportState.Event.*
+import com.se104.passbookapp.ui.screen.report.ReportState.Event.OnBack
+import com.se104.passbookapp.ui.screen.report.ReportState.Event.ShowErrorToast
 import com.se104.passbookapp.ui.screen.report.ReportState.MonthlyReportState
+import com.se104.passbookapp.ui.screen.report.ReportState.MonthlyReportsState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -56,13 +56,13 @@ class ReportViewModel @Inject constructor(
             ).collect { result ->
                 when (result) {
                     is ApiResponse.Loading -> {
-                        _uiState.update { it.copy(monthlyReportState = MonthlyReportState.Loading) }
+                        _uiState.update { it.copy(monthlyReportsState = MonthlyReportsState.Loading) }
                     }
 
                     is ApiResponse.Success -> {
                         _uiState.update {
                             it.copy(
-                                monthlyReportState = MonthlyReportState.Success,
+                                monthlyReportsState = MonthlyReportsState.Success,
                                 monthlyReports = result.data
                             )
                         }
@@ -71,7 +71,7 @@ class ReportViewModel @Inject constructor(
                     is ApiResponse.Failure -> {
                         _uiState.update {
                             it.copy(
-                                monthlyReportState = MonthlyReportState.Error(
+                                monthlyReportsState = MonthlyReportsState.Error(
                                     result.errorMessage
                                 )
                             )
@@ -83,20 +83,19 @@ class ReportViewModel @Inject constructor(
         }
     }
 
-    fun getDailyReports() {
+    fun getMonthlyReport() {
         viewModelScope.launch {
-            reportRepository.getDailyReports(year = _uiState.value.selectedYear, month = _uiState.value.selectedMonth +1)
+            reportRepository.getMonthlyReport(year = _uiState.value.selectedYear, month = _uiState.value.selectedMonth)
                 .collect { result ->
                     when (result) {
                         is ApiResponse.Loading -> {
-                            _uiState.update { it.copy(dailyReportState = DailyReportState.Loading) }
+                            _uiState.update { it.copy(monthlyReportState = MonthlyReportState.Loading) }
                         }
 
                         is ApiResponse.Success -> {
                             _uiState.update {
                                 it.copy(
-                                    dailyReportState = DailyReportState.Success,
-                                    dailyReports = result.data
+                                    monthlyReportState = MonthlyReportState.Success(result.data),
                                 )
                             }
                         }
@@ -104,7 +103,7 @@ class ReportViewModel @Inject constructor(
                         is ApiResponse.Failure -> {
                             _uiState.update {
                                 it.copy(
-                                    dailyReportState = DailyReportState.Error(
+                                    monthlyReportState = MonthlyReportState.Error(
                                         result.errorMessage
                                     )
                                 )
@@ -120,7 +119,7 @@ class ReportViewModel @Inject constructor(
     fun onAction(action: ReportState.Action) {
         when (action) {
             is ReportState.Action.OnChangeFromMonthYear -> {
-                if (action.year <= _uiState.value.toYear && action.month <= _uiState.value.toMonth) {
+                if (isMonthYearBeforeOrEqual(action.year, action.month, _uiState.value.toYear, _uiState.value.toMonth)) {
                     _uiState.update { it.copy(fromMonth = action.month, fromYear = action.year) }
                     getMonthlyReports()
                 } else {
@@ -132,14 +131,17 @@ class ReportViewModel @Inject constructor(
             }
 
             is ReportState.Action.OnChangeToMonthYear -> {
-                if (action.year >= _uiState.value.fromYear && action.month >= _uiState.value.fromMonth && action.year <= Calendar.getInstance()
-                        .get(Calendar.YEAR) && action.month <= Calendar.getInstance()
-                        .get(Calendar.MONTH) + 1
-                ){
+                val now = Calendar.getInstance()
+                val currentYear = now.get(Calendar.YEAR)
+                val currentMonth = now.get(Calendar.MONTH) + 1 // vì Calendar.MONTH bắt đầu từ 0
+
+                if (
+                    isMonthYearAfterOrEqual(action.year, action.month, _uiState.value.fromYear, _uiState.value.fromMonth) &&
+                    isMonthYearBeforeOrEqual(action.year, action.month, currentYear, currentMonth)
+                ) {
                     _uiState.update { it.copy(toMonth = action.month, toYear = action.year) }
                     getMonthlyReports()
-                }
-                else {
+                } else {
                     viewModelScope.launch {
                         _event.send(ShowErrorToast("Thời gian không hợp lệ"))
                     }
@@ -148,21 +150,19 @@ class ReportViewModel @Inject constructor(
 
             is ReportState.Action.OnChangeSelectedMonthYear -> {
                 val (newMonth, newYear) = adjustMonthYear(action.month, action.year)
-                if (newYear <= Calendar.getInstance()
-                        .get(Calendar.YEAR) && newMonth <= Calendar.getInstance()
-                        .get(Calendar.MONTH) + 1
-                ){
+                val now = Calendar.getInstance()
+                val nowMonth = now.get(Calendar.MONTH) + 1
+                val nowYear = now.get(Calendar.YEAR)
 
+                if (isMonthYearBeforeOrEqual(newYear, newMonth, nowYear, nowMonth)) {
                     _uiState.update {
                         it.copy(
                             selectedMonth = newMonth,
                             selectedYear = newYear
                         )
                     }
-                    getDailyReports()
-                }
-
-                else {
+                    getMonthlyReport()
+                } else {
                     viewModelScope.launch {
                         _event.send(ShowErrorToast("Thời gian vượt hiện tại"))
                     }
@@ -170,13 +170,6 @@ class ReportViewModel @Inject constructor(
             }
 
 
-            ReportState.Action.GetDailyReport -> {
-                getDailyReports()
-            }
-
-            ReportState.Action.GetMonthlyReport -> {
-                getMonthlyReports()
-            }
             ReportState.Action.OnBack -> {
                 viewModelScope.launch {
                     _event.send(OnBack)
@@ -191,30 +184,29 @@ class ReportViewModel @Inject constructor(
 object ReportState {
     data class UiState(
         val monthlyReports: List<MonthlyReport> = emptyList(),
+        val monthlyReportsState: MonthlyReportsState = MonthlyReportsState.Loading,
         val monthlyReportState: MonthlyReportState = MonthlyReportState.Loading,
-        val dailyReports: List<DailyReport> = emptyList(),
-        val dailyReportState: DailyReportState = DailyReportState.Loading,
         val fromMonth: Int,
         val fromYear: Int,
         val toMonth: Int,
         val toYear: Int,
-        val selectedMonth: Int = Calendar.getInstance().get(Calendar.MONTH),
+        val selectedMonth: Int = Calendar.getInstance().get(Calendar.MONTH) + 1,
         val selectedYear: Int = Calendar.getInstance().get(Calendar.YEAR),
 
 
         )
 
-    sealed interface MonthlyReportState {
-        data object Loading : MonthlyReportState
-        data class Error(val message: String) : MonthlyReportState
-        data object Success : MonthlyReportState
+    sealed interface MonthlyReportsState {
+        data object Loading : MonthlyReportsState
+        data class Error(val message: String) : MonthlyReportsState
+        data object Success : MonthlyReportsState
 
     }
 
-    sealed interface DailyReportState {
-        data object Loading : DailyReportState
-        data class Error(val message: String) : DailyReportState
-        data object Success : DailyReportState
+    sealed interface MonthlyReportState {
+        data object Loading : MonthlyReportState
+        data class Error(val message: String) : MonthlyReportState
+        data class Success(val data: MonthlyReport) : MonthlyReportState
     }
 
 
@@ -229,8 +221,6 @@ object ReportState {
         data class OnChangeFromMonthYear(val year: Int, val month: Int) : Action
         data class OnChangeToMonthYear(val year: Int, val month: Int) : Action
         data class OnChangeSelectedMonthYear(val year: Int, val month: Int) : Action
-        data object GetMonthlyReport : Action
-        data object GetDailyReport : Action
         data object OnBack: Action
 
 
@@ -243,14 +233,22 @@ fun adjustMonthYear(currentMonth: Int, currentYear: Int): Pair<Int, Int> {
 
     // Lùi hoặc tiến nhiều tháng
     while (newMonth < 1) {
-        newMonth += 11
+        newMonth += 12
         newYear -= 1
     }
 
     while (newMonth > 12) {
-        newMonth -= 11
+        newMonth -= 12
         newYear += 1
     }
 
     return newMonth to newYear
+}
+
+fun isMonthYearBeforeOrEqual(y1: Int, m1: Int, y2: Int, m2: Int): Boolean {
+    return y1 < y2 || (y1 == y2 && m1 <= m2)
+}
+
+fun isMonthYearAfterOrEqual(y1: Int, m1: Int, y2: Int, m2: Int): Boolean {
+    return y1 > y2 || (y1 == y2 && m1 >= m2)
 }
