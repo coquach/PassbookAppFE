@@ -78,10 +78,10 @@ class SignUpViewModel @Inject constructor(
 
         var passwordError: String? = current.passwordError
         var confirmPasswordError: String? = current.confirmPasswordError
-        var number: String? = current.phoneNumberError
-        var fullName: String? = current.fullNameError
-        var address: String? = current.addressError
-        var citizenId: String? = current.citizenIdError
+        var phoneNumberError: String? = current.phoneNumberError
+        var fullNameError: String? = current.fullNameError
+        var addressError: String? = current.addressError
+        var citizenIdError: String? = current.citizenIdError
 
         when (type) {
 
@@ -102,40 +102,44 @@ class SignUpViewModel @Inject constructor(
             }
 
             "phoneNumber" -> {
-                number = validateField(
+                phoneNumberError = validateField(
                     current.phoneNumber.trim(),
                     "Số điện thoại không hợp lệ"
-                ) { it.matches(Regex("^(0|\\+84)(\\s|\\.)?((3[2-9])|(5[689])|(7[06-9])|(8[1-689])|(9[0-9]))(\\s|\\.)?[0-9]{3}(\\s|\\.)?[0-9]{3}$")) }
+                ) { it.matches(Regex("^0\\d{9}\$")) }
             }
 
             "fullName" -> {
-                fullName = validateField(
+                fullNameError = validateField(
                     current.fullName.trim(),
                     "Họ tên không hợp lệ"
                 ) { it.matches(Regex("^[a-zA-Z\\s]+$")) }
             }
 
             "address" -> {
-                address = validateField(
+                addressError = validateField(
                     current.address.trim(),
                     "Địa chỉ không hợp lệ"
                 ) { it.matches(Regex("^[\\p{L}0-9\\s,.\\-\\/()]+\$")) }
             }
 
             "citizenId" -> {
-                citizenId = validateField(
+                citizenIdError = validateField(
                     current.citizenId.trim(),
                     "CCCD không hợp lệ"
                 ) { it.matches(Regex("^0(?!0{11}\$)[0-9]{11}\$")) }
             }
 
         }
-        val isValid =  current.password.isNotBlank() && current.confirmPassword.isNotBlank() && current.phoneNumber.isNotBlank() && current.fullName.isNotBlank() && current.address.isNotBlank() && current.citizenId.isNotBlank()
-            passwordError == null && confirmPasswordError == null && number == null && fullName == null && address == null && citizenId == null
+        val isValid = current.password.isNotBlank() && current.confirmPassword.isNotBlank() && current.phoneNumber.isNotBlank() && current.fullName.isNotBlank() && current.address.isNotBlank() && current.citizenId.isNotBlank()
+            passwordError == null && confirmPasswordError == null && phoneNumberError == null && fullNameError == null && addressError == null && citizenIdError == null
         _uiState.update {
             it.copy(
                 passwordError = passwordError,
                 confirmPasswordError = confirmPasswordError,
+                phoneNumberError = phoneNumberError,
+                fullNameError = fullNameError,
+                addressError = addressError,
+                citizenIdError = citizenIdError,
                 isValid = isValid
             )
         }

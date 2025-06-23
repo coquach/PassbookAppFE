@@ -166,6 +166,7 @@ class PermissionsSettingViewModel @Inject constructor(
                         }
 
                         _event.send(PermissionsSettingState.Event.ShowSuccessToast("Cập nhật nhóm thành công"))
+                        getGroups()
                     }
 
                     is ApiResponse.Failure -> {

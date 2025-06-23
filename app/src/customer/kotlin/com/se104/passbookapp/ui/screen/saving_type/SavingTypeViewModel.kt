@@ -291,8 +291,8 @@ class SavingTypeViewModel @Inject constructor(
             }
 
             is SavingTypeState.Action.OnInterestRateChange -> {
+                val parsed = action.interestRate.toBigDecimalOrNull()
                 _uiState.update {
-                    val parsed = action.interestRate.toBigDecimalOrNull()
                     it.copy(
                         interestRateInput = action.interestRate,
                         savingTypeSelected = it.savingTypeSelected.copy(

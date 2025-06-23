@@ -82,7 +82,6 @@ fun DetailsRow(
             fontWeight = FontWeight.SemiBold,
             color = textColor,
             textAlign = androidx.compose.ui.text.style.TextAlign.End,
-            modifier = Modifier.weight(0.5f)
         )
     }
 }

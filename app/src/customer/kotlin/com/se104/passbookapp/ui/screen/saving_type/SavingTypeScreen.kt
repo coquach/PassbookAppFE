@@ -68,6 +68,7 @@ import com.se104.passbookapp.ui.screen.components.PassbookAppDialog
 import com.se104.passbookapp.ui.screen.components.Retry
 import com.se104.passbookapp.ui.screen.components.TabWithPager
 import com.se104.passbookapp.ui.screen.components.text_field.PassbookTextField
+import com.se104.passbookapp.ui.screen.saving_ticket.SavingTicketState
 import com.se104.passbookapp.ui.theme.confirm
 import com.se104.passbookapp.utils.hasAllPermissions
 import com.se104.passbookapp.utils.hasPermission
@@ -134,6 +135,7 @@ fun SavingTypeScreen(
                 onClick = {
                     if(isModify){
                         viewModel.onAction(SavingTypeState.Action.OnSelectedSavingType(SavingType()))
+                        viewModel.onAction(SavingTypeState.Action.OnInterestRateChange(uiState.savingTypeSelected.interestRate.toPlainString()))
                         viewModel.onAction(SavingTypeState.Action.OnUpdateStatus(false))
                         showDialogUpdate = true
                     }else{
@@ -203,6 +205,7 @@ fun SavingTypeScreen(
                                         onClick = {
                                             viewModel.onAction(SavingTypeState.Action.OnSelectedSavingType(it))
                                             viewModel.onAction(SavingTypeState.Action.OnUpdateStatus(true))
+
                                             showDialogUpdate = true
                                         },
                                         startAction = { it ->
@@ -267,6 +270,7 @@ fun SavingTypeScreen(
                                         savingTypes = uiState.inactiveSavingTypes,
                                         onClick = {
                                             viewModel.onAction(SavingTypeState.Action.OnSelectedSavingType(it))
+                                            viewModel.onAction(SavingTypeState.Action.OnInterestRateChange(uiState.savingTypeSelected.interestRate.toPlainString()))
                                             viewModel.onAction(SavingTypeState.Action.OnUpdateStatus(true))
                                             showDialogUpdate = true
                                         },
@@ -375,7 +379,6 @@ fun SavingTypeScreen(
                         singleLine = true
                     )
                     PassbookTextField(
-                        readOnly = uiState.savingTypeSelected.duration == 0,
                         labelText = "Thời hạn (tháng)",
                         value = uiState.savingTypeSelected.duration.toString(),
                         onValueChange = {
@@ -384,7 +387,7 @@ fun SavingTypeScreen(
                         singleLine = true
                     )
                     PassbookTextField(
-                        labelText = "Lãi suất(0.****)",
+                        labelText = "Lãi suất (0.****)",
                         value = uiState.interestRateInput,
                         onValueChange = {
                             if (it.matches(Regex("^\\d*(\\.\\d{0,4})?$"))) {

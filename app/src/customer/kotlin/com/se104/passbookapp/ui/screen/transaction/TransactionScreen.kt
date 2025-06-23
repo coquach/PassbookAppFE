@@ -48,6 +48,7 @@ fun TransactionScreen(
     permissions: List<String>,
 ) {
     val isStaff by rememberSaveable { mutableStateOf(permissions.hasPermission("VIEW_ALL_TRANSACTIONS")) }
+    val isViewMyTransaction by rememberSaveable { mutableStateOf(permissions.hasPermission("VIEW_MY_TRANSACTIONS")) }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val transactions = remember(uiState.filter) {
         if (isStaff) {
@@ -124,7 +125,23 @@ fun TransactionScreen(
             ) {
                 TransactionDetails(transaction = it, isStaff = isStaff)
             }
-        }else{
+        }else if(isViewMyTransaction){
+            LazyPagingSample(
+                items = transactions,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                textNothing = "Không có giao dịch nào",
+                iconNothing = Icons.Default.CurrencyExchange,
+                columns = 1,
+                key = {
+                    it.id
+                },
+            ) {
+                TransactionDetails(transaction = it, isStaff = isStaff)
+            }
+        }
+        else{
             Nothing(
                 modifier = Modifier.fillMaxWidth().weight(1f),
                 icon = Icons.Default.NotInterested,
