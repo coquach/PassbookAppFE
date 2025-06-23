@@ -2,6 +2,7 @@ package com.se104.passbookapp.ui.screen.components.text_field
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
@@ -16,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -32,6 +34,7 @@ fun PasswordTextField(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     maxLines: Int = 1,
 ){
+    val focusManager = LocalFocusManager.current
     var showPassword by remember { mutableStateOf(false) }
     var isTouched by remember { mutableStateOf(false) }
     PassbookTextField(
@@ -43,7 +46,7 @@ fun PasswordTextField(
         labelText = label,
         isError = errorMessage != null,
         errorText = errorMessage,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .onFocusChanged { focusState ->
                 if (isTouched && !focusState.isFocused) {
@@ -77,6 +80,12 @@ fun PasswordTextField(
             }
         },
         keyboardOptions = keyboardOptions,
+        keyboardActions = KeyboardActions(
+            onDone = {
+                focusManager.clearFocus()
+                validate()
+            }
+        ),
         singleLine = false,
         maxLines = maxLines
     )

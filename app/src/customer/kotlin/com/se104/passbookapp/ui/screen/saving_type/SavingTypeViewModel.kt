@@ -291,10 +291,12 @@ class SavingTypeViewModel @Inject constructor(
             }
 
             is SavingTypeState.Action.OnInterestRateChange -> {
+                val parsed = action.interestRate.toBigDecimalOrNull()
                 _uiState.update {
                     it.copy(
+                        interestRateInput = action.interestRate,
                         savingTypeSelected = it.savingTypeSelected.copy(
-                            interestRate = action.interestRate ?: BigDecimal.ZERO
+                            interestRate = parsed ?: BigDecimal.ZERO
                         )
                     )
                 }
@@ -349,6 +351,7 @@ object SavingTypeState {
         val errorMessage: String? = null,
         val isUpdate: Boolean = false,
         val isHide: Boolean = false,
+        val interestRateInput: String ="",
     )
 
     sealed interface ActiveSavingTypeList {
@@ -378,7 +381,7 @@ object SavingTypeState {
         data class OnSetActiveSavingType(val isActive: Boolean) : Action
         data class OnTypeNameChange(val name: String) : Action
         data class OnDurationChange(val duration: Int?) : Action
-        data class OnInterestRateChange(val interestRate: BigDecimal?) : Action
+        data class OnInterestRateChange(val interestRate: String) : Action
         data class OnSelectedSavingType(val savingType: SavingType) : Action
         data object Refresh : Action
         data class OnUpdateStatus(val isUpdate: Boolean) : Action

@@ -1,7 +1,6 @@
 package com.se104.passbookapp.data.remote.api
 
 
-import com.se104.passbookapp.data.model.DailyReport
 import com.se104.passbookapp.data.model.MonthlyReport
 import retrofit2.Response
 import retrofit2.http.GET
@@ -12,13 +11,13 @@ interface ReportApiService {
         const val PR = "reports"
     }
 
-    @GET("$PR/daily")
-    suspend fun getDailyReports(
+    @GET("$PR/monthly")
+    suspend fun getMonthlyReport(
         @Query("month") month: Int,
         @Query("year") year: Int
-    ): Response<List<DailyReport>>
+    ): Response<MonthlyReport>
 
-    @GET("$PR/monthly")
+    @GET("$PR/list-month")
     suspend fun getMonthlyReports(
         @Query("fromYear") fromYear: Int,
         @Query("fromMonth") fromMonth: Int,

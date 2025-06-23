@@ -313,12 +313,8 @@ fun WithDrawTicketList(
                 withDrawTickets, key = { it -> it.id },
             ) {
                 WithDrawTicketCard(withDrawTicket = it)
-
             }
-
         }
-
-
     }
 }
 
@@ -329,7 +325,7 @@ fun WithDrawTicketCard(withDrawTicket: WithdrawalTicket) {
         modifier = Modifier
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.medium)
-            .background(MaterialTheme.colorScheme.inversePrimary, MaterialTheme.shapes.medium)
+            .background(MaterialTheme.colorScheme.secondaryContainer, MaterialTheme.shapes.medium)
             .padding(12.dp),
     ) {
         Column(

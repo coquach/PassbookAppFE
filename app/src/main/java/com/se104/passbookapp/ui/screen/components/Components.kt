@@ -367,7 +367,7 @@ fun PassbookAppDialog(
             )
         },
         text = { Text(text = message, fontSize = 16.sp, color = messageColor, lineHeight = 24.sp) },
-        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+        containerColor = MaterialTheme.colorScheme.background,
         confirmButton = {
             if (showConfirmButton) {
                 AppButton(

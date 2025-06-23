@@ -12,12 +12,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.AttachMoney
-import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.CurrencyExchange
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Description
-import androidx.compose.material.icons.filled.MonetizationOn
 import androidx.compose.material.icons.filled.MoneyOff
+import androidx.compose.material.icons.filled.NotInterested
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Tag
 import androidx.compose.material3.MaterialTheme
@@ -38,6 +36,7 @@ import com.se104.passbookapp.data.model.enums.TransactionType
 import com.se104.passbookapp.ui.screen.components.DateRangePickerSample
 import com.se104.passbookapp.ui.screen.components.HeaderDefaultView
 import com.se104.passbookapp.ui.screen.components.LazyPagingSample
+import com.se104.passbookapp.ui.screen.components.Nothing
 import com.se104.passbookapp.ui.screen.components.SearchField
 import com.se104.passbookapp.ui.theme.confirm
 import com.se104.passbookapp.utils.StringUtils
@@ -49,6 +48,7 @@ fun TransactionScreen(
     permissions: List<String>,
 ) {
     val isStaff by rememberSaveable { mutableStateOf(permissions.hasPermission("VIEW_ALL_TRANSACTIONS")) }
+    val isViewMyTransaction by rememberSaveable { mutableStateOf(permissions.hasPermission("VIEW_MY_TRANSACTIONS")) }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val transactions = remember(uiState.filter) {
         if (isStaff) {
@@ -98,7 +98,7 @@ fun TransactionScreen(
                     "createdAt" -> "Thời gian"
                     else -> ""
                 },
-            placeHolder = if (isStaff) "Tìm kiếm theo CCCD.." else "Tìm kiếm"
+            placeHolder = if (isStaff) "Tìm kiếm theo CCCD.." else "Tìm kiếm theo lượng giao dịch..."
         )
         DateRangePickerSample(
             modifier = Modifier.width(170.dp),
@@ -110,20 +110,45 @@ fun TransactionScreen(
             startDate = uiState.filter.startDate,
             endDate = uiState.filter.endDate,
         )
-        LazyPagingSample(
-            items = transactions,
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
-            textNothing = "Không có giao dịch nào",
-            iconNothing = Icons.Default.CurrencyExchange,
-            columns = 1,
-            key = {
-                it.id
-            },
-        ) {
-            TransactionDetails(transaction = it, isStaff = isStaff)
+        if(isStaff){
+            LazyPagingSample(
+                items = transactions,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                textNothing = "Không có giao dịch nào",
+                iconNothing = Icons.Default.CurrencyExchange,
+                columns = 1,
+                key = {
+                    it.id
+                },
+            ) {
+                TransactionDetails(transaction = it, isStaff = isStaff)
+            }
+        }else if(isViewMyTransaction){
+            LazyPagingSample(
+                items = transactions,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                textNothing = "Không có giao dịch nào",
+                iconNothing = Icons.Default.CurrencyExchange,
+                columns = 1,
+                key = {
+                    it.id
+                },
+            ) {
+                TransactionDetails(transaction = it, isStaff = isStaff)
+            }
         }
+        else{
+            Nothing(
+                modifier = Modifier.fillMaxWidth().weight(1f),
+                icon = Icons.Default.NotInterested,
+                text = "Bạn không có quyền truy cập"
+            )
+        }
+
     }
 }
 

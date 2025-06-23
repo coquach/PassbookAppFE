@@ -199,7 +199,7 @@ fun UserDetailsScreen(
 
             ) {
                 Column(
-                    modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
@@ -220,7 +220,8 @@ fun UserDetailsScreen(
                                 MaterialTheme.colorScheme.background,
                                 MaterialTheme.shapes.extraLarge
                             )
-                            .padding(12.dp),
+                            .padding(12.dp)
+                            .verticalScroll(rememberScrollState()),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(12.dp)
 

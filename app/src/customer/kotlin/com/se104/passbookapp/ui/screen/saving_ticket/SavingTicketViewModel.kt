@@ -46,16 +46,13 @@ class SavingTicketViewModel @Inject constructor(
     val event = _event.receiveAsFlow()
 
 
-    init {
-        getActiveSavingTypes()
-    }
     fun getSavingTickets(filter: SavingTicketFilter): Flow<PagingData<SavingTicket>> =
         getSavingTicketsUseCase(filter)
 
     fun getSavingTicketsForCustomer(filter: SavingTicketFilter): Flow<PagingData<SavingTicket>> =
         getSavingTicketsForCustomerUseCase(filter)
 
-    private fun getActiveSavingTypes() {
+    fun getActiveSavingTypes() {
         viewModelScope.launch {
             getActiveSavingTypesUseCase().collect { response ->
                 when (response) {
@@ -92,7 +89,14 @@ class SavingTicketViewModel @Inject constructor(
         when (action) {
             is SavingTicketState.Action.SearchCustomer -> {
                 _uiState.update {
-                    it.copy(search = action.search, filter = it.filter.copy(amount = if (action.search.isBlank()) BigDecimal.ZERO else BigDecimal(action.search)))
+                    it.copy(
+                        search = action.search,
+                        filter = it.filter.copy(
+                            amount = if (action.search.isBlank()) BigDecimal.ZERO else BigDecimal(
+                                action.search
+                            )
+                        )
+                    )
                 }
             }
 
@@ -140,12 +144,23 @@ class SavingTicketViewModel @Inject constructor(
                     )
                 }
             }
+
             is SavingTicketState.Action.OnChangeSavingType -> {
                 _uiState.update {
                     it.copy(
                         savingTypeName = action.name,
                         filter = it.filter.copy(savingTypeId = action.id)
-                    )}}
+                    )
+                }
+            }
+
+            is SavingTicketState.Action.OnChangeIsActive -> {
+                _uiState.update {
+                    it.copy(
+                        filter = it.filter.copy(isActive = action.isActive)
+                    )
+                }
+            }
         }
     }
 
@@ -156,7 +171,7 @@ object SavingTicketState {
     data class UiState(
 
         val search: String = "",
-        val savingTypeName: String?=null,
+        val savingTypeName: String? = null,
         val filter: SavingTicketFilter,
         val savingTypeState: SavingTypeState = SavingTypeState.Loading,
         val savingTypes: List<SavingType> = emptyList(),
@@ -180,6 +195,6 @@ object SavingTicketState {
         data class OnChangeSortBy(val sortBy: String) : Action
         data class OnSelectSavingTicket(val savingTicket: SavingTicket) : Action
         data class OnChangeSavingType(val id: Long, val name: String) : Action
-
+        data class OnChangeIsActive(val isActive: Boolean) : Action
     }
 }

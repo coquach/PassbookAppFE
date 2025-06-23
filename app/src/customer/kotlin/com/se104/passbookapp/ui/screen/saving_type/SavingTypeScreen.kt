@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
@@ -46,6 +47,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -65,6 +68,7 @@ import com.se104.passbookapp.ui.screen.components.PassbookAppDialog
 import com.se104.passbookapp.ui.screen.components.Retry
 import com.se104.passbookapp.ui.screen.components.TabWithPager
 import com.se104.passbookapp.ui.screen.components.text_field.PassbookTextField
+import com.se104.passbookapp.ui.screen.saving_ticket.SavingTicketState
 import com.se104.passbookapp.ui.theme.confirm
 import com.se104.passbookapp.utils.hasAllPermissions
 import com.se104.passbookapp.utils.hasPermission
@@ -131,6 +135,7 @@ fun SavingTypeScreen(
                 onClick = {
                     if(isModify){
                         viewModel.onAction(SavingTypeState.Action.OnSelectedSavingType(SavingType()))
+                        viewModel.onAction(SavingTypeState.Action.OnInterestRateChange(uiState.savingTypeSelected.interestRate.toPlainString()))
                         viewModel.onAction(SavingTypeState.Action.OnUpdateStatus(false))
                         showDialogUpdate = true
                     }else{
@@ -200,6 +205,7 @@ fun SavingTypeScreen(
                                         onClick = {
                                             viewModel.onAction(SavingTypeState.Action.OnSelectedSavingType(it))
                                             viewModel.onAction(SavingTypeState.Action.OnUpdateStatus(true))
+
                                             showDialogUpdate = true
                                         },
                                         startAction = { it ->
@@ -264,6 +270,7 @@ fun SavingTypeScreen(
                                         savingTypes = uiState.inactiveSavingTypes,
                                         onClick = {
                                             viewModel.onAction(SavingTypeState.Action.OnSelectedSavingType(it))
+                                            viewModel.onAction(SavingTypeState.Action.OnInterestRateChange(uiState.savingTypeSelected.interestRate.toPlainString()))
                                             viewModel.onAction(SavingTypeState.Action.OnUpdateStatus(true))
                                             showDialogUpdate = true
                                         },
@@ -372,8 +379,7 @@ fun SavingTypeScreen(
                         singleLine = true
                     )
                     PassbookTextField(
-                        readOnly = uiState.savingTypeSelected.duration == 0,
-                        labelText = "Thời hạn",
+                        labelText = "Thời hạn (tháng)",
                         value = uiState.savingTypeSelected.duration.toString(),
                         onValueChange = {
                             viewModel.onAction(SavingTypeState.Action.OnDurationChange(it.toIntOrNull()))
@@ -381,11 +387,17 @@ fun SavingTypeScreen(
                         singleLine = true
                     )
                     PassbookTextField(
-                        labelText = "Lãi suất",
-                        value = uiState.savingTypeSelected.interestRate.toString(),
+                        labelText = "Lãi suất (0.****)",
+                        value = uiState.interestRateInput,
                         onValueChange = {
-                            viewModel.onAction(SavingTypeState.Action.OnInterestRateChange(it.toBigDecimalOrNull()))
+                            if (it.matches(Regex("^\\d*(\\.\\d{0,4})?$"))) {
+                                viewModel.onAction(SavingTypeState.Action.OnInterestRateChange(it))
+                            }
                         },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Decimal,
+                            imeAction = ImeAction.Done
+                        ),
                         singleLine = true
                     )
                     Row(

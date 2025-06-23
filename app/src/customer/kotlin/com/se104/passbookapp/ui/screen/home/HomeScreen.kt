@@ -15,9 +15,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AppSettingsAlt
 import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.CurrencyExchange
 import androidx.compose.material.icons.filled.MoneyOff
+import androidx.compose.material.icons.filled.NotInterested
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Tag
@@ -58,6 +60,7 @@ import com.se104.passbookapp.ui.screen.components.ErrorModalBottomSheet
 import com.se104.passbookapp.ui.screen.components.IconCustomButton
 import com.se104.passbookapp.ui.screen.components.LazyPagingSample
 import com.se104.passbookapp.ui.screen.components.LoadingAnimation
+import com.se104.passbookapp.ui.screen.components.Nothing
 import com.se104.passbookapp.ui.screen.components.Retry
 import com.se104.passbookapp.ui.screen.components.SearchField
 import com.se104.passbookapp.ui.screen.components.TabWithPager
@@ -236,6 +239,11 @@ fun HomeScreen(
                                     user = user,
                                     enabled = isTransaction
                                 )
+                        Nothing(
+                            modifier = Modifier.fillMaxWidth().weight(1f),
+                            icon = Icons.Default.AppSettingsAlt,
+                            text = "Tính năng mới sẽ sớm được ra mắt ..."
+                        )
 
 
                     }
@@ -453,7 +461,7 @@ fun UserSection(
                 )
                 DetailsRow(
                     text = user.citizenID,
-                    title = "Mã CCCD",
+                    title = "CCCD",
                     icon = Icons.Default.Tag,
                 )
             }

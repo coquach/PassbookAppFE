@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.DriveFileRenameOutline
 import androidx.compose.material.icons.filled.NotInterested
 import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.Tag
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -244,7 +245,7 @@ fun PermissionsSettingScreen(
             onConfirm = {
                 viewModel.onAction(PermissionsSettingState.Action.OnDeleteGroup)
                 showDialogDelete = false
-                viewModel.getGroups()
+
             },
             confirmText = "Xóa",
             dismissText = "Đóng",
@@ -306,14 +307,14 @@ fun PermissionsSettingScreen(
                                     )
                                 )
                             },
-                            labelText = "Tên nhóm",
+                            labelText = "Mã nhóm",
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardOptions.Default.keyboardType,
                                 imeAction = ImeAction.Next
                             )
                         )
                         PassbookTextField(
-                            labelText = "Mô tả",
+                            labelText = "Tên nhóm",
                             value = uiState.groupSelected.description,
                             onValueChange = {
                                 viewModel.onAction(
@@ -375,6 +376,7 @@ fun PermissionsSettingScreen(
                             onClick = {
                                 if (uiState.isUpdate) viewModel.onAction(PermissionsSettingState.Action.OnUpdateGroup) else
                                     viewModel.onAction(PermissionsSettingState.Action.OnCreateGroup)
+                                showDialogUpdate = false
                             },
                             enable = uiState.groupSelected.name.isNotBlank() && uiState.groupSelected.description.isNotBlank() && uiState.groupSelected.permissions.isNotEmpty() && !uiState.isLoading
                         )
@@ -462,9 +464,9 @@ fun GroupSection(
             horizontalAlignment = Alignment.Start
         ) {
             DetailsRow(
-                title = "Tên nhóm",
+                title = "Mã nhóm",
                 text = group.name,
-                icon = Icons.Default.DriveFileRenameOutline,
+                icon = Icons.Default.Tag,
                 titleColor = MaterialTheme.colorScheme.primary,
                 textColor = MaterialTheme.colorScheme.primary
 
@@ -472,8 +474,8 @@ fun GroupSection(
 
             DetailsRow(
                 text = group.description,
-                icon = Icons.Default.Description,
-                title = "Mô tả",
+                icon = Icons.Default.DriveFileRenameOutline,
+                title = "Tên nhóm",
                 titleColor = MaterialTheme.colorScheme.outline,
                 textColor = MaterialTheme.colorScheme.onBackground
 

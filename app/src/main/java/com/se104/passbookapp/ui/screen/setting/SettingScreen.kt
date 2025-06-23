@@ -124,7 +124,7 @@ fun SettingScreen(
                         viewModel.onAction(SettingState.Action.OnClickProfile)
                     })
 
-                    if (permissions.contains("CREATE_SAVINGTYPE")) {
+                    if (permissions.contains("VIEW_INACTIVE_SAVINGTYPES")) {
                         SettingItem(Icons.Default.Savings, "Loại tiết kiệm", onClick = {
                             viewModel.onAction(SettingState.Action.OnClickSavingType)
                         })

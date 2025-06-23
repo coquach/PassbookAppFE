@@ -110,7 +110,7 @@ fun AppNavGraph(
                 TransactionScreen(permissions = permissions)
             }
             composable<SelectSavingType>{
-                SelectSavingTypeScreen(navController)
+                SelectSavingTypeScreen(navController, permissions = permissions)
             }
 
             composable<CreateSavingTicket>(

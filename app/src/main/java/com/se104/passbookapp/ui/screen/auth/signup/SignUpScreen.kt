@@ -157,7 +157,7 @@ fun SignUpScreen(
                 },
                 errorMessage = uiState.confirmPasswordError,
                 validate = {
-                    viewModel.validate("password")
+                    viewModel.validate("confirmPassword")
                 },
                 keyboardOptions = KeyboardOptions.Default.copy(
                     keyboardType = KeyboardType.Password,
@@ -244,7 +244,7 @@ fun SignUpScreen(
             onClick = {
                 viewModel.onAction(SignUp.Action.SignUpClicked)
             },
-            enable = !uiState.loading
+            enable = uiState.isValid && !uiState.loading
         )
 
         if (showSuccessDialog) {

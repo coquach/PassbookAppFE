@@ -107,7 +107,7 @@ fun VerifyEmailScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text(
-                    text = "Nhập otp được gửi đến email",
+                    text = "Nhập OTP được gửi đến email",
                     color = MaterialTheme.colorScheme.outline,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.ExtraBold,

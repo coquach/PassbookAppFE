@@ -22,8 +22,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
 import androidx.compose.material.icons.filled.BarChart
-import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -47,16 +47,19 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
+import com.se104.passbookapp.data.model.MonthlyReport
+import com.se104.passbookapp.data.model.MonthlyReportDetails
 import com.se104.passbookapp.ui.component.MonthPicker
-import com.se104.passbookapp.ui.component.report.BarChartFromEntries
 import com.se104.passbookapp.ui.component.report.ChartEntry
-import com.se104.passbookapp.ui.component.report.LineChartFromEntries
+import com.se104.passbookapp.ui.component.report.ChartLine
+import com.se104.passbookapp.ui.component.report.LineChartWithLegend
 import com.se104.passbookapp.ui.screen.components.HeaderDefaultView
 import com.se104.passbookapp.ui.screen.components.LoadingAnimation
 import com.se104.passbookapp.ui.screen.components.Nothing
 import com.se104.passbookapp.ui.screen.components.Retry
 import com.se104.passbookapp.ui.screen.components.TabWithPager
 import com.se104.passbookapp.utils.StringUtils
+import java.math.BigDecimal
 
 @Composable
 fun ReportScreen(
@@ -84,7 +87,7 @@ fun ReportScreen(
 
     LaunchedEffect(Unit) {
         viewModel.getMonthlyReports()
-        viewModel.getDailyReports()
+        viewModel.getMonthlyReport()
     }
 
 
@@ -136,20 +139,20 @@ fun ReportScreen(
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(350.dp)
+                                .height(400.dp)
                         ) {
-                            when (uiState.monthlyReportState) {
-                                is ReportState.MonthlyReportState.Error -> {
+                            when (uiState.monthlyReportsState) {
+                                is ReportState.MonthlyReportsState.Error -> {
                                     Retry(
                                         modifier = Modifier.fillMaxSize(),
                                         onClicked = {
-                                            viewModel.onAction(ReportState.Action.GetMonthlyReport)
+                                            viewModel.getMonthlyReports()
                                         },
-                                        message = (uiState.monthlyReportState as ReportState.MonthlyReportState.Error).message,
+                                        message = (uiState.monthlyReportsState as ReportState.MonthlyReportsState.Error).message,
                                     )
                                 }
 
-                                ReportState.MonthlyReportState.Loading -> {
+                                ReportState.MonthlyReportsState.Loading -> {
                                     LoadingAnimation(
                                         modifier = Modifier
                                             .fillMaxSize()
@@ -157,7 +160,7 @@ fun ReportScreen(
                                     )
                                 }
 
-                                ReportState.MonthlyReportState.Success -> {
+                                ReportState.MonthlyReportsState.Success -> {
                                     if (uiState.monthlyReports.isEmpty()) {
                                         Nothing(
                                             modifier = Modifier.fillMaxSize(),
@@ -167,14 +170,10 @@ fun ReportScreen(
 
                                         )
                                     } else {
-                                        val totalIncomes = uiState.monthlyReports.map {
-                                            ChartEntry(
-                                                xLabel = StringUtils.formatLocalDate(it.reportMonth)!!,
-                                                value = it.totalIncome,
-                                            )
-                                        }
-                                        BarChartFromEntries(
-                                            entries = totalIncomes,
+                                        val lines = prepareChartLines(uiState.monthlyReports) { it.totalIncome }
+                                        LineChartWithLegend(
+                                            lines = lines,
+                                            modifier = Modifier.fillMaxSize()
                                         )
                                     }
 
@@ -188,20 +187,19 @@ fun ReportScreen(
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(350.dp)
+                                .height(400.dp)
                         ) {
-                            when (uiState.monthlyReportState) {
-                                is ReportState.MonthlyReportState.Error -> {
+                            when (uiState.monthlyReportsState) {
+                                is ReportState.MonthlyReportsState.Error -> {
                                     Retry(
                                         modifier = Modifier.fillMaxSize(),
                                         onClicked = {
-                                            viewModel.onAction(ReportState.Action.GetMonthlyReport)
-                                        },
-                                        message = (uiState.monthlyReportState as ReportState.MonthlyReportState.Error).message,
+                                            viewModel.getMonthlyReports()},
+                                        message = (uiState.monthlyReportsState as ReportState.MonthlyReportsState.Error).message,
                                     )
                                 }
 
-                                ReportState.MonthlyReportState.Loading -> {
+                                ReportState.MonthlyReportsState.Loading -> {
                                     LoadingAnimation(
                                         modifier = Modifier
                                             .fillMaxSize()
@@ -209,7 +207,7 @@ fun ReportScreen(
                                     )
                                 }
 
-                                ReportState.MonthlyReportState.Success -> {
+                                ReportState.MonthlyReportsState.Success -> {
                                     if (uiState.monthlyReports.isEmpty()) {
                                         Nothing(
                                             modifier = Modifier.fillMaxSize(),
@@ -219,14 +217,10 @@ fun ReportScreen(
 
                                         )
                                     } else {
-                                        val totalExpenses = uiState.monthlyReports.map {
-                                            ChartEntry(
-                                                xLabel = StringUtils.formatLocalDate(it.reportMonth)!!,
-                                                value = it.totalExpense,
-                                            )
-                                        }
-                                        BarChartFromEntries(
-                                            entries = totalExpenses,
+                                       val lines = prepareChartLines(uiState.monthlyReports) {it.totalExpense  }
+                                        LineChartWithLegend(
+                                            lines = lines,
+                                            modifier = Modifier.fillMaxSize()
                                         )
                                     }
 
@@ -239,20 +233,20 @@ fun ReportScreen(
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(350.dp)
+                                .height(400.dp)
                         ) {
-                            when (uiState.monthlyReportState) {
-                                is ReportState.MonthlyReportState.Error -> {
+                            when (uiState.monthlyReportsState) {
+                                is ReportState.MonthlyReportsState.Error -> {
                                     Retry(
                                         modifier = Modifier.fillMaxSize(),
                                         onClicked = {
-                                            viewModel.onAction(ReportState.Action.GetMonthlyReport)
+                                            viewModel.getMonthlyReports()
                                         },
-                                        message = (uiState.monthlyReportState as ReportState.MonthlyReportState.Error).message,
+                                        message = (uiState.monthlyReportsState as ReportState.MonthlyReportsState.Error).message,
                                     )
                                 }
 
-                                ReportState.MonthlyReportState.Loading -> {
+                                ReportState.MonthlyReportsState.Loading -> {
                                     LoadingAnimation(
                                         modifier = Modifier
                                             .fillMaxSize()
@@ -260,7 +254,7 @@ fun ReportScreen(
                                     )
                                 }
 
-                                ReportState.MonthlyReportState.Success -> {
+                                ReportState.MonthlyReportsState.Success -> {
                                     if (uiState.monthlyReports.isEmpty()) {
                                         Nothing(
                                             modifier = Modifier.fillMaxSize(),
@@ -270,14 +264,10 @@ fun ReportScreen(
 
                                         )
                                     } else {
-                                        val difference = uiState.monthlyReports.map {
-                                            ChartEntry(
-                                                xLabel = StringUtils.formatLocalDate(it.reportMonth)!!,
-                                                value = it.difference,
-                                            )
-                                        }
-                                        BarChartFromEntries(
-                                            entries = difference,
+                                        val lines = prepareChartLines(uiState.monthlyReports) {it.difference }
+                                        LineChartWithLegend(
+                                            lines = lines,
+                                            modifier = Modifier.fillMaxSize()
                                         )
                                     }
 
@@ -303,8 +293,8 @@ fun ReportScreen(
                         viewModel.onAction(
                             ReportState.Action.OnChangeSelectedMonthYear(
 
-                                uiState.selectedYear,
-                                uiState.selectedMonth - 1,
+                               year = uiState.selectedYear,
+                                month = uiState.selectedMonth - 1,
                             )
                         )
                     },
@@ -323,7 +313,7 @@ fun ReportScreen(
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 MonthSection(
-                    month = uiState.selectedMonth + 1,
+                    month = uiState.selectedMonth,
                     year = uiState.selectedYear,
                     onClicked = { month, year ->
                         viewModel.onAction(
@@ -341,8 +331,8 @@ fun ReportScreen(
                         viewModel.onAction(
                             ReportState.Action.OnChangeSelectedMonthYear(
 
-                                uiState.selectedYear,
-                                uiState.selectedMonth + 1,
+                                year =uiState.selectedYear,
+                                month = uiState.selectedMonth + 1,
                             )
                         )
                     },
@@ -360,170 +350,183 @@ fun ReportScreen(
                     )
                 }
             }
+            Box(
+                modifier = Modifier.fillMaxWidth().height(500.dp),
 
-            TabWithPager(
-                tabs = listOf("Tổng thu", "Tổng chi", "Chênh lệch"),
-                pages = listOf(
-                    {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(350.dp)
-                        ) {
-                            when (uiState.dailyReportState) {
-                                is ReportState.DailyReportState.Error -> {
-                                    Retry(
-                                        modifier = Modifier.fillMaxSize(),
-                                        onClicked = {
-                                            viewModel.onAction(ReportState.Action.GetDailyReport)
-                                        },
-                                        message = (uiState.dailyReportState as ReportState.DailyReportState.Error).message,
-                                    )
-                                }
-
-                                ReportState.DailyReportState.Loading -> {
-                                    LoadingAnimation(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .align(Alignment.Center),
-                                    )
-                                }
-
-                                ReportState.DailyReportState.Success -> {
-                                    if (uiState.dailyReports.isEmpty()) {
-                                        Nothing(
-                                            modifier = Modifier.fillMaxSize(),
-                                            icon = Icons.Default.BarChart,
-                                            text = "Chưa có thống kê ngày"
-                                        )
-                                    } else {
-                                        val totalIncomes = uiState.dailyReports.map {
-                                            ChartEntry(
-                                                xLabel = StringUtils.formatLocalDate(it.reportDate)!!,
-                                                value = it.totalIncome,
-                                            )
-                                        }
-                                        BarChartFromEntries(
-                                            entries = totalIncomes,
-                                        )
-                                    }
-
-                                }
-                            }
-                        }
-
-
-                    },
-                    {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(350.dp)
-                        ) {
-                            when (uiState.dailyReportState) {
-                                is ReportState.DailyReportState.Error -> {
-                                    Retry(
-                                        modifier = Modifier.fillMaxSize(),
-                                        onClicked = {
-                                            viewModel.onAction(ReportState.Action.GetDailyReport)
-                                        },
-                                        message = (uiState.dailyReportState as ReportState.DailyReportState.Error).message,
-                                    )
-                                }
-
-                                ReportState.DailyReportState.Loading -> {
-                                    LoadingAnimation(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .align(Alignment.Center),
-                                    )
-                                }
-
-                                ReportState.DailyReportState.Success -> {
-                                    if (uiState.dailyReports.isEmpty()) {
-                                        Nothing(
-                                            modifier = Modifier.fillMaxSize(),
-                                            icon = Icons.Default.BarChart,
-                                            text = "Chưa có thống kê ngày"
-                                        )
-                                    } else {
-                                        val totalExpenses = uiState.dailyReports.map {
-                                            ChartEntry(
-                                                xLabel = StringUtils.formatLocalDate(it.reportDate)!!,
-                                                value = it.totalExpense,
-                                            )
-                                        }
-                                        BarChartFromEntries(
-                                            entries = totalExpenses,
-                                        )
-                                    }
-
-                                }
-                            }
-
-                        }
-
-                    }, {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(350.dp)
-                        ) {
-                            when (uiState.dailyReportState) {
-                                is ReportState.DailyReportState.Error -> {
-                                    Retry(
-                                        modifier = Modifier.fillMaxSize(),
-                                        onClicked = {
-                                            viewModel.onAction(ReportState.Action.GetDailyReport)
-                                        },
-                                        message = (uiState.dailyReportState as ReportState.DailyReportState.Error).message,
-                                    )
-                                }
-
-                                ReportState.DailyReportState.Loading -> {
-                                    LoadingAnimation(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .align(Alignment.Center),
-                                    )
-                                }
-
-                                ReportState.DailyReportState.Success -> {
-                                    if (uiState.dailyReports.isEmpty()) {
-                                        Nothing(
-                                            modifier = Modifier.fillMaxSize(),
-                                            icon = Icons.Default.BarChart,
-                                            text = "Chưa có thống kê ngày"
-                                        )
-                                    } else {
-                                        val difference = uiState.dailyReports.map {
-                                            ChartEntry(
-                                                xLabel = StringUtils.formatLocalDate(it.reportDate)!!,
-                                                value = it.difference,
-                                            )
-                                        }
-                                        BarChartFromEntries(
-                                            entries = difference,
-                                        )
-                                    }
-
-                                }
-                            }
-
-                        }
+            ){
+                when(uiState.monthlyReportState){
+                    is ReportState.MonthlyReportState.Error -> {
+                        val message = (uiState.monthlyReportState as ReportState.MonthlyReportState.Error).message
+                        Retry(
+                            message = message,
+                            onClicked = {
+                                viewModel.getMonthlyReport()
+                            },
+                            modifier = Modifier.fillMaxSize()
+                        )
                     }
+                    ReportState.MonthlyReportState.Loading -> {
+                        LoadingAnimation(
+                            modifier = Modifier.fillMaxSize().align(Alignment.Center)
+                        )
+                    }
+                    is ReportState.MonthlyReportState.Success -> {
+                        val monthlyReport = (uiState.monthlyReportState as ReportState.MonthlyReportState.Success).data
+                        MonthlyReportTable(monthlyReport)
+                    }
+                }
+            }
 
-                ),
-                onTabSelected = {},
-                modifier = Modifier.fillMaxWidth()
-
-            )
 
         }
 
 
     }
 }
+@Composable
+fun MonthlyReportTable(report: MonthlyReport) {
+    val headerStyle = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(MaterialTheme.shapes.extraLarge)
+                .background(MaterialTheme.colorScheme.background, MaterialTheme.shapes.extraLarge)
+                .padding(8.dp)
+            ,
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+
+
+            // Header row
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(MaterialTheme.shapes.large)
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f), MaterialTheme.shapes.large)
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Loại tiết kiệm",
+                    modifier = Modifier.weight(1f),
+                    style = headerStyle,
+                    color = MaterialTheme.colorScheme.primary,
+                    textAlign = TextAlign.Center
+                )
+                Text(
+                    text = "Tổng thu",
+                    modifier = Modifier.weight(1f),
+                    style = headerStyle
+                )
+                Text(
+                    text = "Tổng chi",
+                    modifier = Modifier.weight(1f),
+                    style = headerStyle
+                )
+                Text(
+                    text = "Chênh lệch",
+                    modifier = Modifier.weight(1f),
+                    style = headerStyle
+                )
+            }
+
+            // Data rows
+            if (report.monthlyReportDetails.isEmpty()) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Không có dữ liệu chi tiết cho tháng này",
+                        modifier = Modifier.weight(1f),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            } else {
+                report.monthlyReportDetails.forEach { detail ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = detail.savingTypeName,
+                            modifier = Modifier.weight(1f),
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Start
+                        )
+                        Text(
+                            text = StringUtils.formatCurrency(detail.totalIncome),
+                            modifier = Modifier.weight(1f),
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.Center,
+
+                        )
+                        Text(
+                            text = StringUtils.formatCurrency(detail.totalExpense),
+                            modifier = Modifier.weight(1f),
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                        Text(
+                            text = StringUtils.formatCurrency(detail.difference),
+                            modifier = Modifier.weight(1f),
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    }
+                }
+            }
+
+            // Tổng cộng
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 8.dp),
+                thickness = 1.dp,
+                color = MaterialTheme.colorScheme.outline
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+
+            ) {
+                Text(
+                    text = "Tổng cộng",
+                    modifier = Modifier.weight(1f),
+                    style = headerStyle
+                )
+                Text(
+                    text = StringUtils.formatCurrency(report.totalIncome),
+                    modifier = Modifier.weight(1f),
+                    style = headerStyle,
+                    textAlign = TextAlign.Center
+                )
+                Text(
+                    text = StringUtils.formatCurrency(report.totalExpense),
+                    modifier = Modifier.weight(1f),
+                    style = headerStyle,
+                    textAlign = TextAlign.Center
+                )
+                Text(
+                    text = StringUtils.formatCurrency(report.difference),
+                    modifier = Modifier.weight(1f),
+                    style = headerStyle,
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+
+
+}
+
 
 
 @Composable
@@ -574,6 +577,46 @@ fun MonthSection(
             cancelClicked = {
                 showDialog = false
             }
+        )
+    }
+}
+
+
+fun prepareChartLines(
+    reports: List<MonthlyReport>,
+    valueSelector: (MonthlyReportDetails) -> BigDecimal
+): List<ChartLine<BigDecimal>> {
+    val sortedReports = reports.sortedBy { it.reportMonth }
+    val monthLabels = sortedReports.map { "${it.reportMonth.monthValue}/${it.reportMonth.year}" }
+
+
+    val allSavingTypes = sortedReports
+        .flatMap { it.monthlyReportDetails }
+        .map { it.savingTypeName }
+        .toSet()
+
+    val savingTypeMap = allSavingTypes.associateWith { mutableListOf<ChartEntry<BigDecimal>>() }
+
+    for ((report, monthLabel) in sortedReports.zip(monthLabels)) {
+        val detailsByType = report.monthlyReportDetails.associateBy { it.savingTypeName }
+
+        for (type in allSavingTypes) {
+            val detail = detailsByType[type]
+            val value = detail?.let { valueSelector(it) } ?: BigDecimal.ZERO
+
+            savingTypeMap[type]?.add(
+                ChartEntry(
+                    xLabel = monthLabel,
+                    value = value
+                )
+            )
+        }
+    }
+
+    return savingTypeMap.map { (savingTypeName, entries) ->
+        ChartLine.create(
+            label = savingTypeName,
+            entries = entries
         )
     }
 }
