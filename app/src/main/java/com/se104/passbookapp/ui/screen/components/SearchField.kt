@@ -44,6 +44,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.se104.passbookapp.ui.screen.components.text_field.PassbookTextField
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -65,7 +66,7 @@ fun SearchField(
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-        FoodAppTextField(
+        PassbookTextField(
             value = searchInput,
             onValueChange = { searchChange(it) },
             placeholder = {

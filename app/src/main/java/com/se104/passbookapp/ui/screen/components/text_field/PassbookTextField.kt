@@ -3,9 +3,11 @@ package com.se104.passbookapp.ui.screen.components.text_field
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.LocalTextStyle
@@ -98,15 +100,7 @@ fun PassbookTextField(
             trailingIcon,
             prefix,
             suffix,
-            supportingText = {
-                if (errorText != null) {
-                    Text(
-                        text = errorText,
-                        color = MaterialTheme.colorScheme.error,
-                        fontSize = 12.sp
-                    )
-                }
-            },
+            supportingText ,
             isError,
             visualTransformation,
             keyboardOptions,

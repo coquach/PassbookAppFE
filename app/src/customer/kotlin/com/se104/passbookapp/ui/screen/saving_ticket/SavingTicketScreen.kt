@@ -140,7 +140,7 @@ fun SavingTicketScreen(
                 else -> "Id"
             },
             switchState = uiState.filter.order == "desc",
-            placeHolder = if (isViewAllTickets) "Tìm kiếm theo CCCD" else "Tìm kiếm theo số tiền gửi..."
+            placeHolder =    if (isViewAllTickets) "Tìm kiếm theo CCCD" else "Tìm kiếm theo số tiền gửi..."
         )
         DateRangePickerSample(
             modifier = Modifier.width(170.dp),
